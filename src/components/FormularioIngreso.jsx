@@ -34,9 +34,9 @@ export const FormularioIngreso = ({ monto, tasaRetencion, onMontoChange, onTasaC
         />
       </div>
 
-      <div className="space-y-2">
+      <div className="space-y-1">
         <label className="block text-sm font-medium text-slate-300">
-          Tasa de Retención <a href="https://www.sii.cl/destacados/boletas_honorarios/aumenta_retencion.html" className="block text-sm font-medium text-slate-500 hover:text-orange-600" >(Indicación SII)</a>
+          Tasa de Retención <a href="https://www.sii.cl/destacados/boletas_honorarios/aumenta_retencion.html" className="text-sm font-medium text-slate-500 hover:text-orange-600" target="_blank" title="Servicio de Impuestos Internos" >(Indicación SII)</a>
         </label>
         <select
           value={tasaRetencion}
