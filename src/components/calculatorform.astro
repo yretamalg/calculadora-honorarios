@@ -1,0 +1,42 @@
+---
+// Recibe las funciones onCalculate y onReset como propiedades
+const { onCalculate, onReset } = Astro.props;
+---
+<form>
+  <div>
+    <label for="grossAmount">Monto Bruto:</label>
+    <input
+      id="grossAmount"
+      type="number"
+      placeholder="Ingresa el monto bruto"
+      required
+    />
+  </div>
+  <div>
+    <label for="retentionRate">Tasa de Retención (%):</label>
+    <select id="retentionRate" required>
+      <option value="13,75">13,75%</option>
+      <option value="14,5">14,5%</option>
+      <option value="15,25">15,25%</option>
+      <option value="16">16%</option>
+      <option value="17">17%</option>
+    </select>
+  </div>
+  <div style="margin-top: 20px;">
+    <!-- Botón Calcular -->
+    <button
+      type="button"
+      onClick={onCalculate}
+    >
+      Calcular
+    </button>
+    <!-- Botón Borrar -->
+    <button
+      type="button"
+      onClick={onReset}
+      style="margin-left: 10px;"
+    >
+      Borrar
+    </button>
+  </div>
+</form>
