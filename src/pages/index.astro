@@ -1,101 +1,14 @@
 ---
-import CalculatorForm from "../components/CalculatorForm.astro";
-import ResultsDisplay from "../components/ResultsDisplay.astro";
-
-let results = null;
-
-const handleCalculate = () => {
-  const grossAmount = parseFloat((document.querySelector("#grossAmount") as HTMLInputElement).value);
-  const retentionRate = parseFloat((document.querySelector("#retentionRate") as HTMLSelectElement).value);
-  if (!isNaN(grossAmount) && !isNaN(retentionRate)) {
-    const retention = grossAmount * (retentionRate / 100);
-    const netAmount = grossAmount - retention;
-    results = { gross: grossAmount, retention, net: netAmount };
-  }
-};
-
-const handleReset = () => {
-  results = null;
-  (document.querySelector("#grossAmount") as HTMLInputElement).value = '';
-  (document.querySelector("#retentionRate") as HTMLSelectElement).value = '13.75'; // Restablecer tasa predeterminada
-};
+import CalculadoraRetencion from '../components/CalculadoraRetencion';
 ---
 
 <html lang="es">
   <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Calculadora de Boletas de Honorarios</title>
-    <style>
-      body {
-        background-color: #181818;
-        color: #c4c4c4;
-        font-family: Arial, sans-serif;
-        margin: 0;
-        padding: 0;
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        height: 100vh;
-      }
-
-      h1 {
-        text-align: center;
-        margin-bottom: 20px;
-      }
-
-      form {
-        background-color: #680000;
-        padding: 100px;
-        border-radius: 20px;
-        width: 500px;
-        box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.2);
-      }
-
-      label {
-        font-size: 16px;
-        margin-bottom: 8px;
-        display: block;
-      }
-
-      input,
-      select,
-      button {
-        width: 100%;
-        padding: 100px;
-        margin: 100px 0;
-        border-radius: 20px;
-        border: 1px solid #555;
-        background-color: #424242;
-        color: #ffffff;
-      }
-
-      button:hover {
-        background-color: #616161;
-      }
-
-      button:active {
-        background-color: #757575;
-      }
-
-      div {
-        text-align: center;
-      }
-
-      .results {
-        margin-top: 20px;
-      }
-
-      .results p {
-        margin: 5px 0;
-      }
-    </style>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width" />
+    <title>Calculadora de Honorarios</title>
   </head>
-  <body>
-    <div>
-      <h1>Calculadora de Boletas de Honorarios</h1>
-      <CalculatorForm onCalculate={handleCalculate} onReset={handleReset} />
-      <ResultsDisplay results={results} />
-    </div>
+  <body class="bg-slate-950 min-h-screen py-8">
+    <CalculadoraRetencion client:load />
   </body>
 </html>
