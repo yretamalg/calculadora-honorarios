@@ -1,14 +1,14 @@
 // components/Footer.jsx
 import React from 'react';
 
-const appVersion = '1.01';
+const appVersion = '1.02';
 
 export const Footer = () => {
   return (
     <footer className="text-white py-4 mt-8">
       <div className="container mx-auto px-4 text-center">
         <div className="mb-2">
-          <img src="/logoyr.svg" alt="Logo" className="mx-auto h-[40px] w-[40px] mb-2" />
+          <img src="/logoyr.svg" alt="Y.R. Logo" className="mx-auto h-[40px] w-[40px] mb-2" />
           <p className="text-xs text-gray-400">
             © 2024 Todos los derechos reservados | Versión {appVersion}
           </p>
