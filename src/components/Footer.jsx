@@ -61,10 +61,11 @@ export const Footer = () => {
           onClick={closeModal}
         >
           <div 
-            className="bg-slate-800 rounded-lg p-6 max-w-sm w-full mx-4"
+            className="bg-slate-800 rounded-lg p-6"
+            style={{ width: '500px', height: '400px' }}
             onClick={(e) => e.stopPropagation()}
           >
-            <div className="text-center">
+            <div className="text-center h-full flex flex-col justify-center">
               <h2 className="text-gray-300 text-xl font-bold mb-4">Contáctanos</h2>
               <p className="text-lg font-semibold text-orange-600 mb-4">
                 hola@vbox.pro
@@ -74,7 +75,7 @@ export const Footer = () => {
               </p>
               <button 
                 onClick={closeModal}
-                className="bg-orange-600 text-white px-4 py-2 hover:bg-orange-400 transition-colors rounded-full box-content w-32"
+                className="bg-orange-600 text-white px-4 py-2 hover:bg-orange-400 transition-colors rounded-full box-content w-32 mx-auto"
               >
                 Cerrar
               </button>

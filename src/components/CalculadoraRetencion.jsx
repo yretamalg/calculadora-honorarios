@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { FormularioIngreso } from './FormularioIngreso';
 import { BotonesControl } from './BotonesControl';
 import { ResultadosCalculo } from './ResultadosCalculo';
@@ -71,6 +71,20 @@ export const CalculadoraRetencion = () => {
       liquido: 0
     });
   };
+
+  // Effect to handle Enter key press for calculation
+  useEffect(() => {
+    const handleKeyPress = (event) => {
+      if (event.key === 'Enter' && monto) {
+        calcular();
+      }
+    };
+
+    window.addEventListener('keydown', handleKeyPress);
+    return () => {
+      window.removeEventListener('keydown', handleKeyPress);
+    };
+  }, [monto]);
 
   return (
     <div className="flex flex-col min-h-screen">
