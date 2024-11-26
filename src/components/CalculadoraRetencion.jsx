@@ -1,38 +1,58 @@
-import React, { useState, useEffect } from 'react';
-import { FormularioIngreso } from '../components/FormularioIngreso';
-import { BotonesControl } from '../components/BotonesControl';
-import { ResultadosCalculo } from '../components/ResultadosCalculo';
-import { Footer } from '../components/Footer';
-import SEO from '../components/SEO';
+import React, { useState } from 'react';
+import FormularioIngreso from './FormularioIngreso';
+import BotonesControl from './BotonesControl';
+import ResultadosCalculo from './ResultadosCalculo';
+import Footer from './Footer';
+import { TASAS_RETENCION, parsearMonto } from '../constants/config';
 
-export const CalculadoraRetencion = () => {
-  // (Previous code remains the same)
-  // ... (keep all the existing state and logic)
+const CalculadoraRetencion = () => {
+  const [monto, setMonto] = useState('');
+  const [tasaRetencion, setTasaRetencion] = useState(TASAS_RETENCION[0].valor.toString());
+  const [resultados, setResultados] = useState({
+    bruto: 0,
+    retencion: 0,
+    liquido: 0
+  });
+
+  const calcular = () => {
+    const montoNumerico = parsearMonto(monto);
+    if (!montoNumerico) return;
+
+    const tasa = parseFloat(tasaRetencion) / 100;
+    const montoBruto = montoNumerico / (1 - tasa);
+    const retencion = montoBruto * tasa;
+
+    setResultados({
+      bruto: montoBruto,
+      retencion: retencion,
+      liquido: montoNumerico
+    });
+  };
+
+  const limpiar = () => {
+    setMonto('');
+    setTasaRetencion(TASAS_RETENCION[0].valor.toString());
+    setResultados({
+      bruto: 0,
+      retencion: 0,
+      liquido: 0
+    });
+  };
 
   return (
     <div className="flex flex-col min-h-screen">
-      <SEO 
-        title="Calculadora de Retención de Honorarios - VBox Pro" 
-        description="Calcula fácilmente tu retención de honorarios para profesionales en Chile. Conoce tu monto bruto, líquido y retención según las tasas vigentes."
-        keywords="retención de honorarios, calculadora tributaria, impuestos chile, boleta de honorarios, sii chile"
-        canonical="https://www.vbox.pro"
-      />
       <div className="flex-grow container max-w-2xl mx-auto p-6 bg-slate-800 rounded-lg shadow-xl">
         <h1 className="text-slate-300 text-2xl font-bold text-center mb-6">
           Calculadora de Retención de Honorarios
         </h1>
         <div className="space-y-6">
-          {/* (Rest of the existing component remains the same) */}
           <FormularioIngreso
             monto={monto}
-            tasaRetencion={tasaSeleccionada.tasa.toString()}
+            tasaRetencion={tasaRetencion}
             onMontoChange={setMonto}
-            onTasaChange={(valor) => {
-              const tasaElegida = tasasRetencion.find(t => t.tasa.toString() === valor);
-              setTasaSeleccionada(tasaElegida);
-            }}
-            tasasRetencion={tasasRetencion.map(t => ({
-              valor: t.tasa.toString(), 
+            onTasaChange={setTasaRetencion}
+            tasasRetencion={TASAS_RETENCION.map(t => ({
+              valor: t.valor.toString(),
               etiqueta: t.etiqueta
             }))}
           />
@@ -42,7 +62,7 @@ export const CalculadoraRetencion = () => {
           />
           <ResultadosCalculo
             resultados={resultados}
-            tasaRetencion={tasaSeleccionada.tasa.toString()}
+            tasaRetencion={tasaRetencion}
           />
         </div>
       </div>

@@ -1,12 +1,16 @@
 ---
-import CalculadoraRetencion from '../components/CalculadoraRetencion';
+import CalculadoraRetencion from '../components/CalculadoraRetencion.jsx';
+import { APP_CONFIG } from '../constants/config';
 ---
 
 <html lang="es">
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width" />
-    <title>Calculadora de Honorarios</title>
+    <meta name="description" content="Calcula fácilmente tu retención de honorarios para profesionales en Chile. Conoce tu monto bruto, líquido y retención según las tasas vigentes." />
+    <meta name="keywords" content="retención de honorarios, calculadora tributaria, impuestos chile, boleta de honorarios, sii chile" />
+    <title>Calculadora de Retención de Honorarios - {APP_CONFIG.nombre}</title>
+    <link rel="canonical" href={APP_CONFIG.domain} />
   </head>
   <body class="bg-slate-950 min-h-screen py-8">
     <CalculadoraRetencion client:load />

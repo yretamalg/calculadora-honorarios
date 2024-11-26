@@ -1,6 +1,6 @@
 import React from 'react';
 
-export const BotonesControl = ({ onCalcular, onLimpiar }) => {
+const BotonesControl = ({ onCalcular, onLimpiar }) => {
   return (
     <div className="flex gap-4">
       <button
@@ -18,3 +18,5 @@ export const BotonesControl = ({ onCalcular, onLimpiar }) => {
     </div>
   );
 };
+
+export default BotonesControl;

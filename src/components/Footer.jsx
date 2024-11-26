@@ -1,9 +1,8 @@
 import React, { useState } from 'react';
-import Link from 'next/link';
+import { APP_CONFIG } from '../constants/config';
 
-export const Footer = () => {
+const Footer = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const appVersion = '1.1.4';
 
   const openModal = (e) => {
     e.preventDefault();
@@ -21,23 +20,23 @@ export const Footer = () => {
           <div className="mb-2">
             <img src="/logoyr.svg" alt="Y.R. Logo" className="mx-auto h-[40px] w-[40px] mb-2" />
             <p className="text-xs text-gray-400">
-              © 2024 Todos los derechos reservados | Versión {appVersion} <br />
+              © 2024 Todos los derechos reservados | Versión {APP_CONFIG.version} <br />
               No tenemos ninguna relación con el SII.cl
             </p>
           </div>
           <div className="flex justify-center space-x-4">
-            <Link 
+            <a 
               href="/terminos-de-uso"
               className="text-xs text-gray-300 hover:text-white transition-colors duration-300"
             >
               Términos de Uso
-            </Link>
-            <Link
+            </a>
+            <a
               href="/politica-de-privacidad"
               className="text-xs text-gray-300 hover:text-white transition-colors duration-300"
             >
               Privacidad
-            </Link>
+            </a>
             <a 
               href="#" 
               onClick={openModal}

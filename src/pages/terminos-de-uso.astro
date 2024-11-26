@@ -1,0 +1,59 @@
+---
+import { APP_CONFIG } from '../constants/config';
+import Footer from '../components/Footer';
+---
+
+<html lang="es">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width" />
+    <meta name="description" content="Términos de uso para la calculadora de retención de honorarios de VBox Pro" />
+    <title>Términos de Uso - {APP_CONFIG.nombre}</title>
+    <link rel="canonical" href={`${APP_CONFIG.domain}/terminos-de-uso`} />
+  </head>
+  <body class="bg-slate-950 min-h-screen">
+    <div class="min-h-screen bg-slate-900 text-gray-300 flex flex-col">
+      <div class="container mx-auto px-4 py-12 max-w-4xl flex-grow">
+        <h1 class="text-3xl font-bold mb-6 text-white">Términos de Uso</h1>
+        
+        <div class="space-y-4">
+          <section>
+            <h2 class="text-xl font-semibold mb-2 text-orange-500">1. Introducción</h2>
+            <p>
+              Bienvenido a la Calculadora de Retención de Honorarios de VBox Pro. 
+              Al utilizar esta herramienta, aceptas los siguientes términos de uso.
+            </p>
+          </section>
+          
+          <section>
+            <h2 class="text-xl font-semibold mb-2 text-orange-500">2. Uso de la Herramienta</h2>
+            <p>
+              Esta calculadora proporciona estimaciones basadas en las tasas de retención 
+              vigentes. Los resultados son solo referenciales y no constituyen 
+              asesoramiento tributario oficial.
+            </p>
+          </section>
+          
+          <section>
+            <h2 class="text-xl font-semibold mb-2 text-orange-500">3. Responsabilidad</h2>
+            <p>
+              VBox Pro no se hace responsable por decisiones tomadas basadas 
+              en los cálculos de esta herramienta. Siempre consulte con un 
+              profesional tributario para confirmación.
+            </p>
+          </section>
+        </div>
+        
+        <div class="mt-8 text-center">
+          <a 
+            href="/" 
+            class="inline-block px-4 py-2 text-white bg-orange-700 rounded-md hover:bg-orange-600 focus:outline-none focus:ring-2 focus:ring-orange-500 focus:ring-offset-2 transition-colors duration-300"
+          >
+            Volver a la Calculadora
+          </a>
+        </div>
+      </div>
+      <Footer client:load />
+    </div>
+  </body>
+</html>
