@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 
 export const Footer = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const appVersion = '1.1.2';
+  const appVersion = '1.1.3';
 
   const openModal = (e) => {
     e.preventDefault();

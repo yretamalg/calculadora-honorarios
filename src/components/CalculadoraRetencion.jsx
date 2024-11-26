@@ -5,7 +5,7 @@ import { ResultadosCalculo } from './ResultadosCalculo';
 import { Footer } from './Footer';
 
 export const CalculadoraRetencion = () => {
-  // Definir las tasas de retención con factores precisos
+  // Definir las tasas de retención con factores precisos nuevo calculo
   const tasasRetencion = [
     { 
       año: 2024, 
