@@ -25,26 +25,65 @@ export const ResultadosCalculo = ({ resultados, tasaRetencion }) => {
   };
 
   const montoBrutoCalculado = calcularMontoBruto();
+  const montoNumerico = parseFloat(resultados.liquido);
+  const retencionEnBruto = montoNumerico * (parseFloat(tasaRetencion) / 100);
 
   return (
-    <div className="space-y-4 bg-slate-800 p-6 rounded-lg ">
-      <div className="flex justify-between items-center border-b border-slate-700 pb-4">
-        <p className="text-slate-300 text-sm">Este es el monto por el cual debes hacer tu boleta:</p>
-        <p className="text-slate-100 text-2xl font-bold">{formatearNumero(montoBrutoCalculado)}</p>
+    <div className="space-y-4 bg-slate-800 p-6 rounded-lg">
+      <div 
+        className="border border-slate-700 rounded-lg p-4 mb-4"
+        style={{ boxShadow: 'inset 0 0 0 1px rgba(255,255,255,0.1)' }}
+      >
+        <div className="text-slate-300 text-2xl mb-2 font-bold">
+          Si lo pactado fue en valores líquidos
+        </div>
+        <div className="h-[40px]"></div>
+        <div className="flex justify-between items-center">
+          <p className="text-slate-300 text-sm leading-none">Este es el monto por el cual debes hacer tu boleta:</p>
+          <p className="text-slate-100 text-2xl font-bold leading-none">{formatearNumero(montoBrutoCalculado)}</p>
+        </div>
+        <div className="flex justify-between items-center border-t border-slate-700 pt-4 mt-4">
+          <p className="text-slate-300 text-sm leading-none">
+            La retención del {tasaRetencion}% corresponde al año {añoRetencion} es de:
+          </p>
+          <p className="text-red-400 text-2xl font-bold leading-none">
+            {formatearNumero(montoBrutoCalculado - resultados.liquido)}
+          </p>
+        </div>
+        <div className="flex justify-between items-center border-t border-slate-700 pt-4 mt-4 leading-none">
+          <p className="text-slate-300 text-sm leading-none">Recibirás un monto líquido a tu cuenta:</p>
+          <p className="text-green-400 text-4xl font-bold leading-none">
+            {formatearNumero(resultados.liquido)}
+          </p>
+        </div>
       </div>
-      <div className="flex justify-between items-center border-b border-slate-700 pb-4">
-        <p className="text-slate-300 text-sm">
-          La retención del {tasaRetencion}% corresponde al año {añoRetencion} es de:
-        </p>
-        <p className="text-red-400 text-2xl font-bold">
-          {formatearNumero(montoBrutoCalculado - resultados.liquido)}
-        </p>
-      </div>
-      <div className="flex justify-between items-center">
-        <p className="text-slate-300 text-sm">Recibirás un monto líquido a tu cuenta:</p>
-        <p className="text-green-400 text-4xl font-bold">
-          {formatearNumero(resultados.liquido)}
-        </p>
+
+      <div 
+        className="border border-slate-700 rounded-lg p-4"
+        style={{ boxShadow: 'inset 0 0 0 1px rgba(255,255,255,0.1)' }}
+      >
+        <div className="text-slate-300 text-2xl mb-2 font-bold">
+          Si lo pactado fue en valores brutos
+        </div>
+        <div className="h-[40px]"></div>
+        <div className="flex justify-between items-center">
+          <p className="text-slate-300 text-sm leading-none">Este es el monto por el cual debes hacer tu boleta:</p>
+          <p className="text-slate-100 text-2xl font-bold leading-none">{formatearNumero(montoNumerico)}</p>
+        </div>
+        <div className="flex justify-between items-center border-t border-slate-700 pt-4 mt-4">
+          <p className="text-slate-300 text-sm leading-none">
+            La retención del {tasaRetencion}% corresponde al año {añoRetencion} es de:
+          </p>
+          <p className="text-red-400 text-2xl font-bold leading-none">
+            {formatearNumero(retencionEnBruto)}
+          </p>
+        </div>
+        <div className="flex justify-between items-center border-t border-slate-700 pt-4 mt-4">
+          <p className="text-slate-300 text-sm leading-none">Recibirás un monto líquido a tu cuenta:</p>
+          <p className="text-green-400 text-4xl font-bold leading-none">
+            {formatearNumero(montoNumerico - retencionEnBruto)}
+          </p>
+        </div>
       </div>
     </div>
   );
