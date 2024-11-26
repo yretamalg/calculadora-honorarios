@@ -3,39 +3,46 @@ import FormularioIngreso from './FormularioIngreso';
 import BotonesControl from './BotonesControl';
 import ResultadosCalculo from './ResultadosCalculo';
 import Footer from './Footer';
-import { TASAS_RETENCION, parsearMonto } from '../constants/config';
+import { TASAS_RETENCION, parsearMonto, calcularMontos } from '../constants/config';
 
 const CalculadoraRetencion = () => {
   const [monto, setMonto] = useState('');
   const [tasaRetencion, setTasaRetencion] = useState(TASAS_RETENCION[0].valor.toString());
   const [resultados, setResultados] = useState({
-    bruto: 0,
-    retencion: 0,
-    liquido: 0
+    desdeValoresLiquidos: {
+      bruto: 0,
+      retencion: 0,
+      liquido: 0
+    },
+    desdeValoresBrutos: {
+      bruto: 0,
+      retencion: 0,
+      liquido: 0
+    }
   });
 
   const calcular = () => {
     const montoNumerico = parsearMonto(monto);
     if (!montoNumerico) return;
 
-    const tasa = parseFloat(tasaRetencion) / 100;
-    const montoBruto = montoNumerico / (1 - tasa);
-    const retencion = montoBruto * tasa;
-
-    setResultados({
-      bruto: montoBruto,
-      retencion: retencion,
-      liquido: montoNumerico
-    });
+    const resultadosCalculados = calcularMontos(montoNumerico, tasaRetencion);
+    setResultados(resultadosCalculados);
   };
 
   const limpiar = () => {
     setMonto('');
     setTasaRetencion(TASAS_RETENCION[0].valor.toString());
     setResultados({
-      bruto: 0,
-      retencion: 0,
-      liquido: 0
+      desdeValoresLiquidos: {
+        bruto: 0,
+        retencion: 0,
+        liquido: 0
+      },
+      desdeValoresBrutos: {
+        bruto: 0,
+        retencion: 0,
+        liquido: 0
+      }
     });
   };
 

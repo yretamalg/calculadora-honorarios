@@ -17,20 +17,22 @@ const ResultadosCalculo = ({ resultados, tasaRetencion }) => {
         <div className="h-[40px]"></div>
         <div className="flex justify-between items-center">
           <p className="text-slate-300 text-sm leading-none">Este es el monto por el cual debes hacer tu boleta:</p>
-          <p className="text-slate-100 text-2xl font-bold leading-none">{formatearMonto(resultados.bruto)}</p>
+          <p className="text-slate-100 text-2xl font-bold leading-none">
+            {formatearMonto(resultados.desdeValoresLiquidos.bruto)}
+          </p>
         </div>
         <div className="flex justify-between items-center border-t border-slate-700 pt-4 mt-4">
           <p className="text-slate-300 text-sm leading-none">
             La retención del {tasaRetencion}% corresponde al año {añoRetencion} es de:
           </p>
           <p className="text-red-400 text-2xl font-bold leading-none">
-            {formatearMonto(resultados.retencion)}
+            {formatearMonto(resultados.desdeValoresLiquidos.retencion)}
           </p>
         </div>
         <div className="flex justify-between items-center border-t border-slate-700 pt-4 mt-4 leading-none">
           <p className="text-slate-300 text-sm leading-none">Recibirás un monto líquido a tu cuenta:</p>
           <p className="text-green-400 text-4xl font-bold leading-none">
-            {formatearMonto(resultados.liquido)}
+            {formatearMonto(resultados.desdeValoresLiquidos.liquido)}
           </p>
         </div>
       </div>
@@ -45,20 +47,22 @@ const ResultadosCalculo = ({ resultados, tasaRetencion }) => {
         <div className="h-[40px]"></div>
         <div className="flex justify-between items-center">
           <p className="text-slate-300 text-sm leading-none">Este es el monto por el cual debes hacer tu boleta:</p>
-          <p className="text-slate-100 text-2xl font-bold leading-none">{formatearMonto(resultados.liquido)}</p>
+          <p className="text-slate-100 text-2xl font-bold leading-none">
+            {formatearMonto(resultados.desdeValoresBrutos.bruto)}
+          </p>
         </div>
         <div className="flex justify-between items-center border-t border-slate-700 pt-4 mt-4">
           <p className="text-slate-300 text-sm leading-none">
             La retención del {tasaRetencion}% corresponde al año {añoRetencion} es de:
           </p>
           <p className="text-red-400 text-2xl font-bold leading-none">
-            {formatearMonto(resultados.liquido * (parseFloat(tasaRetencion) / 100))}
+            {formatearMonto(resultados.desdeValoresBrutos.retencion)}
           </p>
         </div>
         <div className="flex justify-between items-center border-t border-slate-700 pt-4 mt-4">
           <p className="text-slate-300 text-sm leading-none">Recibirás un monto líquido a tu cuenta:</p>
           <p className="text-green-400 text-4xl font-bold leading-none">
-            {formatearMonto(resultados.liquido * (1 - parseFloat(tasaRetencion) / 100))}
+            {formatearMonto(resultados.desdeValoresBrutos.liquido)}
           </p>
         </div>
       </div>
