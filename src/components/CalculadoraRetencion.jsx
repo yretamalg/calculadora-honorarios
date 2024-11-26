@@ -1,4 +1,3 @@
-// components/CalculadoraRetencion.jsx
 import React, { useState } from 'react';
 import { FormularioIngreso } from './FormularioIngreso';
 import { BotonesControl } from './BotonesControl';
@@ -6,8 +5,42 @@ import { ResultadosCalculo } from './ResultadosCalculo';
 import { Footer } from './Footer';
 
 export const CalculadoraRetencion = () => {
+  // Definir las tasas de retención con factores precisos
+  const tasasRetencion = [
+    { 
+      año: 2024, 
+      tasa: 13.75, 
+      factor: 0.8625, 
+      etiqueta: '13,75% (año 2024)' 
+    },
+    { 
+      año: 2025, 
+      tasa: 14.50, 
+      factor: 0.855, 
+      etiqueta: '14,50% (año 2025)' 
+    },
+    { 
+      año: 2026, 
+      tasa: 15.25, 
+      factor: 0.8475, 
+      etiqueta: '15,25% (año 2026)' 
+    },
+    { 
+      año: 2027, 
+      tasa: 16.00, 
+      factor: 0.84, 
+      etiqueta: '16,00% (año 2027)' 
+    },
+    { 
+      año: 2028, 
+      tasa: 17.00, 
+      factor: 0.83, 
+      etiqueta: '17,00% (año 2028)' 
+    }
+  ];
+
   const [monto, setMonto] = useState('');
-  const [tasaRetencion, setTasaRetencion] = useState('13.75');
+  const [tasaSeleccionada, setTasaSeleccionada] = useState(tasasRetencion[0]);
   const [resultados, setResultados] = useState({
     bruto: 0,
     retencion: 0,
@@ -18,9 +51,9 @@ export const CalculadoraRetencion = () => {
     const montoNumerico = parseFloat(monto.replace(/\D/g, ''));
     if (!montoNumerico || isNaN(montoNumerico)) return;
 
-    const tasa = parseFloat(tasaRetencion) / 100;
-    const montoBruto = montoNumerico / (1 - tasa);
-    const retencion = montoBruto * tasa;
+    // Cálculo con el factor específico para el año
+    const montoBruto = montoNumerico / tasaSeleccionada.factor;
+    const retencion = montoBruto * (tasaSeleccionada.tasa / 100);
 
     setResultados({
       bruto: montoBruto,
@@ -31,7 +64,7 @@ export const CalculadoraRetencion = () => {
 
   const limpiar = () => {
     setMonto('');
-    setTasaRetencion('13.75');
+    setTasaSeleccionada(tasasRetencion[0]);
     setResultados({
       bruto: 0,
       retencion: 0,
@@ -48,9 +81,16 @@ export const CalculadoraRetencion = () => {
         <div className="space-y-6">
           <FormularioIngreso
             monto={monto}
-            tasaRetencion={tasaRetencion}
+            tasaRetencion={tasaSeleccionada.tasa.toString()}
             onMontoChange={setMonto}
-            onTasaChange={setTasaRetencion}
+            onTasaChange={(valor) => {
+              const tasaElegida = tasasRetencion.find(t => t.tasa.toString() === valor);
+              setTasaSeleccionada(tasaElegida);
+            }}
+            tasasRetencion={tasasRetencion.map(t => ({
+              valor: t.tasa.toString(), 
+              etiqueta: t.etiqueta
+            }))}
           />
           <BotonesControl
             onCalcular={calcular}
@@ -58,7 +98,7 @@ export const CalculadoraRetencion = () => {
           />
           <ResultadosCalculo
             resultados={resultados}
-            tasaRetencion={tasaRetencion}
+            tasaRetencion={tasaSeleccionada.tasa.toString()}
           />
         </div>
       </div>
