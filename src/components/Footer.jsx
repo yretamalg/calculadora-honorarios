@@ -1,8 +1,9 @@
 import React, { useState } from 'react';
+import Link from 'next/link';
 
 export const Footer = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const appVersion = '1.1.3';
+  const appVersion = '1.1.4';
 
   const openModal = (e) => {
     e.preventDefault();
@@ -25,18 +26,18 @@ export const Footer = () => {
             </p>
           </div>
           <div className="flex justify-center space-x-4">
-            <a 
+            <Link 
               href="/terminos-de-uso"
               className="text-xs text-gray-300 hover:text-white transition-colors duration-300"
             >
               Términos de Uso
-            </a>
-            <a
+            </Link>
+            <Link
               href="/politica-de-privacidad"
               className="text-xs text-gray-300 hover:text-white transition-colors duration-300"
             >
               Privacidad
-            </a>
+            </Link>
             <a 
               href="#" 
               onClick={openModal}

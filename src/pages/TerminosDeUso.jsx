@@ -1,26 +1,55 @@
-// pages/TerminosDeUso.jsx
 import React from 'react';
+import SEO from '../components/SEO';
+import Link from 'next/link';
+import { Footer } from '../components/Footer';
 
-export const TerminosDeUso = () => {
+export default function TerminosDeUso() {
   return (
-    <div className="container mx-auto p-6 bg-slate-800 rounded-lg shadow-lg">
-      <h1 className="text-slate-300 text-2xl font-bold mb-6">Términos de Uso</h1>
-      <div className="space-y-4 text-slate-400">
-        <p>
-          Bienvenido a nuestra Calculadora de Honorarios. Al utilizar este servicio, aceptas estar sujeto a estos términos y condiciones.
-        </p>
-        <p>
-          Usted es responsable de proporcionar información precisa y actualizada al utilizar la calculadora. No nos hacemos responsables por cualquier daño o pérdida que surja del uso de esta herramienta.
-        </p>
-        <p>
-          Nos reservamos el derecho de modificar estos términos en cualquier momento sin previo aviso. Es su responsabilidad revisar periódicamente los términos de uso.
-        </p>
-        <p>
-          Si tiene alguna pregunta o inquietud, no dude en ponerse en contacto con nuestro equipo de soporte.
-        </p>
+    <div className="min-h-screen bg-slate-900 text-gray-300">
+      <SEO 
+        title="Términos de Uso - Calculadora de Retención" 
+        description="Términos de uso para la calculadora de retención de honorarios de VBox Pro"
+      />
+      
+      <div className="container mx-auto px-4 py-12 max-w-4xl">
+        <h1 className="text-3xl font-bold mb-6 text-white">Términos de Uso</h1>
+        
+        <div className="space-y-4">
+          <section>
+            <h2 className="text-xl font-semibold mb-2 text-orange-500">1. Introducción</h2>
+            <p>
+              Bienvenido a la Calculadora de Retención de Honorarios de VBox Pro. 
+              Al utilizar esta herramienta, aceptas los siguientes términos de uso.
+            </p>
+          </section>
+          
+          <section>
+            <h2 className="text-xl font-semibold mb-2 text-orange-500">2. Uso de la Herramienta</h2>
+            <p>
+              Esta calculadora proporciona estimaciones basadas en las tasas de retención 
+              vigentes. Los resultados son solo referenciales y no constituyen 
+              asesoramiento tributario oficial.
+            </p>
+          </section>
+          
+          <section>
+            <h2 className="text-xl font-semibold mb-2 text-orange-500">3. Responsabilidad</h2>
+            <p>
+              VBox Pro no se hace responsable por decisiones tomadas basadas 
+              en los cálculos de esta herramienta. Siempre consulte con un 
+              profesional tributario para confirmación.
+            </p>
+          </section>
+        </div>
+        
+        <div className="mt-8 text-center">
+          <Link href="/" className="text-orange-500 hover:underline">
+            Volver a la Calculadora
+          </Link>
+        </div>
       </div>
+      
+      <Footer />
     </div>
   );
-};
-
-export default TerminosDeUso;
+}

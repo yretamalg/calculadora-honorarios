@@ -1,26 +1,53 @@
-// pages/PoliticaDePrivacidad.jsx
 import React from 'react';
+import SEO from '../components/SEO';
+import Link from 'next/link';
+import { Footer } from '../components/Footer';
 
-export const PoliticaDePrivacidad = () => {
+export default function PoliticaDePrivacidad() {
   return (
-    <div className="container mx-auto p-6 bg-slate-800 rounded-lg shadow-lg">
-      <h1 className="text-slate-300 text-2xl font-bold mb-6">Política de Privacidad</h1>
-      <div className="space-y-4 text-slate-400">
-        <p>
-          Nos comprometemos a proteger la privacidad de nuestros usuarios. Esta política describe cómo recopilamos, utilizamos y protegemos la información personal que nos proporciona.
-        </p>
-        <p>
-          Recopilamos únicamente la información necesaria para brindarle el servicio de la Calculadora de Honorarios, como el monto y la tasa de retención. Esta información no se compartirá ni se utilizará para ningún otro fin.
-        </p>
-        <p>
-          Implementamos medidas de seguridad adecuadas para proteger su información contra accesos no autorizados, uso indebido o divulgación.
-        </p>
-        <p>
-          Si tiene alguna pregunta o inquietud sobre nuestra política de privacidad, no dude en ponerse en contacto con nuestro equipo de soporte.
-        </p>
+    <div className="min-h-screen bg-slate-900 text-gray-300">
+      <SEO 
+        title="Política de Privacidad - Calculadora de Retención" 
+        description="Política de privacidad para la calculadora de retención de honorarios de VBox Pro"
+      />
+      
+      <div className="container mx-auto px-4 py-12 max-w-4xl">
+        <h1 className="text-3xl font-bold mb-6 text-white">Política de Privacidad</h1>
+        
+        <div className="space-y-4">
+          <section>
+            <h2 className="text-xl font-semibold mb-2 text-orange-500">1. Información Recopilada</h2>
+            <p>
+              No recopilamos ni almacenamos información personal de los usuarios 
+              que utilizan la Calculadora de Retención de Honorarios.
+            </p>
+          </section>
+          
+          <section>
+            <h2 className="text-xl font-semibold mb-2 text-orange-500">2. Uso de Datos</h2>
+            <p>
+              Los cálculos realizados son completamente confidenciales y 
+              no son registrados ni compartidos con terceros.
+            </p>
+          </section>
+          
+          <section>
+            <h2 className="text-xl font-semibold mb-2 text-orange-500">3. Cookies</h2>
+            <p>
+              Esta aplicación no utiliza cookies para rastrear la información 
+              de los usuarios.
+            </p>
+          </section>
+        </div>
+        
+        <div className="mt-8 text-center">
+          <Link href="/" className="text-orange-500 hover:underline">
+            Volver a la Calculadora
+          </Link>
+        </div>
       </div>
+      
+      <Footer />
     </div>
   );
-};
-
-export default PoliticaDePrivacidad;
+}
