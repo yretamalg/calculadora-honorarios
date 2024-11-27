@@ -5,7 +5,6 @@ import { SEO_CONFIG, STRUCTURED_DATA, PAGE_METADATA } from '../constants/seo';
 
 const { home: pageMetadata } = PAGE_METADATA;
 
-// Enhance the default WebApplication schema with additional data
 const schemaData = {
     ...STRUCTURED_DATA.webApplication,
     "dateModified": new Date().toISOString(),
@@ -34,7 +33,7 @@ const schemaData = {
     schemaType="WebApplication"
     schemaData={schemaData}
 >
-    <main>
+    <main class="pt-8"> <!-- Agregado el padding top de 32px (pt-8 en Tailwind) -->
         <CalculadoraRetencion client:load />
     </main>
 </Layout>
