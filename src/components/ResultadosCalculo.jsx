@@ -1,4 +1,3 @@
-import React from 'react';
 import { TASAS_RETENCION, formatearMonto } from '../constants/config';
 
 const ResultadosCalculo = ({ resultados, tasaRetencion }) => {

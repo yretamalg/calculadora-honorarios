@@ -1,5 +1,3 @@
-import React from 'react';
-
 const BotonesControl = ({ onCalcular, onLimpiar }) => {
   return (
     <div className="flex gap-4">

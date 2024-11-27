@@ -31,7 +31,7 @@ export const SEO_CONFIG = {
     ],
     languageAlternates: [
         {
-            hrefLang: 'es-CL',
+            hrefLang: 'es-CL',  // Cambiado de hrefLang a hrefLang
             href: APP_CONFIG.domain
         }
     ]

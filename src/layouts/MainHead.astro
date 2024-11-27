@@ -52,7 +52,11 @@ const languageAlternates = SEO_CONFIG.languageAlternates || [];
 
 <!-- Language Alternates -->
 {languageAlternates.map((alternate) => (
-    <link rel="alternate" hrefLang={alternate.hrefLang} href={alternate.href} />
+    <link 
+        rel="alternate" 
+        hreflang={alternate.hrefLang} 
+        href={alternate.href}
+    />
 ))}
 
 <!-- Additional Meta Tags -->
