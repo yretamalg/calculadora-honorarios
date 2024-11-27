@@ -45,7 +45,7 @@ const FormularioIngreso = ({ monto, tasaRetencion, onMontoChange, onTasaChange, 
     <div className="space-y-4">
       <div>
         <label htmlFor="monto" className="block text-sm font-medium text-slate-300 mb-2">
-          Ingresa el monto:
+          Ingresa el monto a calcular:
         </label>
         <input
           type="text"
