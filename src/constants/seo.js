@@ -1,8 +1,8 @@
 import { APP_CONFIG } from './config';
 
 export const SEO_CONFIG = {
-    defaultTitle: 'Calculadora de Retención de Honorarios Chile 2024',
-    titleTemplate: '%s | VBox Pro',
+    defaultTitle: 'Calculadora de Retención de Honorarios Chile 2024-2028',
+    titleTemplate: '%s | vBox Pro',
     defaultDescription: 'Calcula fácilmente tu retención de honorarios para profesionales en Chile. Conoce tu monto bruto, líquido y retención según las tasas vigentes 2024-2028.',
     longDescription: `Herramienta gratuita para calcular la retención de honorarios en Chile. 
                      Incluye las tasas actualizadas desde 2024 hasta 2028, permite calcular montos 
@@ -18,7 +18,7 @@ export const SEO_CONFIG = {
         },
         {
             name: 'author',
-            content: 'VBox Pro'
+            content: 'vBox Pro'
         },
         {
             name: 'application-name',
