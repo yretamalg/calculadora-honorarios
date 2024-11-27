@@ -61,24 +61,21 @@ const Footer = () => {
           onClick={closeModal}
         >
           <div 
-            className="bg-slate-800 rounded-lg p-6"
+            className="bg-slate-800 rounded-lg p-6 relative"
             style={{ width: '500px', height: '400px' }}
             onClick={(e) => e.stopPropagation()}
           >
-            <div className="text-center h-full flex flex-col justify-center">
-              <h2 className="text-gray-300 text-xl font-bold mb-4">Contáctanos</h2>
-              <p className="text-lg font-semibold text-orange-600 mb-4">
+            <button 
+              onClick={closeModal}
+              className="absolute top-4 right-4 text-gray-400 hover:text-white text-xl font-bold"
+              aria-label="Cerrar"
+            >
+              ×
+            </button>
+            <div className="text-center h-full flex items-center justify-center">
+              <p className="text-lg font-semibold text-orange-600">
                 hola@vbox.pro
               </p>
-              <p className="text-sm text-gray-300 mb-6">
-                Estamos disponibles para responder tus preguntas
-              </p>
-              <button 
-                onClick={closeModal}
-                className="bg-orange-600 text-white px-4 py-2 hover:bg-orange-400 transition-colors rounded-full box-content w-32 mx-auto"
-              >
-                Cerrar
-              </button>
             </div>
           </div>
         </div>
