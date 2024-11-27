@@ -1,50 +1,60 @@
 ---
-interface Props {
-	title: string;
+import MainHead from './MainHead.astro';
+import { SEO_CONFIG, STRUCTURED_DATA } from '../constants/seo';
+import { generateStructuredData } from '../utils/seoHelpers';
+
+export interface Props {
+    title?: string;
+    description?: string;
+    image?: string;
+    noindex?: boolean;
+    schemaType?: string;
+    schemaData?: Record<string, any>;
 }
 
-const { title } = Astro.props;
+const {
+    title = SEO_CONFIG.defaultTitle,
+    description = SEO_CONFIG.defaultDescription,
+    image = SEO_CONFIG.defaultImage,
+    noindex = false,
+    schemaType = 'WebApplication',
+    schemaData = {}
+} = Astro.props;
+
+// Generate structured data
+const pageSchema = generateStructuredData(schemaType, {
+    name: title,
+    description: description,
+    ...schemaData
+});
+
+// Generate organization schema
+const organizationSchema = JSON.stringify(STRUCTURED_DATA.organization, null, 2);
 ---
 
-<!doctype html>
-<html lang="en">
-	<head>
-		<meta charset="UTF-8" />
-		<meta name="description" content="Astro description" />
-		<meta name="viewport" content="width=device-width" />
-		<link rel="icon" type="image/svg+xml" href="/favicon.svg" />
-		<meta name="generator" content={Astro.generator} />
-		<title>{title}</title>
-	</head>
-	<body>
-		<slot />
-	</body>
+<!DOCTYPE html>
+<html lang="es">
+    <head>
+        <MainHead 
+            title={title}
+            description={description}
+            image={image}
+            noindex={noindex}
+        />
+        
+        <!-- Structured Data -->
+        <script type="application/ld+json" set:html={pageSchema} />
+        <script type="application/ld+json" set:html={organizationSchema} />
+        
+        <!-- Preload critical assets -->
+        <link rel="preload" as="image" href="/favicon.svg" type="image/svg+xml" />
+    </head>
+    <body class="bg-slate-950 min-h-screen">
+        <slot />
+        
+        <!-- Prevent Flash of Unstyled Content -->
+        <script>
+            document.documentElement.classList.add('js-loaded');
+        </script>
+    </body>
 </html>
-<style is:global>
-	:root {
-		--accent: 136, 58, 234;
-		--accent-light: 224, 204, 250;
-		--accent-dark: 49, 10, 101;
-		--accent-gradient: linear-gradient(
-			45deg,
-			rgb(var(--accent)),
-			rgb(var(--accent-light)) 30%,
-			white 60%
-		);
-	}
-	html {
-		font-family: system-ui, sans-serif;
-		background: #13151a;
-	}
-	code {
-		font-family:
-			Menlo,
-			Monaco,
-			Lucida Console,
-			Liberation Mono,
-			DejaVu Sans Mono,
-			Bitstream Vera Sans Mono,
-			Courier New,
-			monospace;
-	}
-</style>

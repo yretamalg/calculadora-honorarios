@@ -29,43 +29,47 @@ export const TASAS_RETENCION = [
       año: 2028,
       factor: 0.83
     }
-  ];
-  
-  export const LIMITES = {
+];
+
+export const LIMITES = {
     MIN_MONTO: 0,
     MAX_MONTO: 999999999999
-  };
-  
-  export const APP_CONFIG = {
+};
+
+export const APP_CONFIG = {
     nombre: 'vBox Pro',
     version: '1.2.4',
-    domain: 'https://www.vbox.pro'
-  };
-  
-  export const formatearMonto = (numero) => {
+    domain: 'https://www.vbox.pro',
+    contactEmail: 'hola@vbox.pro',
+    social: {
+        twitter: '@vboxpro'
+    }
+};
+
+export const formatearMonto = (numero) => {
     if (typeof numero !== 'number' || isNaN(numero)) return '$ 0';
     return new Intl.NumberFormat('es-CL', {
-      style: 'currency',
-      currency: 'CLP',
-      maximumFractionDigits: 0
+        style: 'currency',
+        currency: 'CLP',
+        maximumFractionDigits: 0
     }).format(numero);
-  };
-  
-  export const parsearMonto = (texto) => {
+};
+
+export const parsearMonto = (texto) => {
     if (!texto) return 0;
     // Eliminar el símbolo $ y cualquier caracter que no sea número
     const numero = parseFloat(texto.replace(/[^\d]/g, ''));
     if (isNaN(numero) || numero < LIMITES.MIN_MONTO) return 0;
     if (numero > LIMITES.MAX_MONTO) return LIMITES.MAX_MONTO;
     return numero;
-  };
-  
-  export const calcularMontos = (montoIngresado, tasaSeleccionada) => {
+};
+
+export const calcularMontos = (montoIngresado, tasaSeleccionada) => {
     const tasa = TASAS_RETENCION.find(t => t.valor.toString() === tasaSeleccionada.toString());
     
     if (!tasa) return { 
-      desdeValoresLiquidos: { bruto: 0, retencion: 0, liquido: 0 },
-      desdeValoresBrutos: { bruto: 0, retencion: 0, liquido: 0 }
+        desdeValoresLiquidos: { bruto: 0, retencion: 0, liquido: 0 },
+        desdeValoresBrutos: { bruto: 0, retencion: 0, liquido: 0 }
     };
     
     // Para valores líquidos (cuando el monto ingresado es lo que quiero recibir)
@@ -77,15 +81,15 @@ export const TASAS_RETENCION = [
     const liquidoDesdeBruto = montoIngresado - retencionDesdeBruto;
     
     return {
-      desdeValoresLiquidos: {
-        bruto: montoBrutoDesdeLiquido,
-        retencion: retencionDesdeLiquido,
-        liquido: montoIngresado
-      },
-      desdeValoresBrutos: {
-        bruto: montoIngresado,
-        retencion: retencionDesdeBruto,
-        liquido: liquidoDesdeBruto
-      }
+        desdeValoresLiquidos: {
+            bruto: montoBrutoDesdeLiquido,
+            retencion: retencionDesdeLiquido,
+            liquido: montoIngresado
+        },
+        desdeValoresBrutos: {
+            bruto: montoIngresado,
+            retencion: retencionDesdeBruto,
+            liquido: liquidoDesdeBruto
+        }
     };
-  };
+};

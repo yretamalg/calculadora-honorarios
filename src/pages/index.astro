@@ -1,19 +1,40 @@
 ---
+import Layout from '../layouts/Layout.astro';
 import CalculadoraRetencion from '../components/CalculadoraRetencion';
-import { APP_CONFIG } from '../constants/config';
+import { SEO_CONFIG, STRUCTURED_DATA, PAGE_METADATA } from '../constants/seo';
+
+const { home: pageMetadata } = PAGE_METADATA;
+
+// Enhance the default WebApplication schema with additional data
+const schemaData = {
+    ...STRUCTURED_DATA.webApplication,
+    "dateModified": new Date().toISOString(),
+    "keywords": [
+        "calculadora retención",
+        "honorarios chile",
+        "retención honorarios",
+        "cálculo impuestos",
+        "boletas honorarios"
+    ],
+    "availableLanguage": ["es-CL"],
+    "applicationCategory": "FinanceApplication",
+    "operatingSystem": "Web",
+    "offers": {
+        "@type": "Offer",
+        "price": "0",
+        "priceCurrency": "CLP",
+        "availability": "http://schema.org/InStock"
+    }
+};
 ---
 
-<html lang="es">
-  <head>
-    <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width" />
-    <meta name="description" content="Calcula fácilmente tu retención de honorarios para profesionales en Chile. Conoce tu monto bruto, líquido y retención según las tasas vigentes." />
-    <meta name="keywords" content="retención de honorarios, calculadora tributaria, impuestos chile, boleta de honorarios, sii chile" />
-    <title>Calculadora de Retención de Honorarios - {APP_CONFIG.nombre}</title>
-    <link rel="canonical" href={APP_CONFIG.domain} />
-    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
-  </head>
-  <body class="bg-slate-950 min-h-screen py-8">
-    <CalculadoraRetencion client:load />
-  </body>
-</html>
+<Layout
+    title={pageMetadata.title}
+    description={pageMetadata.description}
+    schemaType="WebApplication"
+    schemaData={schemaData}
+>
+    <main>
+        <CalculadoraRetencion client:load />
+    </main>
+</Layout>
