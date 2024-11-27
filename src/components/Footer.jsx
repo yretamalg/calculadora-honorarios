@@ -73,7 +73,7 @@ const Footer = () => {
               ×
             </button>
             <div className="text-center h-full flex items-center justify-center">
-              <p className="text-lg font-semibold text-orange-600">
+              <p className="text-lg font-semibold text-gray-300">
                 hola@vbox.pro
               </p>
             </div>
