@@ -38,7 +38,7 @@ export const TASAS_RETENCION = [
   
   export const APP_CONFIG = {
     nombre: 'vBox Pro',
-    version: '1.1.9',
+    version: '1.2.0',
     domain: 'https://www.vbox.pro'
   };
   

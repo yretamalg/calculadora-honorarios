@@ -30,17 +30,114 @@ import Footer from '../components/Footer';
             <p>
               Esta calculadora proporciona estimaciones basadas en las tasas de retención 
               vigentes. Los resultados son solo referenciales y no constituyen 
-              asesoramiento tributario oficial. No tenemos ninguna relación con el SII.cl
+              asesoramiento tributario oficial.
             </p>
           </section>
           
           <section>
             <h2 class="text-xl font-semibold mb-2 text-orange-500">3. Responsabilidad</h2>
             <p>
-              No me responsabilizo por decisiones tomadas basadas 
+              No nos hacemos responsable por decisiones tomadas basadas 
               en los cálculos de esta herramienta. Siempre consulte con un 
               profesional tributario para confirmación.
             </p>
+          </section>
+
+          <section>
+            <h2 class="text-xl font-semibold mb-2 text-orange-500">4. Guía Simple de Cálculos</h2>
+            <div class="bg-slate-800 p-6 rounded-lg space-y-4">
+              <h3 class="text-lg font-semibold text-white mb-2">¿Por qué aumenta la retención?</h3>
+              <div class="bg-slate-700 p-4 rounded-lg space-y-2">
+                <p>
+                  El 2 de febrero de 2019 se publicó en el Diario Oficial la <strong>Ley N°21.133</strong> que incorpora a los 
+                  trabajadores a honorarios a los regímenes de Protección Social, estableciendo un mecanismo obligatorio y 
+                  gradual del pago de sus cotizaciones, lo que les permite tener acceso a todos los beneficios de la 
+                  seguridad social.
+                </p>
+                <p>
+                  Con el objeto de contar con los recursos necesarios para el financiamiento de estas cotizaciones, 
+                  la ley estableció también que, a partir del 1 de enero de 2020, se aumentará gradualmente la 
+                  retención del 10% o la tasa del Pago Provisional Mensual obligatorio (PPM) en los casos que no 
+                  aplica la retención del receptor, en la emisión de Boletas de Honorarios.
+                </p>
+                <div class="mt-4 text-sm">
+                  <p>Para más información, puedes consultar:</p>
+                  <ul class="list-disc pl-6 mt-2 space-y-1">
+                    <li>
+                      <a 
+                        href="https://www.sii.cl/destacados/boletas_honorarios/aumenta_retencion.html" 
+                        target="_blank" 
+                        rel="noopener noreferrer"
+                        class="text-orange-400 hover:text-orange-300 underline"
+                      >
+                        Servicios de Impuestos Internos - Información sobre el aumento de la retención
+                      </a>
+                    </li>
+                    <li>
+                      <a 
+                        href="https://www.bcn.cl/leychile/navegar?idNorma=1128420" 
+                        target="_blank" 
+                        rel="noopener noreferrer"
+                        class="text-orange-400 hover:text-orange-300 underline"
+                      >
+                        Biblioteca del Congreso Nacional de Chile - Ley N°21.133
+                      </a>
+                    </li>
+                  </ul>
+                </div>
+              </div>
+
+              <h3 class="text-lg font-semibold text-white mt-6 mb-2">¿Cómo funciona la retención?</h3>
+              <p>
+                Cuando emites una boleta de honorarios, el SII retiene un porcentaje del monto total. Este porcentaje varía según el año:
+              </p>
+              <ul class="list-disc pl-6 space-y-2">
+                <li>2024: 13,75% de retención</li>
+                <li>2025: 14,50% de retención</li>
+                <li>2026: 15,25% de retención</li>
+                <li>2027: 16,00% de retención</li>
+                <li>2028: 17,00% de retención</li>
+              </ul>
+
+              <h3 class="text-lg font-semibold text-white mt-6 mb-2">Ejemplos Prácticos</h3>
+              
+              <div class="space-y-4">
+                <div class="border-l-4 border-orange-500 pl-4">
+                  <p class="font-semibold text-white">Si acordaste un monto líquido (lo que quieres recibir):</p>
+                  <p>Por ejemplo, si quieres recibir $100.000 en 2024:</p>
+                  <ul class="list-disc pl-6 space-y-1">
+                    <li>Debes hacer la boleta por un monto mayor</li>
+                    <li>La calculadora determina automáticamente que debes emitir la boleta por $115.977</li>
+                    <li>El SII retendrá $15.977 (13,75%)</li>
+                    <li>Recibirás tus $100.000</li>
+                  </ul>
+                </div>
+
+                <div class="border-l-4 border-orange-500 pl-4">
+                  <p class="font-semibold text-white">Si acordaste un monto bruto (monto total de la boleta):</p>
+                  <p>Por ejemplo, si haces una boleta por $100.000 en 2024:</p>
+                  <ul class="list-disc pl-6 space-y-1">
+                    <li>El monto total de la boleta es $100.000</li>
+                    <li>El SII retendrá $13.750 (13,75%)</li>
+                    <li>Recibirás $86.250</li>
+                  </ul>
+                </div>
+              </div>
+
+              <div class="mt-6 bg-slate-700 p-4 rounded-lg space-y-4">
+                <p class="text-sm">
+                  <span class="text-orange-500 font-semibold">Nota importante:</span> Nuestra calculadora maneja ambos 
+                  escenarios automáticamente. Solo ingresa el monto que conoces (sea líquido o bruto) y la calculadora 
+                  te mostrará todos los valores relevantes.
+                </p>
+                <p class="text-sm">
+                  <span class="text-orange-500 font-semibold">Descargo de responsabilidad:</span> No tenemos
+                  ninguna relación ni afiliación con el Servicio de Impuestos Internos (SII), la Biblioteca del 
+                  Congreso Nacional de Chile (BCN), ni ninguna otra entidad gubernamental. Los enlaces proporcionados 
+                  son solo para fines informativos y de referencia.
+                </p>
+              </div>
+            </div>
           </section>
         </div>
         
