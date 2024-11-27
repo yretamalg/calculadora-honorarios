@@ -1,5 +1,5 @@
 ---
-import CalculadoraRetencion from '../components/CalculadoraRetencion.jsx';
+import CalculadoraRetencion from '../components/CalculadoraRetencion';
 import { APP_CONFIG } from '../constants/config';
 ---
 
@@ -11,6 +11,7 @@ import { APP_CONFIG } from '../constants/config';
     <meta name="keywords" content="retención de honorarios, calculadora tributaria, impuestos chile, boleta de honorarios, sii chile" />
     <title>Calculadora de Retención de Honorarios - {APP_CONFIG.nombre}</title>
     <link rel="canonical" href={APP_CONFIG.domain} />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
   </head>
   <body class="bg-slate-950 min-h-screen py-8">
     <CalculadoraRetencion client:load />
