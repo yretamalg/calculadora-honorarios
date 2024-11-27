@@ -1,6 +1,6 @@
 ---
 import MainHead from './MainHead.astro';
-import { SEO_CONFIG, STRUCTURED_DATA } from '../constants/seo';
+import { SEO_CONFIG } from '../constants/seo';
 import { generateStructuredData } from '../utils/seoHelpers';
 
 export interface Props {
@@ -28,8 +28,13 @@ const pageSchema = generateStructuredData(schemaType, {
     ...schemaData
 });
 
-// Generate organization schema
-const organizationSchema = JSON.stringify(STRUCTURED_DATA.organization, null, 2);
+// Organization schema
+const organizationSchema = JSON.stringify({
+    "@context": "https://schema.org",
+    "@type": "Organization",
+    "name": "VBox Pro",
+    "url": SEO_CONFIG.siteUrl
+});
 ---
 
 <!DOCTYPE html>
@@ -43,18 +48,10 @@ const organizationSchema = JSON.stringify(STRUCTURED_DATA.organization, null, 2)
         />
         
         <!-- Structured Data -->
-        <script type="application/ld+json" set:html={pageSchema} />
-        <script type="application/ld+json" set:html={organizationSchema} />
-        
-        <!-- Preload critical assets -->
-        <link rel="preload" as="image" href="/favicon.svg" type="image/svg+xml" />
+        <script is:inline type="application/ld+json" set:html={pageSchema} />
+        <script is:inline type="application/ld+json" set:html={organizationSchema} />
     </head>
     <body class="bg-slate-950 min-h-screen">
         <slot />
-        
-        <!-- Prevent Flash of Unstyled Content -->
-        <script>
-            document.documentElement.classList.add('js-loaded');
-        </script>
     </body>
 </html>

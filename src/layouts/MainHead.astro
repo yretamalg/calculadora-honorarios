@@ -63,7 +63,7 @@ const languageAlternates = SEO_CONFIG.languageAlternates || [];
 {SEO_CONFIG.additionalMetaTags.map((tag) => <meta {...tag} />)}
 
 <!-- Twitter Card -->
-{SEO_CONFIG.social?.twitter && (
+{SEO_CONFIG.social && 'twitter' in SEO_CONFIG.social && (
     <meta name="twitter:creator" content={SEO_CONFIG.social.twitter} />
 )}
 

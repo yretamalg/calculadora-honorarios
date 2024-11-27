@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { APP_CONFIG } from '../constants/config';
 
 const Footer = () => {
