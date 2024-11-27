@@ -4,25 +4,11 @@ import Footer from '../components/Footer';
 import { PAGE_METADATA } from '../constants/seo';
 
 const { termsOfUse: pageMetadata } = PAGE_METADATA;
-
-const schemaData = {
-    "@type": "WebPage",
-    "name": pageMetadata.title,
-    "description": pageMetadata.description,
-    "inLanguage": "es-CL",
-    "lastReviewed": new Date().toISOString(),
-    "mainContentOfPage": {
-        "@type": "WebPageElement",
-        "cssSelector": "main"
-    }
-};
 ---
 
 <Layout
     title={pageMetadata.title}
     description={pageMetadata.description}
-    schemaType="WebPage"
-    schemaData={schemaData}
 >
     <div class="min-h-screen bg-slate-900 text-gray-300 flex flex-col">
         <main class="container mx-auto px-4 py-12 max-w-4xl flex-grow">

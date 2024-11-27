@@ -20,13 +20,6 @@ const {
     noindex = false
 } = Astro.props;
 
-// Validate SEO parameters
-const { isValid, errors } = validateSEOParams({ title, description, image });
-if (!isValid) {
-    console.warn('SEO Validation Errors:', errors);
-}
-
-// Generate all meta tags
 const metaTags = generateMetaTags({
     title,
     description,
@@ -34,7 +27,6 @@ const metaTags = generateMetaTags({
     path
 });
 
-// Generate language alternates
 const languageAlternates = SEO_CONFIG.languageAlternates || [];
 ---
 
@@ -52,18 +44,14 @@ const languageAlternates = SEO_CONFIG.languageAlternates || [];
 
 <!-- Language Alternates -->
 {languageAlternates.map((alternate) => (
-    <link 
-        rel="alternate" 
-        hreflang={alternate.hrefLang} 
-        href={alternate.href}
-    />
+    <link rel="alternate" hreflang={alternate.hrefLang} href={alternate.href} />
 ))}
 
 <!-- Additional Meta Tags -->
 {SEO_CONFIG.additionalMetaTags.map((tag) => <meta {...tag} />)}
 
 <!-- Twitter Card -->
-{SEO_CONFIG.social && 'twitter' in SEO_CONFIG.social && (
+{SEO_CONFIG.social?.twitter && (
     <meta name="twitter:creator" content={SEO_CONFIG.social.twitter} />
 )}
 
@@ -73,16 +61,11 @@ const languageAlternates = SEO_CONFIG.languageAlternates || [];
 <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png" />
 <link rel="manifest" href="/site.webmanifest" />
 
-<!-- Security Headers -->
-<meta http-equiv="X-Content-Type-Options" content="nosniff" />
-<meta http-equiv="X-Frame-Options" content="DENY" />
-<meta http-equiv="Permissions-Policy" content="interest-cohort=()" />
-
 <!-- Mobile Web App -->
 <meta name="theme-color" content="#ff5722" />
 <meta name="apple-mobile-web-app-capable" content="yes" />
 <meta name="apple-mobile-web-app-status-bar-style" content="black" />
 
-<!-- Preconnect to required origins -->
+<!-- Preconnect -->
 <link rel="preconnect" href="https://fonts.googleapis.com" />
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />

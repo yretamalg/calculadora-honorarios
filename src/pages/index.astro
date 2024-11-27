@@ -1,39 +1,16 @@
 ---
 import Layout from '../layouts/Layout.astro';
 import CalculadoraRetencion from '../components/CalculadoraRetencion';
-import { SEO_CONFIG, STRUCTURED_DATA, PAGE_METADATA } from '../constants/seo';
+import { PAGE_METADATA } from '../constants/seo';
 
 const { home: pageMetadata } = PAGE_METADATA;
-
-const schemaData = {
-    ...STRUCTURED_DATA.webApplication,
-    "dateModified": new Date().toISOString(),
-    "keywords": [
-        "calculadora retención",
-        "honorarios chile",
-        "retención honorarios",
-        "cálculo impuestos",
-        "boletas honorarios"
-    ],
-    "availableLanguage": ["es-CL"],
-    "applicationCategory": "FinanceApplication",
-    "operatingSystem": "Web",
-    "offers": {
-        "@type": "Offer",
-        "price": "0",
-        "priceCurrency": "CLP",
-        "availability": "http://schema.org/InStock"
-    }
-};
 ---
 
 <Layout
     title={pageMetadata.title}
     description={pageMetadata.description}
-    schemaType="WebApplication"
-    schemaData={schemaData}
 >
-    <main class="pt-8"> <!-- Agregado el padding top de 32px (pt-8 en Tailwind) -->
+    <main class="pt-8">
         <CalculadoraRetencion client:load />
     </main>
 </Layout>

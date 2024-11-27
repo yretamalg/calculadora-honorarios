@@ -1,15 +1,12 @@
 ---
 import MainHead from './MainHead.astro';
-import { SEO_CONFIG } from '../constants/seo';
-import { generateStructuredData } from '../utils/seoHelpers';
+import { SEO_CONFIG, STRUCTURED_DATA } from '../constants/seo';
 
 export interface Props {
     title?: string;
     description?: string;
     image?: string;
     noindex?: boolean;
-    schemaType?: string;
-    schemaData?: Record<string, any>;
 }
 
 const {
@@ -17,24 +14,15 @@ const {
     description = SEO_CONFIG.defaultDescription,
     image = SEO_CONFIG.defaultImage,
     noindex = false,
-    schemaType = 'WebApplication',
-    schemaData = {}
 } = Astro.props;
 
-// Generate structured data
-const pageSchema = generateStructuredData(schemaType, {
+// Enrich structured data with current page info
+const pageStructuredData = {
+    ...STRUCTURED_DATA.webApplication,
     name: title,
-    description: description,
-    ...schemaData
-});
+    description: description
+};
 
-// Organization schema
-const organizationSchema = JSON.stringify({
-    "@context": "https://schema.org",
-    "@type": "Organization",
-    "name": "VBox Pro",
-    "url": SEO_CONFIG.siteUrl
-});
 ---
 
 <!DOCTYPE html>
@@ -48,8 +36,8 @@ const organizationSchema = JSON.stringify({
         />
         
         <!-- Structured Data -->
-        <script is:inline type="application/ld+json" set:html={pageSchema} />
-        <script is:inline type="application/ld+json" set:html={organizationSchema} />
+        <script is:inline type="application/ld+json" set:html={JSON.stringify(pageStructuredData)} />
+        <script is:inline type="application/ld+json" set:html={JSON.stringify(STRUCTURED_DATA.organization)} />
     </head>
     <body class="bg-slate-950 min-h-screen">
         <slot />
