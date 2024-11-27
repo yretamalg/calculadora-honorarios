@@ -38,12 +38,12 @@ export const TASAS_RETENCION = [
   
   export const APP_CONFIG = {
     nombre: 'vBox Pro',
-    version: '1.2.1',
+    version: '1.2.2',
     domain: 'https://www.vbox.pro'
   };
   
   export const formatearMonto = (numero) => {
-    if (typeof numero !== 'number' || isNaN(numero)) return 'CLP 0';
+    if (typeof numero !== 'number' || isNaN(numero)) return '$ 0';
     return new Intl.NumberFormat('es-CL', {
       style: 'currency',
       currency: 'CLP',
@@ -53,7 +53,8 @@ export const TASAS_RETENCION = [
   
   export const parsearMonto = (texto) => {
     if (!texto) return 0;
-    const numero = parseFloat(texto.replace(/[^\d,-]/g, ''));
+    // Eliminar el símbolo $ y cualquier caracter que no sea número
+    const numero = parseFloat(texto.replace(/[^\d]/g, ''));
     if (isNaN(numero) || numero < LIMITES.MIN_MONTO) return 0;
     if (numero > LIMITES.MAX_MONTO) return LIMITES.MAX_MONTO;
     return numero;
@@ -62,7 +63,10 @@ export const TASAS_RETENCION = [
   export const calcularMontos = (montoIngresado, tasaSeleccionada) => {
     const tasa = TASAS_RETENCION.find(t => t.valor.toString() === tasaSeleccionada.toString());
     
-    if (!tasa) return { bruto: 0, retencion: 0, liquido: 0 };
+    if (!tasa) return { 
+      desdeValoresLiquidos: { bruto: 0, retencion: 0, liquido: 0 },
+      desdeValoresBrutos: { bruto: 0, retencion: 0, liquido: 0 }
+    };
     
     // Para valores líquidos (cuando el monto ingresado es lo que quiero recibir)
     const montoBrutoDesdeLiquido = Math.round(montoIngresado / tasa.factor);
