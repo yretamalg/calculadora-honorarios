@@ -1,22 +1,45 @@
 import { APP_CONFIG } from './config';
 
+export const STRUCTURED_DATA = {
+    organization: {
+        "@context": "https://schema.org",
+        "@type": "Organization",
+        "name": "vBox Pro",
+        "url": APP_CONFIG.domain,
+        "contactPoint": {
+            "@type": "ContactPoint",
+            "email": APP_CONFIG.contactEmail
+        }
+    },
+    webApplication: {
+        "@context": "https://schema.org",
+        "@type": "WebApplication",
+        "name": "Calculadoras Tributarias Chile",
+        "applicationCategory": "FinanceApplication",
+        "operatingSystem": "Web",
+        "offers": {
+            "@type": "Offer",
+            "price": "0",
+            "priceCurrency": "CLP"
+        }
+    }
+};
+
 export const SEO_CONFIG = {
-    defaultTitle: 'Calculadora de Retención de Boleta de Honorarios Chile 2024-2028',
+    defaultTitle: 'Calculadoras Tributarias Chile | vBox Pro',
     titleTemplate: '%s | vBox Pro',
-    defaultDescription: 'Calcula fácilmente tu retención de la boleta honorarios para profesionales en Chile. Conoce tu monto bruto, líquido y retención según las tasas vigentes 2024-2028.',
+    defaultDescription: 'Herramientas gratuitas para el cálculo de retención de honorarios e IVA en Chile.',
     siteUrl: APP_CONFIG.domain,
     defaultImage: '/og-image.jpg',
-    social: {
-        twitter: '@vboxpro'
-    },
+    social: APP_CONFIG.social,
     additionalMetaTags: [
         {
             name: 'keywords',
-            content: 'calculadora, retención, boleta, honorarios, chile, boleta, impuestos, SII'
+            content: 'calculadora, retención, honorarios, iva, impuestos, chile, boleta, SII'
         },
         {
             name: 'author',
-            content: 'vBox Pro'
+            content: APP_CONFIG.nombre
         }
     ],
     languageAlternates: [
@@ -29,43 +52,33 @@ export const SEO_CONFIG = {
 
 export const PAGE_METADATA = {
     home: {
-        title: SEO_CONFIG.defaultTitle,
-        description: SEO_CONFIG.defaultDescription,
+        title: 'Calculadoras Tributarias Chile',
+        description: 'Herramientas gratuitas para el cálculo de retención de honorarios e IVA en Chile.',
         path: '/',
+        priority: '1.0'
+    },
+    honorarios: {
+        title: 'Calculadora de Retención de Honorarios',
+        description: 'Calcula fácilmente tu retención de honorarios según las tasas vigentes 2024-2028.',
+        path: '/honorarios',
+        priority: '1.0'
+    },
+    iva: {
+        title: 'Calculadora de IVA Chile',
+        description: 'Calcula el IVA (19%) para tus productos y servicios en Chile.',
+        path: '/iva',
         priority: '1.0'
     },
     privacyPolicy: {
         title: 'Política de Privacidad',
-        description: 'Política de privacidad de la Calculadora de Retención de Boleta Honorarios.',
+        description: 'Política de privacidad de las Calculadoras Tributarias.',
         path: '/politica-de-privacidad',
         priority: '0.5'
     },
     termsOfUse: {
         title: 'Términos de Uso',
-        description: 'Términos y condiciones de uso de la Calculadora de Retención de Boleta Honorarios.',
+        description: 'Términos y condiciones de uso de las Calculadoras Tributarias.',
         path: '/terminos-de-uso',
         priority: '0.5'
-    }
-};
-
-export const STRUCTURED_DATA = {
-    organization: {
-        "@context": "https://schema.org",
-        "@type": "Organization",
-        "name": "vBox Pro",
-        "url": APP_CONFIG.domain
-    },
-    webApplication: {
-        "@context": "https://schema.org",
-        "@type": "WebApplication",
-        "name": SEO_CONFIG.defaultTitle,
-        "applicationCategory": "FinanceApplication",
-        "operatingSystem": "Web",
-        "offers": {
-            "@type": "Offer",
-            "price": "0",
-            "priceCurrency": "CLP"
-        },
-        "description": SEO_CONFIG.defaultDescription
     }
 };

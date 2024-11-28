@@ -38,30 +38,12 @@ export const LIMITES = {
 
 export const APP_CONFIG = {
     nombre: 'vBox Pro',
-    version: '1.3.4',
+    version: '1.2.8',
     domain: 'https://www.vbox.pro',
     contactEmail: 'hola@vbox.pro',
     social: {
         twitter: '@vboxpro'
     }
-};
-
-export const formatearMonto = (numero) => {
-    if (typeof numero !== 'number' || isNaN(numero)) return '$ 0';
-    return new Intl.NumberFormat('es-CL', {
-        style: 'currency',
-        currency: 'CLP',
-        maximumFractionDigits: 0
-    }).format(numero);
-};
-
-export const parsearMonto = (texto) => {
-    if (!texto) return 0;
-    // Eliminar el símbolo $ y cualquier caracter que no sea número
-    const numero = parseFloat(texto.replace(/[^\d]/g, ''));
-    if (isNaN(numero) || numero < LIMITES.MIN_MONTO) return 0;
-    if (numero > LIMITES.MAX_MONTO) return LIMITES.MAX_MONTO;
-    return numero;
 };
 
 export const calcularMontos = (montoIngresado, tasaSeleccionada) => {

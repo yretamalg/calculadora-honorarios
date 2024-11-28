@@ -1,0 +1,20 @@
+---
+import Layout from '../layouts/Layout.astro';
+import CalculadoraIVA from '../components/calculadoras/iva/CalculadoraIVA';
+import Footer from '../components/shared/Footer';
+import { SEO_CONFIG, PAGE_METADATA } from '../constants/seo';
+
+const { iva: pageMetadata } = PAGE_METADATA;
+---
+
+<Layout
+    title={pageMetadata.title}
+    description={pageMetadata.description}
+>
+    <main class="flex min-h-screen flex-col bg-slate-950">
+        <div class="flex-grow">
+            <CalculadoraIVA client:load />
+        </div>
+        <Footer client:load />
+    </main>
+</Layout>

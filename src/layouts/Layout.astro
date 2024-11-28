@@ -1,9 +1,8 @@
 ---
 import MainHead from './MainHead.astro';
 import { SEO_CONFIG, STRUCTURED_DATA } from '../constants/seo';
-import { ANALYTICS_CONFIG } from '../constants/analytics';
 
-export interface Props {
+interface Props {
     title?: string;
     description?: string;
     image?: string;
@@ -17,16 +16,16 @@ const {
     noindex = false,
 } = Astro.props;
 
+// Enrich structured data with current page info
 const pageStructuredData = {
     ...STRUCTURED_DATA.webApplication,
     name: title,
     description: description
 };
-
 ---
 
 <!DOCTYPE html>
-<html lang="es">
+<html lang="es" class="scroll-smooth">
     <head>
         <MainHead 
             title={title}
@@ -35,20 +34,66 @@ const pageStructuredData = {
             noindex={noindex}
         />
         
+        <!-- Preload fonts -->
+        <link 
+            rel="preconnect" 
+            href="https://fonts.googleapis.com" 
+            crossorigin
+        />
+        <link 
+            rel="preconnect" 
+            href="https://fonts.gstatic.com" 
+            crossorigin
+        />
+        <link 
+            href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" 
+            rel="stylesheet"
+        />
+        
         <!-- Structured Data -->
-        <script is:inline type="application/ld+json" set:html={JSON.stringify(pageStructuredData)} />
-        <script is:inline type="application/ld+json" set:html={JSON.stringify(STRUCTURED_DATA.organization)} />
-
-        <!-- Google Analytics -->
-        <script async src={`https://www.googletagmanager.com/gtag/js?id=${ANALYTICS_CONFIG.GA_MEASUREMENT_ID}`}></script>
-        <script is:inline define:vars={{ GA_ID: ANALYTICS_CONFIG.GA_MEASUREMENT_ID }}>
-            window.dataLayer = window.dataLayer || [];
-            function gtag(){dataLayer.push(arguments);}
-            gtag('js', new Date());
-            gtag('config', GA_ID);
-        </script>
+        <script type="application/ld+json" set:html={JSON.stringify(pageStructuredData)} />
+        <script type="application/ld+json" set:html={JSON.stringify(STRUCTURED_DATA.organization)} />
+        
+        <!-- Preload critical assets -->
+        <link rel="preload" as="image" href="/logoyr.svg" />
+        <link rel="preload" as="image" href="/chileflag.svg" />
+        
+        <!-- Analytics snippet (if needed) -->
+        {import.meta.env.PROD && (
+            <script async src="/analytics.js"></script>
+        )}
+        
+        <!-- Critical CSS -->
+        <style is:global>
+            :root {
+                color-scheme: dark;
+            }
+            
+            body {
+                font-family: 'Inter', system-ui, sans-serif;
+                -webkit-font-smoothing: antialiased;
+                text-rendering: optimizeLegibility;
+            }
+            
+            ::selection {
+                background-color: #ff5722;
+                color: white;
+            }
+            
+            .scroll-smooth {
+                scroll-behavior: smooth;
+            }
+        </style>
     </head>
-    <body class="bg-slate-950 min-h-screen">
+    <body class="bg-slate-950 min-h-screen text-white antialiased">
         <slot />
+        
+        <!-- Skip to main content -->
+        <a 
+            href="#main" 
+            class="sr-only focus:not-sr-only focus:absolute focus:top-4 focus:left-4 bg-orange-500 text-white px-4 py-2 rounded-md"
+        >
+            Saltar al contenido principal
+        </a>
     </body>
 </html>
