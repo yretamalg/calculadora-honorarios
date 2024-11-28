@@ -1,0 +1,16 @@
+---
+import Layout from '../layouts/Layout.astro';
+import CalculadoraRetencion from '../components/CalculadoraRetencion';
+import { PAGE_METADATA } from '../constants/seo';
+
+const { home: pageMetadata } = PAGE_METADATA;
+---
+
+<Layout
+    title={pageMetadata.title}
+    description={pageMetadata.description}
+>
+    <main class="pt-8">
+        <CalculadoraRetencion client:load />
+    </main>
+</Layout>

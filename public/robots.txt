@@ -1,0 +1,12 @@
+# www.robotstxt.org/
+
+User-agent: *
+Allow: /
+
+# Sitemap
+Sitemap: ./sitemap.xml
+
+# Directories
+Disallow: /api/
+Disallow: /admin/
+Disallow: /private/
