@@ -33,7 +33,7 @@ const FormularioIngreso = ({ monto, tasaRetencion, onMontoChange, onTasaChange, 
   };
 
   return (
-    <div className="space-y-4">
+    <div className="space-y-3 sm:space-y-4">
       <div>
         <label htmlFor="monto" className="block text-sm font-medium text-slate-300 mb-2">
           Ingresa el monto a calcular:

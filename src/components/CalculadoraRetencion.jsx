@@ -48,8 +48,8 @@ const CalculadoraRetencion = () => {
 
   return (
     <div className="flex flex-col min-h-screen">
-      <div className="flex-grow container max-w-2xl mx-auto p-6 bg-slate-800 rounded-lg shadow-xl">
-        <h1 className="text-slate-300 text-2xl font-bold text-center mb-6">
+      <div className="flex-grow container max-w-2xl mx-auto px-4 sm:px-6 py-4 sm:py-6 bg-slate-800 rounded-lg shadow-xl">
+        <h1 className="text-slate-300 text-xl sm:text-2xl font-bold text-center mb-4 sm:mb-6">
           Calculadora de Retención de Honorarios
         </h1>
         <div className="space-y-6">

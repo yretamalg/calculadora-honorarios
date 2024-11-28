@@ -1,6 +1,6 @@
 const BotonesControl = ({ onCalcular, onLimpiar }) => {
   return (
-    <div className="flex gap-4">
+    <div className="flex gap-2 sm:gap-4">
       <button
         onClick={onCalcular}
         className="flex-1 px-4 py-2 text-white bg-orange-700 rounded-md hover:bg-orange-600 focus:outline-none focus:ring-2 focus:ring-orange-500 focus:ring-offset-2"

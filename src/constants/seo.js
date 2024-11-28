@@ -1,9 +1,9 @@
 import { APP_CONFIG } from './config';
 
 export const SEO_CONFIG = {
-    defaultTitle: 'Calculadora de Retención de Honorarios Chile 2024-2028',
+    defaultTitle: 'Calculadora de Retención de Boleta de Honorarios Chile 2024-2028',
     titleTemplate: '%s | vBox Pro',
-    defaultDescription: 'Calcula fácilmente tu retención de honorarios para profesionales en Chile. Conoce tu monto bruto, líquido y retención según las tasas vigentes 2024-2028.',
+    defaultDescription: 'Calcula fácilmente tu retención de la boleta honorarios para profesionales en Chile. Conoce tu monto bruto, líquido y retención según las tasas vigentes 2024-2028.',
     siteUrl: APP_CONFIG.domain,
     defaultImage: '/og-image.jpg',
     social: {
@@ -12,7 +12,7 @@ export const SEO_CONFIG = {
     additionalMetaTags: [
         {
             name: 'keywords',
-            content: 'calculadora, retención, honorarios, chile, boleta, impuestos, SII'
+            content: 'calculadora, retención, boleta, honorarios, chile, boleta, impuestos, SII'
         },
         {
             name: 'author',
@@ -36,13 +36,13 @@ export const PAGE_METADATA = {
     },
     privacyPolicy: {
         title: 'Política de Privacidad',
-        description: 'Política de privacidad de la Calculadora de Retención de Honorarios.',
+        description: 'Política de privacidad de la Calculadora de Retención de Boleta Honorarios.',
         path: '/politica-de-privacidad',
         priority: '0.5'
     },
     termsOfUse: {
         title: 'Términos de Uso',
-        description: 'Términos y condiciones de uso de la Calculadora de Retención de Honorarios.',
+        description: 'Términos y condiciones de uso de la Calculadora de Retención de Boleta Honorarios.',
         path: '/terminos-de-uso',
         priority: '0.5'
     }

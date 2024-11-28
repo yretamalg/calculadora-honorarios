@@ -11,21 +11,21 @@ const { termsOfUse: pageMetadata } = PAGE_METADATA;
     description={pageMetadata.description}
 >
     <div class="min-h-screen bg-slate-900 text-gray-300 flex flex-col">
-        <main class="container mx-auto px-4 py-12 max-w-4xl flex-grow">
-            <h1 class="text-3xl font-bold mb-6 text-white">Términos de Uso</h1>
+        <main class="container mx-auto px-4 py-8 sm:py-12 max-w-4xl flex-grow">
+            <h1 class="text-2xl sm:text-3xl font-bold mb-6 text-white">Términos de Uso</h1>
             
-            <div class="space-y-4">
+            <div class="space-y-6">
                 <section>
-                    <h2 class="text-xl font-semibold mb-2 text-orange-500">1. Introducción</h2>
-                    <p>
+                    <h2 class="text-lg sm:text-xl font-semibold mb-2 text-orange-500">1. Introducción</h2>
+                    <p class="text-sm sm:text-base">
                         Bienvenido a la Calculadora de Retención de Honorarios. 
                         Al utilizar esta herramienta, aceptas los siguientes términos de uso.
                     </p>
                 </section>
                 
                 <section>
-                    <h2 class="text-xl font-semibold mb-2 text-orange-500">2. Uso de la Herramienta</h2>
-                    <p>
+                    <h2 class="text-lg sm:text-xl font-semibold mb-2 text-orange-500">2. Uso de la Herramienta</h2>
+                    <p class="text-sm sm:text-base">
                         Esta calculadora proporciona estimaciones basadas en las tasas de retención 
                         vigentes. Los resultados son solo referenciales y no constituyen 
                         asesoramiento tributario oficial.
@@ -33,8 +33,8 @@ const { termsOfUse: pageMetadata } = PAGE_METADATA;
                 </section>
                 
                 <section>
-                    <h2 class="text-xl font-semibold mb-2 text-orange-500">3. Responsabilidad</h2>
-                    <p>
+                    <h2 class="text-lg sm:text-xl font-semibold mb-2 text-orange-500">3. Responsabilidad</h2>
+                    <p class="text-sm sm:text-base">
                         No nos hacemos responsable por decisiones tomadas basadas 
                         en los cálculos de esta herramienta. Siempre consulte con un 
                         profesional tributario para confirmación.
@@ -42,23 +42,23 @@ const { termsOfUse: pageMetadata } = PAGE_METADATA;
                 </section>
 
                 <section>
-                    <h2 class="text-xl font-semibold mb-2 text-orange-500">4. Guía Simple de Cálculos</h2>
-                    <div class="bg-slate-800 p-6 rounded-lg space-y-4">
-                        <h3 class="text-lg font-semibold text-white mb-2">¿Por qué aumenta la retención?</h3>
+                    <h2 class="text-lg sm:text-xl font-semibold mb-2 text-orange-500">4. Guía Simple de Cálculos</h2>
+                    <div class="bg-slate-800 p-4 sm:p-6 rounded-lg space-y-4">
+                        <h3 class="text-base sm:text-lg font-semibold text-white mb-2">¿Por qué aumenta la retención?</h3>
                         <div class="bg-slate-700 p-4 rounded-lg space-y-2">
-                            <p>
+                            <p class="text-sm sm:text-base">
                                 El 2 de febrero de 2019 se publicó en el Diario Oficial la <strong>Ley N°21.133</strong> que incorpora a los 
                                 trabajadores a honorarios a los regímenes de Protección Social, estableciendo un mecanismo obligatorio y 
                                 gradual del pago de sus cotizaciones, lo que les permite tener acceso a todos los beneficios de la 
                                 seguridad social.
                             </p>
-                            <p>
+                            <p class="text-sm sm:text-base">
                                 Con el objeto de contar con los recursos necesarios para el financiamiento de estas cotizaciones, 
                                 la ley estableció también que, a partir del 1 de enero de 2020, se aumentará gradualmente la 
                                 retención del 10% o la tasa del Pago Provisional Mensual obligatorio (PPM) en los casos que no 
                                 aplica la retención del receptor, en la emisión de Boletas de Honorarios.
                             </p>
-                            <div class="mt-4 text-sm">
+                            <div class="mt-4 text-xs sm:text-sm">
                                 <p>Para más información, puedes consultar:</p>
                                 <ul class="list-disc pl-6 mt-2 space-y-1">
                                     <li>
@@ -85,12 +85,12 @@ const { termsOfUse: pageMetadata } = PAGE_METADATA;
                             </div>
                         </div>
 
-                        <h3 class="text-lg font-semibold text-white mt-6 mb-2">¿Cómo funciona la retención?</h3>
-                        <p>
+                        <h3 class="text-base sm:text-lg font-semibold text-white mt-6 mb-2">¿Cómo funciona la retención?</h3>
+                        <p class="text-sm sm:text-base">
                             Cuando emites una boleta de honorarios, el SII retiene un porcentaje del monto total. 
                             Este porcentaje varía según el año:
                         </p>
-                        <ul class="list-disc pl-6 space-y-2">
+                        <ul class="list-disc pl-6 space-y-2 text-sm sm:text-base">
                             <li>2024: 13,75% de retención</li>
                             <li>2025: 14,50% de retención</li>
                             <li>2026: 15,25% de retención</li>
@@ -98,12 +98,12 @@ const { termsOfUse: pageMetadata } = PAGE_METADATA;
                             <li>2028: 17,00% de retención</li>
                         </ul>
 
-                        <h3 class="text-lg font-semibold text-white mt-6 mb-2">Ejemplos Prácticos</h3>
+                        <h3 class="text-base sm:text-lg font-semibold text-white mt-6 mb-2">Ejemplos Prácticos</h3>
                         <div class="space-y-4">
                             <div class="border-l-4 border-orange-500 pl-4">
-                                <p class="font-semibold text-white">Si acordaste un monto líquido:</p>
-                                <p>Por ejemplo, si quieres recibir $100.000 en 2024:</p>
-                                <ul class="list-disc pl-6 space-y-1">
+                                <p class="font-semibold text-white text-sm sm:text-base">Si acordaste un monto líquido:</p>
+                                <p class="text-sm sm:text-base">Por ejemplo, si quieres recibir $100.000 en 2024:</p>
+                                <ul class="list-disc pl-6 space-y-1 text-sm sm:text-base">
                                     <li>Debes hacer la boleta por un monto mayor</li>
                                     <li>La calculadora determina automáticamente que debes emitir la boleta por $115.977</li>
                                     <li>El SII retendrá $15.977 (13,75%)</li>
@@ -112,9 +112,9 @@ const { termsOfUse: pageMetadata } = PAGE_METADATA;
                             </div>
 
                             <div class="border-l-4 border-orange-500 pl-4">
-                                <p class="font-semibold text-white">Si acordaste un monto bruto:</p>
-                                <p>Por ejemplo, si haces una boleta por $100.000 en 2024:</p>
-                                <ul class="list-disc pl-6 space-y-1">
+                                <p class="font-semibold text-white text-sm sm:text-base">Si acordaste un monto bruto:</p>
+                                <p class="text-sm sm:text-base">Por ejemplo, si haces una boleta por $100.000 en 2024:</p>
+                                <ul class="list-disc pl-6 space-y-1 text-sm sm:text-base">
                                     <li>El monto total de la boleta es $100.000</li>
                                     <li>El SII retendrá $13.750 (13,75%)</li>
                                     <li>Recibirás $86.250</li>
@@ -123,12 +123,12 @@ const { termsOfUse: pageMetadata } = PAGE_METADATA;
                         </div>
 
                         <div class="mt-6 bg-slate-700 p-4 rounded-lg space-y-4">
-                            <p class="text-sm">
+                            <p class="text-xs sm:text-sm">
                                 <span class="text-orange-500 font-semibold">Nota importante:</span> Nuestra calculadora maneja ambos 
                                 escenarios automáticamente. Solo ingresa el monto que conoces (sea líquido o bruto) y la calculadora 
                                 te mostrará todos los valores relevantes.
                             </p>
-                            <p class="text-sm">
+                            <p class="text-xs sm:text-sm">
                                 <span class="text-orange-500 font-semibold">Descargo de responsabilidad:</span> No tenemos
                                 ninguna relación ni afiliación con el Servicio de Impuestos Internos (SII), la Biblioteca del 
                                 Congreso Nacional de Chile (BCN), ni ninguna otra entidad gubernamental. Los enlaces proporcionados 

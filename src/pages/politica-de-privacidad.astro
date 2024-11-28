@@ -11,13 +11,13 @@ const { privacyPolicy: pageMetadata } = PAGE_METADATA;
     description={pageMetadata.description}
 >
     <div class="min-h-screen bg-slate-900 text-gray-300 flex flex-col">
-        <main class="container mx-auto px-4 py-12 max-w-4xl flex-grow">
-            <h1 class="text-3xl font-bold mb-6 text-white">Política de Privacidad</h1>
+        <main class="container mx-auto px-4 py-8 sm:py-12 max-w-4xl flex-grow">
+            <h1 class="text-2xl sm:text-3xl font-bold mb-6 text-white">Política de Privacidad</h1>
             
-            <div class="space-y-4">
+            <div class="space-y-6">
                 <section>
-                    <h2 class="text-xl font-semibold mb-2 text-orange-500">1. Información Recopilada</h2>
-                    <p>
+                    <h2 class="text-lg sm:text-xl font-semibold mb-2 text-orange-500">1. Información Recopilada</h2>
+                    <p class="text-sm sm:text-base">
                         No recopilamos ni almacenamos información personal de los usuarios 
                         que utilizan la Calculadora de Retención de Honorarios. Todos los cálculos
                         se realizan en el navegador del usuario sin enviar datos a ningún servidor.
@@ -25,8 +25,8 @@ const { privacyPolicy: pageMetadata } = PAGE_METADATA;
                 </section>
                 
                 <section>
-                    <h2 class="text-xl font-semibold mb-2 text-orange-500">2. Uso de Datos</h2>
-                    <p>
+                    <h2 class="text-lg sm:text-xl font-semibold mb-2 text-orange-500">2. Uso de Datos</h2>
+                    <p class="text-sm sm:text-base">
                         Los cálculos realizados son completamente confidenciales y 
                         no son registrados ni compartidos con terceros. No utilizamos ningún
                         tipo de análisis o seguimiento de usuarios.
@@ -34,8 +34,8 @@ const { privacyPolicy: pageMetadata } = PAGE_METADATA;
                 </section>
                 
                 <section>
-                    <h2 class="text-xl font-semibold mb-2 text-orange-500">3. Cookies</h2>
-                    <p>
+                    <h2 class="text-lg sm:text-xl font-semibold mb-2 text-orange-500">3. Cookies</h2>
+                    <p class="text-sm sm:text-base">
                         Esta aplicación no utiliza cookies para rastrear la información 
                         de los usuarios. No se almacena ningún tipo de información en el
                         dispositivo del usuario.
@@ -43,20 +43,46 @@ const { privacyPolicy: pageMetadata } = PAGE_METADATA;
                 </section>
 
                 <section>
-                    <h2 class="text-xl font-semibold mb-2 text-orange-500">4. Seguridad</h2>
-                    <p>
+                    <h2 class="text-lg sm:text-xl font-semibold mb-2 text-orange-500">4. Seguridad</h2>
+                    <p class="text-sm sm:text-base">
                         Todos los cálculos se realizan de forma local en su dispositivo.
                         No se transmite ninguna información a través de Internet.
                     </p>
                 </section>
 
                 <section>
-                    <h2 class="text-xl font-semibold mb-2 text-orange-500">5. Cambios en la Política</h2>
-                    <p>
+                    <h2 class="text-lg sm:text-xl font-semibold mb-2 text-orange-500">5. Cambios en la Política</h2>
+                    <p class="text-sm sm:text-base">
                         Nos reservamos el derecho de actualizar esta política de privacidad
                         en cualquier momento. Los cambios serán efectivos inmediatamente
                         después de su publicación en esta página.
                     </p>
+                </section>
+
+                <section class="bg-slate-800 p-4 sm:p-6 rounded-lg mt-8">
+                    <h2 class="text-lg sm:text-xl font-semibold mb-4 text-orange-500">Información Adicional</h2>
+                    <div class="space-y-4">
+                        <p class="text-sm sm:text-base">
+                            Esta política de privacidad está diseñada para ser clara y transparente sobre 
+                            nuestro compromiso con la privacidad de los usuarios. Algunos puntos importantes 
+                            a destacar:
+                        </p>
+                        <ul class="list-disc pl-6 space-y-2 text-sm sm:text-base">
+                            <li>No requerimos registro de usuarios</li>
+                            <li>No almacenamos historial de cálculos</li>
+                            <li>No utilizamos análisis de comportamiento</li>
+                            <li>No compartimos información con terceros</li>
+                            <li>No recopilamos datos de uso</li>
+                        </ul>
+                        
+                        <div class="bg-slate-700 p-4 rounded-lg mt-4">
+                            <p class="text-xs sm:text-sm">
+                                <span class="text-orange-500 font-semibold">Nota importante:</span> 
+                                Si tienes alguna pregunta sobre nuestra política de privacidad, 
+                                no dudes en contactarnos a través del botón de contacto en el pie de página.
+                            </p>
+                        </div>
+                    </div>
                 </section>
             </div>
             
