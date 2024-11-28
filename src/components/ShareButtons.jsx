@@ -1,4 +1,3 @@
-import React from 'react';
 import { Share2, Facebook, Twitter, Instagram, Link2 } from 'lucide-react';
 
 const WhatsappIcon = ({ className }) => (

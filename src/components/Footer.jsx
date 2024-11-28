@@ -21,7 +21,7 @@ const Footer = () => {
           <div className="mb-2">
             <img src="/logoyr.svg" alt="Y.R. Logo" className="mx-auto h-[40px] w-[40px] mb-2" />
             <p className="text-xs text-gray-400">
-              © 2024 Todos los derechos reservados | Versión {APP_CONFIG.version} <br />
+              © 2024 Todos los derechos reservados | versión {APP_CONFIG.version} <br />
               No tenemos ninguna relación con el SII.cl
             </p>
           </div>
