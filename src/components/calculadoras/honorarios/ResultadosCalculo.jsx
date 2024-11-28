@@ -1,17 +1,43 @@
 import React, { useState } from 'react';
+import { Check, Copy } from 'lucide-react';
 import { TASAS_RETENCION } from '../../../constants/config';
 import { formatearMonto } from '../../../utils/formatters';
+import BotonExportar from '../../shared/BotonExportar';
+import generarPDFHonorarios from '../../../utils/pdf/honorariosPdfGenerator';
 
 const ResultadosCalculo = ({ resultados, tasaRetencion }) => {
   const [copiado, setCopiado] = useState('');
   const tasaActual = TASAS_RETENCION.find(t => t.valor.toString() === tasaRetencion);
   const añoRetencion = tasaActual?.año || '2024';
 
-  const copiarAlPortapapeles = (monto, tipo) => {
-    navigator.clipboard.writeText(monto.toString().replace(/[^\d]/g, ''));
+  const copiarAlPortapapeles = async (valor, tipo) => {
+    await navigator.clipboard.writeText(valor.toString());
     setCopiado(tipo);
     setTimeout(() => setCopiado(''), 2000);
   };
+
+  const handleExportPDF = () => {
+    try {
+      console.log('Iniciando exportación PDF...');
+      generarPDFHonorarios(resultados, tasaRetencion, añoRetencion);
+    } catch (error) {
+      console.error('Error al exportar PDF:', error);
+    }
+  };
+
+  const CopyButton = ({ valor, tipo }) => (
+    <button
+      onClick={() => copiarAlPortapapeles(valor, tipo)}
+      className="text-slate-400 hover:text-slate-300 transition-colors p-1"
+      title="Copiar valor"
+    >
+      {copiado === tipo ? (
+        <Check className="w-4 h-4 text-green-400" />
+      ) : (
+        <Copy className="w-4 h-4" />
+      )}
+    </button>
+  );
 
   return (
     <div className="space-y-4 bg-slate-800 p-6 rounded-lg">
@@ -27,34 +53,41 @@ const ResultadosCalculo = ({ resultados, tasaRetencion }) => {
         </div>
         <div className="flex justify-between items-center">
           <p className="text-slate-300 text-sm leading-none">Este es el monto por el cual debes hacer tu boleta:</p>
-          <div className="flex items-center space-x-2">
+          <div className="flex items-center gap-2">
             <p className="text-slate-100 text-2xl font-bold leading-none">
               {formatearMonto(resultados.desdeValoresLiquidos.bruto)}
             </p>
-            <button
-              onClick={() => copiarAlPortapapeles(resultados.desdeValoresLiquidos.bruto, 'brutoLiquido')}
-              className="text-slate-400 hover:text-white p-1"
-              title="Copiar monto"
-            >
-              <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 5H6a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2v-1M8 5a2 2 0 002 2h2a2 2 0 002-2M8 5a2 2 0 012-2h2a2 2 0 012 2m0 0h2a2 2 0 012 2v3m2 4H10m0 0l3-3m-3 3l3 3" />
-              </svg>
-            </button>
+            <CopyButton 
+              valor={resultados.desdeValoresLiquidos.bruto} 
+              tipo="brutoLiquido" 
+            />
           </div>
         </div>
         <div className="flex justify-between items-center border-t border-slate-700 pt-4 mt-4">
           <p className="text-slate-300 text-sm leading-none">
             La retención del {tasaRetencion}% corresponde al año {añoRetencion} es de:
           </p>
-          <p className="text-red-400 text-2xl font-bold leading-none">
-            {formatearMonto(resultados.desdeValoresLiquidos.retencion)}
-          </p>
+          <div className="flex items-center gap-2">
+            <p className="text-red-400 text-2xl font-bold leading-none">
+              {formatearMonto(resultados.desdeValoresLiquidos.retencion)}
+            </p>
+            <CopyButton 
+              valor={resultados.desdeValoresLiquidos.retencion} 
+              tipo="retencionLiquido" 
+            />
+          </div>
         </div>
         <div className="flex justify-between items-center border-t border-slate-700 pt-4 mt-4">
           <p className="text-slate-300 text-sm leading-none">Recibirás un monto líquido a tu cuenta:</p>
-          <p className="text-green-400 text-4xl font-bold leading-none">
-            {formatearMonto(resultados.desdeValoresLiquidos.liquido)}
-          </p>
+          <div className="flex items-center gap-2">
+            <p className="text-green-400 text-4xl font-bold leading-none">
+              {formatearMonto(resultados.desdeValoresLiquidos.liquido)}
+            </p>
+            <CopyButton 
+              valor={resultados.desdeValoresLiquidos.liquido} 
+              tipo="liquidoLiquido" 
+            />
+          </div>
         </div>
       </div>
 
@@ -70,35 +103,47 @@ const ResultadosCalculo = ({ resultados, tasaRetencion }) => {
         </div>
         <div className="flex justify-between items-center">
           <p className="text-slate-300 text-sm leading-none">Este es el monto por el cual debes hacer tu boleta:</p>
-          <div className="flex items-center space-x-2">
+          <div className="flex items-center gap-2">
             <p className="text-slate-100 text-2xl font-bold leading-none">
               {formatearMonto(resultados.desdeValoresBrutos.bruto)}
             </p>
-            <button
-              onClick={() => copiarAlPortapapeles(resultados.desdeValoresBrutos.bruto, 'brutoBruto')}
-              className="text-slate-400 hover:text-white p-1"
-              title="Copiar monto"
-            >
-              <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 5H6a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2v-1M8 5a2 2 0 002 2h2a2 2 0 002-2M8 5a2 2 0 012-2h2a2 2 0 012 2m0 0h2a2 2 0 012 2v3m2 4H10m0 0l3-3m-3 3l3 3" />
-              </svg>
-            </button>
+            <CopyButton 
+              valor={resultados.desdeValoresBrutos.bruto} 
+              tipo="brutoBruto" 
+            />
           </div>
         </div>
         <div className="flex justify-between items-center border-t border-slate-700 pt-4 mt-4">
           <p className="text-slate-300 text-sm leading-none">
             La retención del {tasaRetencion}% corresponde al año {añoRetencion} es de:
           </p>
-          <p className="text-red-400 text-2xl font-bold leading-none">
-            {formatearMonto(resultados.desdeValoresBrutos.retencion)}
-          </p>
+          <div className="flex items-center gap-2">
+            <p className="text-red-400 text-2xl font-bold leading-none">
+              {formatearMonto(resultados.desdeValoresBrutos.retencion)}
+            </p>
+            <CopyButton 
+              valor={resultados.desdeValoresBrutos.retencion} 
+              tipo="retencionBruto" 
+            />
+          </div>
         </div>
         <div className="flex justify-between items-center border-t border-slate-700 pt-4 mt-4">
           <p className="text-slate-300 text-sm leading-none">Recibirás un monto líquido a tu cuenta:</p>
-          <p className="text-green-400 text-4xl font-bold leading-none">
-            {formatearMonto(resultados.desdeValoresBrutos.liquido)}
-          </p>
+          <div className="flex items-center gap-2">
+            <p className="text-green-400 text-4xl font-bold leading-none">
+              {formatearMonto(resultados.desdeValoresBrutos.liquido)}
+            </p>
+            <CopyButton 
+              valor={resultados.desdeValoresBrutos.liquido} 
+              tipo="liquidoBruto" 
+            />
+          </div>
         </div>
+      </div>
+
+      {/* Botón Exportar PDF */}
+      <div className="mt-6 flex justify-center">
+        <BotonExportar onClick={handleExportPDF} />
       </div>
     </div>
   );

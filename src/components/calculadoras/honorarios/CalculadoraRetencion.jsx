@@ -3,8 +3,7 @@ import FormularioIngreso from './FormularioIngreso';
 import BotonesControl from './BotonesControl';
 import ResultadosCalculo from './ResultadosCalculo';
 import NavigationMenu from '../../shared/NavigationMenu';
-import { TASAS_RETENCION, calcularMontos } from '../../../constants/config';
-import { parsearMonto } from '../../../utils/formatters';
+import { TASAS_RETENCION, parsearMonto, calcularMontos } from '../../../constants/config';
 
 const CalculadoraRetencion = () => {
   const [monto, setMonto] = useState('');
@@ -34,18 +33,26 @@ const CalculadoraRetencion = () => {
     setMonto('');
     setTasaRetencion(TASAS_RETENCION[0].valor.toString());
     setResultados({
-      desdeValoresLiquidos: { bruto: 0, retencion: 0, liquido: 0 },
-      desdeValoresBrutos: { bruto: 0, retencion: 0, liquido: 0 }
+      desdeValoresLiquidos: {
+        bruto: 0,
+        retencion: 0,
+        liquido: 0
+      },
+      desdeValoresBrutos: {
+        bruto: 0,
+        retencion: 0,
+        liquido: 0
+      }
     });
   };
 
   return (
-    <>
+    <div className="flex flex-col min-h-screen">
       <NavigationMenu />
-      <div className="container max-w-2xl mx-auto px-4">
+      <div className="flex-grow container max-w-2xl mx-auto px-4">
         <div className="bg-slate-800 rounded-lg shadow-xl p-6">
           <h1 className="text-slate-300 text-2xl font-bold text-center mb-6">
-            Calculadora de Retención de Honorarios
+            Retención Boleta
           </h1>
           <div className="space-y-6">
             <FormularioIngreso
@@ -69,7 +76,7 @@ const CalculadoraRetencion = () => {
           </div>
         </div>
       </div>
-    </>
+    </div>
   );
 };
 

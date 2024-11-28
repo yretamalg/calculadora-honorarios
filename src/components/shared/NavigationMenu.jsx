@@ -1,33 +1,39 @@
+import React from 'react';
+import { Home } from 'lucide-react';
+
 const NavigationMenu = () => {
-    return (
-      <nav className="bg-slate-900 py-3 mb-6 border-b border-slate-700">
-        <div className="container mx-auto px-4 max-w-4xl flex items-center justify-between">
+  return (
+    <nav className="py-3 mb-6">
+      <div className="container mx-auto px-4 max-w-4xl">
+        <div className="flex justify-between items-center">
+          {/* Botón Home a la izquierda */}
           <a 
             href="/" 
-            className="text-slate-300 hover:text-white transition-colors"
+            className="flex items-center gap-2 text-sm text-slate-300 hover:text-white transition-colors px-4 py-2 rounded-md hover:bg-slate-800"
           >
-            <div className="flex items-center space-x-2">
-              <img src="/logoyr.svg" alt="Logo" className="h-8 w-8" />
-              <span className="font-semibold">vBox Pro</span>
-            </div>
+            <Home size={18} />
+            <span>Inicio</span>
           </a>
+
+          {/* Botones de navegación a la derecha */}
           <div className="flex space-x-4">
             <a 
               href="/honorarios" 
-              className="text-sm text-slate-300 hover:text-white transition-colors"
+              className="px-4 py-2 text-sm bg-slate-800 text-slate-300 hover:text-white hover:bg-slate-700 transition-colors rounded-md border border-slate-600"
             >
-              Retención
+              Retención Boleta
             </a>
             <a 
               href="/iva" 
-              className="text-sm text-slate-300 hover:text-white transition-colors"
+              className="px-4 py-2 text-sm bg-slate-800 text-slate-300 hover:text-white hover:bg-slate-700 transition-colors rounded-md border border-slate-600"
             >
-              IVA
+              19% IVA Facturas
             </a>
           </div>
         </div>
-      </nav>
-    );
-  };
-  
-  export default NavigationMenu;
+      </div>
+    </nav>
+  );
+};
+
+export default NavigationMenu;

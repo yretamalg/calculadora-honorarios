@@ -1,6 +1,6 @@
 import React from 'react';
 import ItemLista from './ItemLista';
-import BotonesControl from './BotonesControl';
+import { parsearMonto } from '../../../utils/formatters';
 
 const FormularioItems = ({ items, setItems, onCalcular, onLimpiar }) => {
   const agregarItem = () => {
@@ -19,21 +19,26 @@ const FormularioItems = ({ items, setItems, onCalcular, onLimpiar }) => {
     if (items.length === 1) return;
     const nuevosItems = items.filter(item => item.id !== id);
     setItems(nuevosItems);
-    onCalcular(nuevosItems);
+    calcularTotal(nuevosItems);
   };
 
   const actualizarItem = (id, campo, valor) => {
     const nuevosItems = items.map(item => {
       if (item.id === id) {
-        if (campo === 'valorUnitario') {
-          valor = formatearMonto(parsearMonto(valor));
-        }
         return { ...item, [campo]: valor };
       }
       return item;
     });
     setItems(nuevosItems);
-    onCalcular(nuevosItems);
+    calcularTotal(nuevosItems);
+  };
+
+  const calcularTotal = (items) => {
+    const itemsConValores = items.map(item => ({
+      ...item,
+      valorNumerico: parsearMonto(item.valorUnitario)
+    }));
+    onCalcular(itemsConValores);
   };
 
   return (
@@ -49,17 +54,20 @@ const FormularioItems = ({ items, setItems, onCalcular, onLimpiar }) => {
           />
         ))}
         
-        <button
-          onClick={agregarItem}
-          className="w-full px-4 py-2 text-white bg-orange-700 rounded-md hover:bg-orange-600 focus:outline-none focus:ring-2 focus:ring-orange-500 focus:ring-offset-2"
-        >
-          Agregar Artículo
-        </button>
-
-        <BotonesControl
-          onCalcular={() => onCalcular(items)}
-          onLimpiar={onLimpiar}
-        />
+        <div className="flex gap-4">
+          <button
+            onClick={agregarItem}
+            className="flex-1 px-4 py-2 text-white bg-orange-700 rounded-md hover:bg-orange-600 focus:outline-none focus:ring-2 focus:ring-orange-500 focus:ring-offset-2"
+          >
+            Agregar Artículo
+          </button>
+          <button
+            onClick={onLimpiar}
+            className="flex-1 px-4 py-2 text-gray-900 bg-slate-300 border border-gray-300 rounded-md hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
+          >
+            Limpiar
+          </button>
+        </div>
       </div>
     </div>
   );

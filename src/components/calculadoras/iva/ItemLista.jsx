@@ -1,6 +1,18 @@
 import React from 'react';
+import { formatearMonto, parsearMonto } from '../../../utils/formatters';
 
 const ItemLista = ({ item, onUpdate, onDelete, isLastItem }) => {
+  const handleMontoChange = (e) => {
+    let valor = e.target.value;
+    if (valor === '') {
+      onUpdate(item.id, 'valorUnitario', '');
+      return;
+    }
+    const montoNumerico = parsearMonto(valor);
+    const montoFormateado = formatearMonto(montoNumerico);
+    onUpdate(item.id, 'valorUnitario', montoFormateado);
+  };
+
   return (
     <div className="flex gap-2 items-center">
       <input
@@ -20,7 +32,20 @@ const ItemLista = ({ item, onUpdate, onDelete, isLastItem }) => {
       <input
         type="text"
         value={item.valorUnitario}
-        onChange={(e) => onUpdate(item.id, 'valorUnitario', e.target.value)}
+        onChange={handleMontoChange}
+        onFocus={(e) => {
+          if (!e.target.value) {
+            onUpdate(item.id, 'valorUnitario', '$ ');
+          }
+          const temp = e.target.value;
+          e.target.value = '';
+          e.target.value = temp;
+        }}
+        onBlur={(e) => {
+          if (e.target.value === '$ ') {
+            onUpdate(item.id, 'valorUnitario', '');
+          }
+        }}
         placeholder="$ 0"
         className="w-32 bg-slate-700 text-white border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-orange-500 focus:border-orange-500 sm:text-sm"
       />

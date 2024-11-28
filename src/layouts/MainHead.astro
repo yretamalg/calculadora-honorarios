@@ -27,7 +27,9 @@ const metaTags = generateMetaTags({
     path
 });
 
-const canonicalURL = new URL(path, Astro.site);
+// Construir la URL canónica correctamente
+const canonicalURL = new URL(path, Astro.site || 'https://www.vbox.pro/').toString();
+const imageUrl = new URL(image, Astro.site || 'https://www.vbox.pro/').toString();
 const languageAlternates = SEO_CONFIG.languageAlternates || [];
 ---
 
@@ -40,8 +42,8 @@ const languageAlternates = SEO_CONFIG.languageAlternates || [];
 <link rel="canonical" href={canonicalURL} />
 
 <!-- Primary Meta Tags -->
-<title>{metaTags.title}</title>
-<meta name="title" content={metaTags.title} />
+<title>{title}</title>
+<meta name="title" content={title} />
 <meta name="description" content={description} />
 
 <!-- Open Graph / Facebook -->
@@ -49,31 +51,47 @@ const languageAlternates = SEO_CONFIG.languageAlternates || [];
 <meta property="og:url" content={canonicalURL} />
 <meta property="og:title" content={title} />
 <meta property="og:description" content={description} />
-<meta property="og:image" content={new URL(image, Astro.site)} />
-<meta property="og:locale" content="es_CL" />
+<meta property="og:image" content={imageUrl} />
 
 <!-- Twitter -->
 <meta property="twitter:card" content="summary_large_image" />
 <meta property="twitter:url" content={canonicalURL} />
 <meta property="twitter:title" content={title} />
 <meta property="twitter:description" content={description} />
-<meta property="twitter:image" content={new URL(image, Astro.site)} />
-{SEO_CONFIG.social?.twitter && (
-    <meta name="twitter:creator" content={SEO_CONFIG.social.twitter} />
-)}
+<meta property="twitter:image" content={imageUrl} />
 
 <!-- Language Alternates -->
 {languageAlternates.map((alternate) => (
-    <link rel="alternate" hrefLang={alternate.hrefLang} href={alternate.href} />
+    <link 
+        rel="alternate" 
+        hrefLang={alternate.hrefLang} 
+        href={new URL(alternate.href, Astro.site || 'https://www.vbox.pro/').toString()}
+    />
 ))}
 
 <!-- Additional Meta Tags -->
-{SEO_CONFIG.additionalMetaTags.map((tag) => <meta {...tag} />)}
+{SEO_CONFIG.additionalMetaTags?.map((tag) => <meta {...tag} />)}
 
-<!-- PWA Tags -->
+<!-- Favicons -->
+<link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+<link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png" />
+<link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png" />
+<link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png" />
+<link rel="manifest" href="/site.webmanifest" />
 <meta name="theme-color" content="#ff5722" />
-<meta name="mobile-web-app-capable" content="yes" />
-<meta name="application-name" content={SEO_CONFIG.defaultTitle} />
-<meta name="apple-mobile-web-app-capable" content="yes" />
-<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
-<meta name="apple-mobile-web-app-title" content={SEO_CONFIG.defaultTitle} />
+
+<!-- Fonts -->
+<link 
+    rel="preconnect" 
+    href="https://fonts.googleapis.com" 
+    crossorigin="anonymous"
+/>
+<link 
+    rel="preconnect" 
+    href="https://fonts.gstatic.com" 
+    crossorigin="anonymous"
+/>
+<link 
+    href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" 
+    rel="stylesheet"
+/>

@@ -1,6 +1,7 @@
 ---
 import MainHead from './MainHead.astro';
 import { SEO_CONFIG, STRUCTURED_DATA } from '../constants/seo';
+import Analytics from '../components/shared/Analytics';
 
 interface Props {
     title?: string;
@@ -16,7 +17,6 @@ const {
     noindex = false,
 } = Astro.props;
 
-// Enrich structured data with current page info
 const pageStructuredData = {
     ...STRUCTURED_DATA.webApplication,
     name: title,
@@ -34,61 +34,14 @@ const pageStructuredData = {
             noindex={noindex}
         />
         
-        <!-- Preload fonts -->
-        <link 
-            rel="preconnect" 
-            href="https://fonts.googleapis.com" 
-            crossorigin
-        />
-        <link 
-            rel="preconnect" 
-            href="https://fonts.gstatic.com" 
-            crossorigin
-        />
-        <link 
-            href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" 
-            rel="stylesheet"
-        />
+        <!-- Resto del head -->
         
-        <!-- Structured Data -->
-        <script type="application/ld+json" set:html={JSON.stringify(pageStructuredData)} />
-        <script type="application/ld+json" set:html={JSON.stringify(STRUCTURED_DATA.organization)} />
-        
-        <!-- Preload critical assets -->
-        <link rel="preload" as="image" href="/logoyr.svg" />
-        <link rel="preload" as="image" href="/chileflag.svg" />
-        
-        <!-- Analytics snippet (if needed) -->
-        {import.meta.env.PROD && (
-            <script async src="/analytics.js"></script>
-        )}
-        
-        <!-- Critical CSS -->
-        <style is:global>
-            :root {
-                color-scheme: dark;
-            }
-            
-            body {
-                font-family: 'Inter', system-ui, sans-serif;
-                -webkit-font-smoothing: antialiased;
-                text-rendering: optimizeLegibility;
-            }
-            
-            ::selection {
-                background-color: #ff5722;
-                color: white;
-            }
-            
-            .scroll-smooth {
-                scroll-behavior: smooth;
-            }
-        </style>
+        <!-- Analytics -->
+        {import.meta.env.PROD && <Analytics client:load />}
     </head>
     <body class="bg-slate-950 min-h-screen text-white antialiased">
         <slot />
         
-        <!-- Skip to main content -->
         <a 
             href="#main" 
             class="sr-only focus:not-sr-only focus:absolute focus:top-4 focus:left-4 bg-orange-500 text-white px-4 py-2 rounded-md"

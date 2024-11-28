@@ -1,3 +1,5 @@
+import { parsearMonto } from '../utils/formatters';
+
 export const TASAS_RETENCION = [
     { 
       valor: 13.75, 
@@ -38,7 +40,7 @@ export const LIMITES = {
 
 export const APP_CONFIG = {
     nombre: 'vBox Pro',
-    version: '1.2.8',
+    version: '1.3.2',
     domain: 'https://www.vbox.pro',
     contactEmail: 'hola@vbox.pro',
     social: {

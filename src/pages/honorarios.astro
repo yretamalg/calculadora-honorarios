@@ -1,8 +1,9 @@
 ---
 import Layout from '../layouts/Layout.astro';
 import CalculadoraRetencion from '../components/calculadoras/honorarios/CalculadoraRetencion';
+import ShareButtons from '../components/shared/ShareButtons';
 import Footer from '../components/shared/Footer';
-import { SEO_CONFIG, PAGE_METADATA } from '../constants/seo';
+import { PAGE_METADATA } from '../constants/seo';
 
 const { honorarios: pageMetadata } = PAGE_METADATA;
 ---
@@ -11,9 +12,10 @@ const { honorarios: pageMetadata } = PAGE_METADATA;
     title={pageMetadata.title}
     description={pageMetadata.description}
 >
-    <main class="flex min-h-screen flex-col bg-slate-950">
-        <div class="flex-grow">
+    <main class="min-h-screen bg-slate-950">
+        <div class="pt-8">
             <CalculadoraRetencion client:load />
+            <ShareButtons client:load />
         </div>
         <Footer client:load />
     </main>

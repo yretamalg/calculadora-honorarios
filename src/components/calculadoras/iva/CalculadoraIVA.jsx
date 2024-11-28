@@ -30,12 +30,12 @@ const CalculadoraIVA = () => {
   };
 
   return (
-    <>
+    <div className="flex flex-col min-h-screen">
       <NavigationMenu />
-      <div className="container max-w-2xl mx-auto px-4">
+      <div className="flex-grow container max-w-2xl mx-auto px-4">
         <div className="bg-slate-800 rounded-lg shadow-xl p-6">
           <h1 className="text-slate-300 text-2xl font-bold text-center mb-6">
-            Calculadora de IVA
+            19% IVA Facturas
           </h1>
           <div className="space-y-6">
             <FormularioItems
@@ -44,11 +44,14 @@ const CalculadoraIVA = () => {
               onCalcular={calcular}
               onLimpiar={limpiar}
             />
-            <ResultadosIVA resultados={resultados} />
+            <ResultadosIVA 
+              resultados={resultados}
+              items={items}
+            />
           </div>
         </div>
       </div>
-    </>
+    </div>
   );
 };
 
