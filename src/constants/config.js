@@ -38,7 +38,7 @@ export const LIMITES = {
 
 export const APP_CONFIG = {
     nombre: 'vBox Pro',
-    version: '1.2.9',
+    version: '1.3.1',
     domain: 'https://www.vbox.pro',
     contactEmail: 'hola@vbox.pro',
     social: {

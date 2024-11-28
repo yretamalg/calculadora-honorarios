@@ -1,6 +1,7 @@
 ---
 import MainHead from './MainHead.astro';
 import { SEO_CONFIG, STRUCTURED_DATA } from '../constants/seo';
+import { ANALYTICS_CONFIG } from '../constants/analytics';
 
 export interface Props {
     title?: string;
@@ -16,7 +17,6 @@ const {
     noindex = false,
 } = Astro.props;
 
-// Enrich structured data with current page info
 const pageStructuredData = {
     ...STRUCTURED_DATA.webApplication,
     name: title,
@@ -38,6 +38,15 @@ const pageStructuredData = {
         <!-- Structured Data -->
         <script is:inline type="application/ld+json" set:html={JSON.stringify(pageStructuredData)} />
         <script is:inline type="application/ld+json" set:html={JSON.stringify(STRUCTURED_DATA.organization)} />
+
+        <!-- Google Analytics -->
+        <script async src={`https://www.googletagmanager.com/gtag/js?id=${ANALYTICS_CONFIG.GA_MEASUREMENT_ID}`}></script>
+        <script is:inline define:vars={{ GA_ID: ANALYTICS_CONFIG.GA_MEASUREMENT_ID }}>
+            window.dataLayer = window.dataLayer || [];
+            function gtag(){dataLayer.push(arguments);}
+            gtag('js', new Date());
+            gtag('config', GA_ID);
+        </script>
     </head>
     <body class="bg-slate-950 min-h-screen">
         <slot />
