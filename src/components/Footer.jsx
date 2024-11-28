@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { APP_CONFIG } from '../constants/config';
+import ShareButtons from './ShareButtons';
 
 const Footer = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -15,7 +16,7 @@ const Footer = () => {
 
   return (
     <>
-      <footer className="text-white py-4 mt-8">
+      <footer className="text-white py-2">
         <div className="container mx-auto px-4 text-center">
           <div className="mb-2">
             <img src="/logoyr.svg" alt="Y.R. Logo" className="mx-auto h-[40px] w-[40px] mb-2" />
@@ -61,7 +62,7 @@ const Footer = () => {
           onClick={closeModal}
         >
           <div 
-            className="bg-slate-800 rounded-lg p-6 relative"
+            className="bg-slate-800 rounded-lg p-6 relative flex flex-col"
             style={{ width: '500px', height: '400px' }}
             onClick={(e) => e.stopPropagation()}
           >
@@ -72,10 +73,13 @@ const Footer = () => {
             >
               ×
             </button>
-            <div className="text-center h-full flex items-center justify-center">
+            <div className="flex-grow flex items-center justify-center">
               <p className="text-lg font-semibold text-gray-300">
                 hola@vbox.pro
               </p>
+            </div>
+            <div className="mt-auto pb-2.5">
+              <ShareButtons />
             </div>
           </div>
         </div>

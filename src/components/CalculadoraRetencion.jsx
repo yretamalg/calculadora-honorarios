@@ -2,6 +2,7 @@ import { useState } from 'react';
 import FormularioIngreso from './FormularioIngreso';
 import BotonesControl from './BotonesControl';
 import ResultadosCalculo from './ResultadosCalculo';
+import ShareButtons from './ShareButtons';
 import Footer from './Footer';
 import { TASAS_RETENCION, parsearMonto, calcularMontos } from '../constants/config';
 
@@ -48,7 +49,7 @@ const CalculadoraRetencion = () => {
 
   return (
     <div className="min-h-screen flex flex-col">
-      <main className="flex-grow pt-8 sm:pt-12 pb-8">
+      <div className="flex-grow mt-5">
         <div className="container max-w-2xl mx-auto px-4 sm:px-6">
           <div className="bg-slate-800 rounded-lg shadow-xl p-4 sm:p-6">
             <h1 className="text-slate-300 text-xl sm:text-2xl font-bold text-center mb-4 sm:mb-6">
@@ -76,8 +77,13 @@ const CalculadoraRetencion = () => {
             </div>
           </div>
         </div>
-      </main>
-      <Footer />
+      </div>
+      <div className="w-full mt-auto">
+        <div className="pb-2.5">
+          <ShareButtons />
+        </div>
+        <Footer />
+      </div>
     </div>
   );
 };
