@@ -28,8 +28,8 @@ const metaTags = generateMetaTags({
 });
 
 // Construir la URL canónica correctamente
-const canonicalURL = new URL(path, Astro.site || 'https://www.vbox.pro/').toString();
-const imageUrl = new URL(image, Astro.site || 'https://www.vbox.pro/').toString();
+const canonicalURL = new URL(path, Astro.site || 'https://honorario.netlify.app/').toString();
+const imageUrl = new URL(image, Astro.site || 'https://honorario.netlify.app/').toString();
 const languageAlternates = SEO_CONFIG.languageAlternates || [];
 ---
 
@@ -65,7 +65,7 @@ const languageAlternates = SEO_CONFIG.languageAlternates || [];
     <link 
         rel="alternate" 
         hreflang={alternate.hrefLang}
-        href={new URL(alternate.href, Astro.site || 'https://www.vbox.pro/').toString()}
+        href={new URL(alternate.href, Astro.site || 'https://honorario.netlify.app/').toString()}
     />
 ))}
 

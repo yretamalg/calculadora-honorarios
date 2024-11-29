@@ -41,7 +41,7 @@ export const LIMITES = {
 export const APP_CONFIG = {
     nombre: 'vBox Pro',
     version: '1.3.7',
-    domain: 'https://www.vbox.pro',
+    domain: 'https://honorario.netlify.app/',
     contactEmail: 'hola@vbox.pro',
     social: {
         twitter: '@vboxpro'
