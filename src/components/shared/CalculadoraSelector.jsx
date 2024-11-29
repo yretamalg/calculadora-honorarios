@@ -6,7 +6,7 @@ const CalculadoraSelector = () => {
     <div className="flex flex-col min-h-screen">
       <div className="flex-grow container max-w-2xl mx-auto p-6">
         <h1 className="text-slate-300 text-3xl font-bold text-center mb-12">
-          Calculadoras Tributarias Chile
+          Calculadoras de Impuestos (Chile)
         </h1>
         
         <div className="grid md:grid-cols-2 gap-6">

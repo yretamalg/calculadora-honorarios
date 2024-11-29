@@ -14,7 +14,7 @@ export const STRUCTURED_DATA = {
     webApplication: {
         "@context": "https://schema.org",
         "@type": "WebApplication",
-        "name": "Calculadoras Tributarias Chile",
+        "name": "Calculadoras de Impuestos (Chile)",
         "applicationCategory": "FinanceApplication",
         "operatingSystem": "Web",
         "offers": {
@@ -26,7 +26,7 @@ export const STRUCTURED_DATA = {
 };
 
 export const SEO_CONFIG = {
-    defaultTitle: 'Calculadoras Tributarias Chile | vBox Pro',
+    defaultTitle: 'Calculadoras de Impuestos (Chile) | vBox Pro',
     titleTemplate: '%s | vBox Pro',
     defaultDescription: 'Herramientas gratuitas para el cálculo de retención de honorarios e IVA en Chile.',
     siteUrl: APP_CONFIG.domain,
@@ -52,7 +52,7 @@ export const SEO_CONFIG = {
 
 export const PAGE_METADATA = {
     home: {
-        title: 'Calculadoras Tributarias Chile',
+        title: 'Calculadoras de Impuestos (Chile)',
         description: 'Herramientas gratuitas para el cálculo de retención de honorarios e IVA en Chile.',
         path: '/',
         priority: '1.0'
