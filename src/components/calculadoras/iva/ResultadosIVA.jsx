@@ -1,30 +1,36 @@
 import React, { useState } from 'react';
 import { Check, Copy } from 'lucide-react';
-import { formatearMonto, parsearMonto } from '../../../utils/formatters';
+import { formatearMonto } from '../../../utils/formatters';
 import BotonExportar from '../../shared/BotonExportar';
-import { jsPDF } from 'jspdf';
-import 'jspdf-autotable';
 
 const ResultadosIVA = ({ resultados, items }) => {
   const [copiado, setCopiado] = useState('');
 
   const copiarAlPortapapeles = async (valor, tipo) => {
-    await navigator.clipboard.writeText(valor.toString());
-    setCopiado(tipo);
-    setTimeout(() => setCopiado(''), 2000);
+    try {
+      // Formateamos el valor antes de copiarlo
+      const valorFormateado = formatearMonto(valor);
+      await navigator.clipboard.writeText(valorFormateado);
+      setCopiado(tipo);
+      setTimeout(() => setCopiado(''), 2000);
+    } catch (error) {
+      console.error('Error al copiar:', error);
+    }
   };
 
-  const handleExportPDF = () => {
+  const handleExportPDF = async () => {
     try {
+      const { jsPDF } = await import('jspdf');
+      await import('jspdf-autotable');
+      
       const doc = new jsPDF();
       const pageWidth = doc.internal.pageSize.width;
-      
+
       // Título
       doc.setFontSize(20);
       doc.setTextColor(33, 37, 41);
       const titulo = 'Cálculo de IVA';
-      const tituloWidth = doc.getTextWidth(titulo);
-      doc.text(titulo, (pageWidth - tituloWidth) / 2, 20);
+      doc.text(titulo, pageWidth/2, 20, { align: 'center' });
 
       // Fecha
       doc.setFontSize(12);
@@ -32,7 +38,7 @@ const ResultadosIVA = ({ resultados, items }) => {
 
       // Tabla de items
       const itemsParaTabla = items.map(item => {
-        const valorUnitarioNumerico = parsearMonto(item.valorUnitario);
+        const valorUnitarioNumerico = parseFloat(item.valorUnitario.replace(/[^\d]/g, ''));
         const subtotal = item.cantidad * valorUnitarioNumerico;
         return [
           item.descripcion || 'Sin descripción',
@@ -40,7 +46,7 @@ const ResultadosIVA = ({ resultados, items }) => {
           formatearMonto(valorUnitarioNumerico),
           formatearMonto(subtotal)
         ];
-      }).filter(item => parsearMonto(item[2]) > 0); // Solo incluir items con valor > 0
+      }).filter(item => parseFloat(item[2].replace(/[^\d]/g, '')) > 0);
 
       doc.autoTable({
         startY: 45,
@@ -73,7 +79,7 @@ const ResultadosIVA = ({ resultados, items }) => {
         }
       });
 
-      // Agregar footer
+      // Disclaimer
       doc.setFontSize(9);
       doc.setTextColor(128);
       const disclaimer = [
@@ -84,9 +90,7 @@ const ResultadosIVA = ({ resultados, items }) => {
 
       let y = 260;
       disclaimer.forEach(line => {
-        const textWidth = doc.getTextWidth(line);
-        const startX = (pageWidth - textWidth) / 2;
-        doc.text(line, startX, y);
+        doc.text(line, pageWidth/2, y, { align: 'center' });
         y += 6;
       });
 
