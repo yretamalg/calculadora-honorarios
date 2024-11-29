@@ -64,7 +64,7 @@ const languageAlternates = SEO_CONFIG.languageAlternates || [];
 {languageAlternates.map((alternate) => (
     <link 
         rel="alternate" 
-        hrefLang={alternate.hrefLang} 
+        hreflang={alternate.hrefLang}
         href={new URL(alternate.href, Astro.site || 'https://www.vbox.pro/').toString()}
     />
 ))}
