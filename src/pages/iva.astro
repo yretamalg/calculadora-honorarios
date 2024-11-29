@@ -11,8 +11,8 @@ const { iva: pageMetadata } = PAGE_METADATA;
     title={pageMetadata.title}
     description={pageMetadata.description}
 >
-    <main class="min-h-screen bg-slate-950">
-        <div class="pt-8">  <!-- cambiado a pt-8 (32px) -->
+    <main class="flex-1 flex flex-col">
+        <div class="flex-1 pt-8">
             <CalculadoraIVA client:load />
         </div>
         <Footer client:load />

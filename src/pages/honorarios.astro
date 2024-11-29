@@ -11,8 +11,8 @@ const { honorarios: pageMetadata } = PAGE_METADATA;
     title={pageMetadata.title}
     description={pageMetadata.description}
 >
-    <main class="min-h-screen bg-slate-950">
-        <div class="pt-8">
+    <main class="flex-1 flex flex-col">
+        <div class="flex-1 pt-8">
             <CalculadoraRetencion client:load />
         </div>
         <Footer client:load />
