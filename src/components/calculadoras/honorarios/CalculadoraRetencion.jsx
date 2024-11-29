@@ -3,7 +3,9 @@ import FormularioIngreso from './FormularioIngreso';
 import BotonesControl from './BotonesControl';
 import ResultadosCalculo from './ResultadosCalculo';
 import NavigationMenu from '../../shared/NavigationMenu';
-import { TASAS_RETENCION, parsearMonto, calcularMontos } from '../../../constants/config';
+import ShareButtons from '../../shared/ShareButtons';
+import { TASAS_RETENCION } from '../../../constants/config';
+import { parsearMonto } from '../../../utils/formatters';
 
 const CalculadoraRetencion = () => {
   const [monto, setMonto] = useState('');
@@ -25,8 +27,27 @@ const CalculadoraRetencion = () => {
     const montoNumerico = parsearMonto(monto);
     if (!montoNumerico) return;
 
-    const resultadosCalculados = calcularMontos(montoNumerico, tasaRetencion);
-    setResultados(resultadosCalculados);
+    const tasa = TASAS_RETENCION.find(t => t.valor.toString() === tasaRetencion);
+    if (!tasa) return;
+    
+    const montoBrutoDesdeLiquido = Math.round(montoNumerico / tasa.factor);
+    const retencionDesdeLiquido = montoBrutoDesdeLiquido - montoNumerico;
+    
+    const retencionDesdeBruto = Math.round(montoNumerico * (tasa.valor / 100));
+    const liquidoDesdeBruto = montoNumerico - retencionDesdeBruto;
+    
+    setResultados({
+      desdeValoresLiquidos: {
+        bruto: montoBrutoDesdeLiquido,
+        retencion: retencionDesdeLiquido,
+        liquido: montoNumerico
+      },
+      desdeValoresBrutos: {
+        bruto: montoNumerico,
+        retencion: retencionDesdeBruto,
+        liquido: liquidoDesdeBruto
+      }
+    });
   };
 
   const limpiar = () => {
@@ -50,7 +71,7 @@ const CalculadoraRetencion = () => {
     <div className="flex flex-col min-h-screen">
       <NavigationMenu />
       <div className="flex-grow container max-w-2xl mx-auto px-4">
-        <div className="bg-slate-800 rounded-lg shadow-xl p-6">
+        <div className="bg-slate-800 rounded-lg shadow-xl p-6 mb-6">
           <h1 className="text-slate-300 text-2xl font-bold text-center mb-6">
             Retención Boleta
           </h1>
@@ -60,10 +81,7 @@ const CalculadoraRetencion = () => {
               tasaRetencion={tasaRetencion}
               onMontoChange={setMonto}
               onTasaChange={setTasaRetencion}
-              tasasRetencion={TASAS_RETENCION.map(t => ({
-                valor: t.valor.toString(),
-                etiqueta: t.etiqueta
-              }))}
+              tasasRetencion={TASAS_RETENCION}
             />
             <BotonesControl
               onCalcular={calcular}
@@ -74,6 +92,9 @@ const CalculadoraRetencion = () => {
               tasaRetencion={tasaRetencion}
             />
           </div>
+        </div>
+        <div className="mb-6">
+          <ShareButtons />
         </div>
       </div>
     </div>

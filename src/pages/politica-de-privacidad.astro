@@ -2,7 +2,9 @@
 import Layout from '../layouts/Layout.astro';
 import NavigationMenu from '../components/shared/NavigationMenu';
 import Footer from '../components/shared/Footer';
+import PoliticaPrivacidad from '../components/PoliticaPrivacidad';
 import { PAGE_METADATA } from '../constants/seo';
+import ShareButtons from '../components/shared/ShareButtons';
 
 const { privacyPolicy: pageMetadata } = PAGE_METADATA;
 ---
@@ -14,10 +16,9 @@ const { privacyPolicy: pageMetadata } = PAGE_METADATA;
     <div class="min-h-screen bg-slate-900 text-gray-300 flex flex-col">
         <NavigationMenu client:load />
         <main class="container mx-auto px-4 py-12 max-w-4xl flex-grow">
-            <!-- El contenido existente sigue igual -->
-            <h1 class="text-3xl font-bold mb-6 text-white">Política de Privacidad</h1>
-            <!-- ... resto del contenido ... -->
+            <PoliticaPrivacidad client:load />
         </main>
+        <ShareButtons client:load />
         <Footer client:load />
     </div>
 </Layout>

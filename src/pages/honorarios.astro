@@ -1,7 +1,6 @@
 ---
 import Layout from '../layouts/Layout.astro';
 import CalculadoraRetencion from '../components/calculadoras/honorarios/CalculadoraRetencion';
-import ShareButtons from '../components/shared/ShareButtons';
 import Footer from '../components/shared/Footer';
 import { PAGE_METADATA } from '../constants/seo';
 
@@ -15,7 +14,6 @@ const { honorarios: pageMetadata } = PAGE_METADATA;
     <main class="min-h-screen bg-slate-950">
         <div class="pt-8">
             <CalculadoraRetencion client:load />
-            <ShareButtons client:load />
         </div>
         <Footer client:load />
     </main>

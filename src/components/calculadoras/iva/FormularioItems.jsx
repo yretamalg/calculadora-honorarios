@@ -1,6 +1,6 @@
 import React from 'react';
 import ItemLista from './ItemLista';
-import { parsearMonto } from '../../../utils/formatters';
+import { parsearMonto, formatearMonto } from '../../../utils/formatters';
 
 const FormularioItems = ({ items, setItems, onCalcular, onLimpiar }) => {
   const agregarItem = () => {
@@ -44,14 +44,30 @@ const FormularioItems = ({ items, setItems, onCalcular, onLimpiar }) => {
   return (
     <div className="bg-slate-800 border-slate-700 rounded-lg p-6">
       <div className="space-y-4">
+        {/* Encabezados */}
+        <div className="grid grid-cols-[1fr,80px,120px,40px] gap-2 text-sm text-slate-300 mb-2">
+          <div>Descripción del artículo</div>
+          <div className="text-center">Cantidad</div>
+          <div className="text-center">Valor Unit.</div>
+          <div></div>
+        </div>
+
+        {/* Items con subtotales */}
         {items.map((item, index) => (
-          <ItemLista
-            key={item.id}
-            item={item}
-            onUpdate={actualizarItem}
-            onDelete={eliminarItem}
-            isLastItem={items.length === 1}
-          />
+          <div key={item.id} className="space-y-2">
+            <ItemLista
+              item={item}
+              onUpdate={actualizarItem}
+              onDelete={eliminarItem}
+              isLastItem={items.length === 1}
+            />
+            {/* Subtotal por ítem */}
+            {parsearMonto(item.valorUnitario) > 0 && (
+              <div className="text-right text-sm text-slate-400 pr-10">
+                Subtotal: {formatearMonto(parsearMonto(item.valorUnitario) * item.cantidad)}
+              </div>
+            )}
+          </div>
         ))}
         
         <div className="flex gap-4">

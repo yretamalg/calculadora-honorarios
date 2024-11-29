@@ -1,4 +1,5 @@
 import React from 'react';
+import ShareButtons from './ShareButtons';
 
 const CalculadoraSelector = () => {
   return (
@@ -52,6 +53,11 @@ const CalculadoraSelector = () => {
               </div>
             </a>
           </div>
+        </div>
+
+        {/* Agregamos el componente ShareButtons */}
+        <div className="mt-8">
+          <ShareButtons />
         </div>
       </div>
     </div>

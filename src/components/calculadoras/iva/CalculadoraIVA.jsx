@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import FormularioItems from './FormularioItems';
 import ResultadosIVA from './ResultadosIVA';
 import NavigationMenu from '../../shared/NavigationMenu';
+import ShareButtons from '../../shared/ShareButtons';
 import { calcularIVA } from '../../../utils/calculators';
 import { parsearMonto } from '../../../utils/formatters';
 
@@ -32,22 +33,27 @@ const CalculadoraIVA = () => {
   return (
     <div className="flex flex-col min-h-screen">
       <NavigationMenu />
-      <div className="flex-grow container max-w-2xl mx-auto px-4">
-        <div className="bg-slate-800 rounded-lg shadow-xl p-6">
-          <h1 className="text-slate-300 text-2xl font-bold text-center mb-6">
-            19% IVA Facturas
-          </h1>
-          <div className="space-y-6">
-            <FormularioItems
-              items={items}
-              setItems={setItems}
-              onCalcular={calcular}
-              onLimpiar={limpiar}
-            />
-            <ResultadosIVA 
-              resultados={resultados}
-              items={items}
-            />
+      <div className="flex-grow container mx-auto px-4">
+        <div className="max-w-4xl mx-auto">
+          <div className="bg-slate-800 rounded-lg shadow-xl p-6 mb-6">
+            <h1 className="text-slate-300 text-2xl font-bold text-center mb-6">
+              19% IVA Facturas
+            </h1>
+            <div className="space-y-6">
+              <FormularioItems
+                items={items}
+                setItems={setItems}
+                onCalcular={calcular}
+                onLimpiar={limpiar}
+              />
+              <ResultadosIVA 
+                resultados={resultados}
+                items={items}
+              />
+            </div>
+          </div>
+          <div className="mb-6">
+            <ShareButtons />
           </div>
         </div>
       </div>

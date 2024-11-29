@@ -3,7 +3,21 @@ import { Check, Copy } from 'lucide-react';
 import { TASAS_RETENCION } from '../../../constants/config';
 import { formatearMonto } from '../../../utils/formatters';
 import BotonExportar from '../../shared/BotonExportar';
-import generarPDFHonorarios from '../../../utils/pdf/honorariosPdfGenerator';
+
+// Movemos el CopyButton fuera del componente principal
+const CopyButton = ({ valor, tipo, copiadoActual, onCopy }) => (
+  <button
+    onClick={() => onCopy(valor, tipo)}
+    className="text-slate-400 hover:text-slate-300 transition-colors p-1"
+    title="Copiar valor"
+  >
+    {copiadoActual === tipo ? (
+      <Check className="w-4 h-4 text-green-400" />
+    ) : (
+      <Copy className="w-4 h-4" />
+    )}
+  </button>
+);
 
 const ResultadosCalculo = ({ resultados, tasaRetencion }) => {
   const [copiado, setCopiado] = useState('');
@@ -11,33 +25,94 @@ const ResultadosCalculo = ({ resultados, tasaRetencion }) => {
   const añoRetencion = tasaActual?.año || '2024';
 
   const copiarAlPortapapeles = async (valor, tipo) => {
-    await navigator.clipboard.writeText(valor.toString());
-    setCopiado(tipo);
-    setTimeout(() => setCopiado(''), 2000);
-  };
-
-  const handleExportPDF = () => {
     try {
-      console.log('Iniciando exportación PDF...');
-      generarPDFHonorarios(resultados, tasaRetencion, añoRetencion);
+      // Formatear el valor antes de copiarlo
+      const valorFormateado = formatearMonto(valor).replace(/\s/g, '');
+      await navigator.clipboard.writeText(valorFormateado);
+      setCopiado(tipo);
+      // Aumentamos el tiempo del feedback visual a 2 segundos
+      setTimeout(() => setCopiado(''), 2000);
     } catch (error) {
-      console.error('Error al exportar PDF:', error);
+      console.error('Error al copiar:', error);
     }
   };
 
-  const CopyButton = ({ valor, tipo }) => (
-    <button
-      onClick={() => copiarAlPortapapeles(valor, tipo)}
-      className="text-slate-400 hover:text-slate-300 transition-colors p-1"
-      title="Copiar valor"
-    >
-      {copiado === tipo ? (
-        <Check className="w-4 h-4 text-green-400" />
-      ) : (
-        <Copy className="w-4 h-4" />
-      )}
-    </button>
-  );
+  const handleExportPDF = async () => {
+    try {
+      const { jsPDF } = await import('jspdf');
+      await import('jspdf-autotable');
+      
+      const doc = new jsPDF();
+      const pageWidth = doc.internal.pageSize.width;
+
+      // Título
+      doc.setFontSize(20);
+      doc.setTextColor(33, 37, 41);
+      const titulo = 'Cálculo de Retención de Honorarios';
+      doc.text(titulo, pageWidth/2, 20, { align: 'center' });
+
+      // Información del cálculo
+      doc.setFontSize(12);
+      doc.text(`Tasa de Retención: ${tasaRetencion}% (año ${añoRetencion})`, 14, 40);
+      doc.text(`Fecha de cálculo: ${new Date().toLocaleDateString('es-CL')}`, 14, 48);
+
+      // Valores Líquidos
+      doc.autoTable({
+        startY: 60,
+        head: [['Desde valores líquidos', 'Monto']],
+        body: [
+          ['Monto Bruto (Boleta)', formatearMonto(resultados.desdeValoresLiquidos.bruto)],
+          ['Retención', formatearMonto(resultados.desdeValoresLiquidos.retencion)],
+          ['Monto Líquido', formatearMonto(resultados.desdeValoresLiquidos.liquido)]
+        ],
+        theme: 'grid',
+        headStyles: { fillColor: [255, 87, 34] },
+        styles: { halign: 'left', fontSize: 11 },
+        columnStyles: {
+          0: { cellWidth: 100 },
+          1: { cellWidth: 80, halign: 'right' }
+        }
+      });
+
+      // Valores Brutos
+      doc.autoTable({
+        startY: doc.lastAutoTable.finalY + 15,
+        head: [['Desde valores brutos', 'Monto']],
+        body: [
+          ['Monto Bruto (Boleta)', formatearMonto(resultados.desdeValoresBrutos.bruto)],
+          ['Retención', formatearMonto(resultados.desdeValoresBrutos.retencion)],
+          ['Monto Líquido', formatearMonto(resultados.desdeValoresBrutos.liquido)]
+        ],
+        theme: 'grid',
+        headStyles: { fillColor: [255, 87, 34] },
+        styles: { halign: 'left', fontSize: 11 },
+        columnStyles: {
+          0: { cellWidth: 100 },
+          1: { cellWidth: 80, halign: 'right' }
+        }
+      });
+
+      // Disclaimer
+      doc.setFontSize(9);
+      doc.setTextColor(128);
+      const disclaimer = [
+        'No nos hacemos responsable por decisiones tomadas basadas en los cálculos de esta herramienta.',
+        'Siempre consulte con un profesional tributario para confirmación.',
+        'Para más información lea nuestros Términos de Uso en www.vbox.pro/terminos-de-uso'
+      ];
+
+      let y = 260;
+      disclaimer.forEach(line => {
+        doc.text(line, pageWidth/2, y, { align: 'center' });
+        y += 6;
+      });
+
+      // Guardar PDF
+      doc.save('calculo-retencion.pdf');
+    } catch (error) {
+      console.error('Error al generar PDF:', error);
+    }
+  };
 
   return (
     <div className="space-y-4 bg-slate-800 p-6 rounded-lg">
@@ -59,7 +134,9 @@ const ResultadosCalculo = ({ resultados, tasaRetencion }) => {
             </p>
             <CopyButton 
               valor={resultados.desdeValoresLiquidos.bruto} 
-              tipo="brutoLiquido" 
+              tipo="brutoLiquido"
+              copiadoActual={copiado}
+              onCopy={copiarAlPortapapeles}
             />
           </div>
         </div>
@@ -72,8 +149,10 @@ const ResultadosCalculo = ({ resultados, tasaRetencion }) => {
               {formatearMonto(resultados.desdeValoresLiquidos.retencion)}
             </p>
             <CopyButton 
-              valor={resultados.desdeValoresLiquidos.retencion} 
-              tipo="retencionLiquido" 
+              valor={resultados.desdeValoresLiquidos.retencion}
+              tipo="retencionLiquido"
+              copiadoActual={copiado}
+              onCopy={copiarAlPortapapeles}
             />
           </div>
         </div>
@@ -84,8 +163,10 @@ const ResultadosCalculo = ({ resultados, tasaRetencion }) => {
               {formatearMonto(resultados.desdeValoresLiquidos.liquido)}
             </p>
             <CopyButton 
-              valor={resultados.desdeValoresLiquidos.liquido} 
-              tipo="liquidoLiquido" 
+              valor={resultados.desdeValoresLiquidos.liquido}
+              tipo="liquidoLiquido"
+              copiadoActual={copiado}
+              onCopy={copiarAlPortapapeles}
             />
           </div>
         </div>
@@ -108,8 +189,10 @@ const ResultadosCalculo = ({ resultados, tasaRetencion }) => {
               {formatearMonto(resultados.desdeValoresBrutos.bruto)}
             </p>
             <CopyButton 
-              valor={resultados.desdeValoresBrutos.bruto} 
-              tipo="brutoBruto" 
+              valor={resultados.desdeValoresBrutos.bruto}
+              tipo="brutoBruto"
+              copiadoActual={copiado}
+              onCopy={copiarAlPortapapeles}
             />
           </div>
         </div>
@@ -122,8 +205,10 @@ const ResultadosCalculo = ({ resultados, tasaRetencion }) => {
               {formatearMonto(resultados.desdeValoresBrutos.retencion)}
             </p>
             <CopyButton 
-              valor={resultados.desdeValoresBrutos.retencion} 
-              tipo="retencionBruto" 
+              valor={resultados.desdeValoresBrutos.retencion}
+              tipo="retencionBruto"
+              copiadoActual={copiado}
+              onCopy={copiarAlPortapapeles}
             />
           </div>
         </div>
@@ -134,8 +219,10 @@ const ResultadosCalculo = ({ resultados, tasaRetencion }) => {
               {formatearMonto(resultados.desdeValoresBrutos.liquido)}
             </p>
             <CopyButton 
-              valor={resultados.desdeValoresBrutos.liquido} 
-              tipo="liquidoBruto" 
+              valor={resultados.desdeValoresBrutos.liquido}
+              tipo="liquidoBruto"
+              copiadoActual={copiado}
+              onCopy={copiarAlPortapapeles}
             />
           </div>
         </div>

@@ -14,20 +14,20 @@ const ItemLista = ({ item, onUpdate, onDelete, isLastItem }) => {
   };
 
   return (
-    <div className="flex gap-2 items-center">
+    <div className="grid grid-cols-[1fr,80px,120px,40px] gap-2 items-center">
       <input
         type="text"
         value={item.descripcion}
         onChange={(e) => onUpdate(item.id, 'descripcion', e.target.value)}
         placeholder="Descripción"
-        className="flex-grow bg-slate-700 text-white border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-orange-500 focus:border-orange-500 sm:text-sm"
+        className="w-full bg-slate-700 text-white border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-orange-500 focus:border-orange-500 sm:text-sm"
       />
       <input
         type="number"
         value={item.cantidad}
         onChange={(e) => onUpdate(item.id, 'cantidad', parseInt(e.target.value) || 1)}
         min="1"
-        className="w-20 bg-slate-700 text-white border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-orange-500 focus:border-orange-500 sm:text-sm"
+        className="w-full bg-slate-700 text-white border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-orange-500 focus:border-orange-500 sm:text-sm text-center"
       />
       <input
         type="text"
@@ -47,12 +47,13 @@ const ItemLista = ({ item, onUpdate, onDelete, isLastItem }) => {
           }
         }}
         placeholder="$ 0"
-        className="w-32 bg-slate-700 text-white border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-orange-500 focus:border-orange-500 sm:text-sm"
+        className="w-full bg-slate-700 text-white border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-orange-500 focus:border-orange-500 sm:text-sm"
       />
       <button
         onClick={() => onDelete(item.id)}
         className="p-2 text-red-400 hover:text-red-300 focus:outline-none disabled:opacity-50"
         disabled={isLastItem}
+        title={isLastItem ? "No se puede eliminar el último ítem" : "Eliminar ítem"}
       >
         ×
       </button>

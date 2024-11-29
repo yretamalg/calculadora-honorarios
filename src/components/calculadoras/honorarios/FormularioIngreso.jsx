@@ -1,7 +1,9 @@
 const FormularioIngreso = ({ monto, tasaRetencion, onMontoChange, onTasaChange, tasasRetencion }) => {
   const formatearMonto = (valor) => {
+    // Remover todo excepto números
     let numero = valor.replace(/\D/g, '');
     if (numero) {
+      // Convertir a número y formatear con separadores de miles
       numero = new Intl.NumberFormat('es-CL').format(parseInt(numero));
     }
     return numero ? `$ ${numero}` : '';
@@ -9,18 +11,29 @@ const FormularioIngreso = ({ monto, tasaRetencion, onMontoChange, onTasaChange, 
 
   const handleMontoChange = (e) => {
     let valor = e.target.value;
+    // Si está vacío, actualizar el estado directamente
     if (valor === '') {
       onMontoChange('');
       return;
     }
+    // Si no está vacío, formatear y actualizar
     const montoFormateado = formatearMonto(valor);
     onMontoChange(montoFormateado);
+  };
+
+  const handleKeyPress = (e) => {
+    // Permitir Enter para el cálculo
+    if (e.key === 'Enter') {
+      e.preventDefault();
+      document.querySelector('button[type="submit"]')?.click();
+    }
   };
 
   const handleFocus = (e) => {
     if (!e.target.value) {
       onMontoChange('$ ');
     }
+    // Posicionar el cursor al final
     const temp = e.target.value;
     e.target.value = '';
     e.target.value = temp;
@@ -43,6 +56,7 @@ const FormularioIngreso = ({ monto, tasaRetencion, onMontoChange, onTasaChange, 
           id="monto"
           value={monto}
           onChange={handleMontoChange}
+          onKeyPress={handleKeyPress}
           onFocus={handleFocus}
           onBlur={handleBlur}
           className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-orange-500 focus:border-orange-500 sm:text-sm bg-slate-700 text-white"

@@ -25,7 +25,7 @@ const generarPDFHonorarios = (resultados, tasaRetencion, añoRetencion) => {
       startY: 60,
       head: [['Desde valores líquidos', 'Monto']],
       body: [
-        ['Monto Bruto (Boleta)', formatearMonto(resultados.desdeValoresLiquidos.bruto)],
+        ['Monto Bruto (monto por el cual debes hacer tu boleta)', formatearMonto(resultados.desdeValoresLiquidos.bruto)],
         ['Retención', formatearMonto(resultados.desdeValoresLiquidos.retencion)],
         ['Monto Líquido', formatearMonto(resultados.desdeValoresLiquidos.liquido)]
       ],
@@ -43,7 +43,7 @@ const generarPDFHonorarios = (resultados, tasaRetencion, añoRetencion) => {
       startY: doc.lastAutoTable.finalY + 15,
       head: [['Desde valores brutos', 'Monto']],
       body: [
-        ['Monto Bruto (Boleta)', formatearMonto(resultados.desdeValoresBrutos.bruto)],
+        ['Monto Bruto (monto por el cual debes hacer tu boleta)', formatearMonto(resultados.desdeValoresBrutos.bruto)],
         ['Retención', formatearMonto(resultados.desdeValoresBrutos.retencion)],
         ['Monto Líquido', formatearMonto(resultados.desdeValoresBrutos.liquido)]
       ],

@@ -1,11 +1,9 @@
 import React, { useState } from 'react';
 import { Check, Copy } from 'lucide-react';
-import { formatearMonto } from '../../../utils/formatters';
+import { formatearMonto, parsearMonto } from '../../../utils/formatters';
 import BotonExportar from '../../shared/BotonExportar';
 import { jsPDF } from 'jspdf';
 import 'jspdf-autotable';
-import { generarPDFIva } from '../../../utils/pdf';
-
 
 const ResultadosIVA = ({ resultados, items }) => {
   const [copiado, setCopiado] = useState('');
@@ -17,78 +15,86 @@ const ResultadosIVA = ({ resultados, items }) => {
   };
 
   const handleExportPDF = () => {
-    const doc = new jsPDF();
-    const pageWidth = doc.internal.pageSize.width;
-    
-    // Título
-    doc.setFontSize(20);
-    doc.setTextColor(33, 37, 41);
-    const titulo = 'Cálculo de IVA';
-    const tituloWidth = doc.getTextWidth(titulo);
-    doc.text(titulo, (pageWidth - tituloWidth) / 2, 20);
+    try {
+      const doc = new jsPDF();
+      const pageWidth = doc.internal.pageSize.width;
+      
+      // Título
+      doc.setFontSize(20);
+      doc.setTextColor(33, 37, 41);
+      const titulo = 'Cálculo de IVA';
+      const tituloWidth = doc.getTextWidth(titulo);
+      doc.text(titulo, (pageWidth - tituloWidth) / 2, 20);
 
-    // Fecha
-    doc.setFontSize(12);
-    doc.text(`Fecha de cálculo: ${new Date().toLocaleDateString('es-CL')}`, 14, 35);
+      // Fecha
+      doc.setFontSize(12);
+      doc.text(`Fecha de cálculo: ${new Date().toLocaleDateString('es-CL')}`, 14, 35);
 
-    // Tabla de items
-    const itemsParaTabla = items.map(item => [
-      item.descripcion || 'Sin descripción',
-      item.cantidad.toString(),
-      formatearMonto(Number(item.valorUnitario)),
-      formatearMonto(item.cantidad * Number(item.valorUnitario))
-    ]);
+      // Tabla de items
+      const itemsParaTabla = items.map(item => {
+        const valorUnitarioNumerico = parsearMonto(item.valorUnitario);
+        const subtotal = item.cantidad * valorUnitarioNumerico;
+        return [
+          item.descripcion || 'Sin descripción',
+          item.cantidad.toString(),
+          formatearMonto(valorUnitarioNumerico),
+          formatearMonto(subtotal)
+        ];
+      }).filter(item => parsearMonto(item[2]) > 0); // Solo incluir items con valor > 0
 
-    doc.autoTable({
-      startY: 45,
-      head: [['Descripción', 'Cantidad', 'Valor Unitario', 'Subtotal']],
-      body: itemsParaTabla,
-      theme: 'grid',
-      headStyles: { fillColor: [255, 87, 34] },
-      styles: { fontSize: 10 },
-      columnStyles: {
-        0: { cellWidth: 80 },
-        1: { cellWidth: 30, halign: 'center' },
-        2: { cellWidth: 40, halign: 'right' },
-        3: { cellWidth: 40, halign: 'right' }
-      }
-    });
+      doc.autoTable({
+        startY: 45,
+        head: [['Descripción', 'Cantidad', 'Valor Unitario', 'Subtotal']],
+        body: itemsParaTabla,
+        theme: 'grid',
+        headStyles: { fillColor: [255, 87, 34] },
+        styles: { fontSize: 10 },
+        columnStyles: {
+          0: { cellWidth: 80 },
+          1: { cellWidth: 30, halign: 'center' },
+          2: { cellWidth: 40, halign: 'right' },
+          3: { cellWidth: 40, halign: 'right' }
+        }
+      });
 
-    // Tabla de totales
-    doc.autoTable({
-      startY: doc.lastAutoTable.finalY + 15,
-      body: [
-        ['Neto', formatearMonto(resultados.subtotal)],
-        ['IVA (19%)', formatearMonto(resultados.iva)],
-        ['Total', formatearMonto(resultados.total)]
-      ],
-      theme: 'plain',
-      styles: { fontSize: 12, fontStyle: 'bold' },
-      columnStyles: {
-        0: { cellWidth: 100 },
-        1: { cellWidth: 80, halign: 'right' }
-      }
-    });
+      // Tabla de totales
+      doc.autoTable({
+        startY: doc.lastAutoTable.finalY + 15,
+        body: [
+          ['Neto', formatearMonto(resultados.subtotal)],
+          ['IVA (19%)', formatearMonto(resultados.iva)],
+          ['Total', formatearMonto(resultados.total)]
+        ],
+        theme: 'plain',
+        styles: { fontSize: 12, fontStyle: 'bold' },
+        columnStyles: {
+          0: { cellWidth: 100 },
+          1: { cellWidth: 80, halign: 'right' }
+        }
+      });
 
-    // Agregar footer
-    doc.setFontSize(9);
-    doc.setTextColor(128);
-    const disclaimer = [
-      'No nos hacemos responsable por decisiones tomadas basadas en los cálculos de esta herramienta.',
-      'Siempre consulte con un profesional tributario para confirmación.',
-      'Para más información lea nuestros Términos de Uso en www.vbox.pro/terminos-de-uso'
-    ];
+      // Agregar footer
+      doc.setFontSize(9);
+      doc.setTextColor(128);
+      const disclaimer = [
+        'No nos hacemos responsable por decisiones tomadas basadas en los cálculos de esta herramienta.',
+        'Siempre consulte con un profesional tributario para confirmación.',
+        'Para más información lea nuestros Términos de Uso en www.vbox.pro/terminos-de-uso'
+      ];
 
-    let y = 260;
-    disclaimer.forEach(line => {
-      const textWidth = doc.getTextWidth(line);
-      const startX = (pageWidth - textWidth) / 2;
-      doc.text(line, startX, y);
-      y += 6;
-    });
+      let y = 260;
+      disclaimer.forEach(line => {
+        const textWidth = doc.getTextWidth(line);
+        const startX = (pageWidth - textWidth) / 2;
+        doc.text(line, startX, y);
+        y += 6;
+      });
 
-    // Guardar PDF
-    doc.save('calculo-iva.pdf');
+      // Guardar PDF
+      doc.save('calculo-iva.pdf');
+    } catch (error) {
+      console.error('Error al generar PDF:', error);
+    }
   };
 
   return (
@@ -112,6 +118,7 @@ const ResultadosIVA = ({ resultados, items }) => {
           </button>
         </div>
       </div>
+
       <div className="flex justify-between items-center border-t border-slate-700 pt-4">
         <p className="text-slate-300 text-sm">IVA (19%):</p>
         <div className="flex items-center gap-2">
@@ -131,6 +138,7 @@ const ResultadosIVA = ({ resultados, items }) => {
           </button>
         </div>
       </div>
+
       <div className="flex justify-between items-center border-t border-slate-700 pt-4">
         <p className="text-slate-300 text-sm">Total:</p>
         <div className="flex items-center gap-2">
