@@ -14,7 +14,7 @@ const CalculadoraSelector = () => {
             <a href="/honorarios" className="block">
               <div className="p-4">
                 <h2 className="text-slate-300 text-lg font-semibold group-hover:text-orange-500 transition-colors text-center">
-                  Calculadora de Retención
+                  Calculadora Boleta Honorarios
                 </h2>
               </div>
               <div className="p-4 pt-0">
@@ -36,7 +36,7 @@ const CalculadoraSelector = () => {
             <a href="/iva" className="block">
               <div className="p-4">
                 <h2 className="text-slate-300 text-lg font-semibold group-hover:text-orange-500 transition-colors text-center">
-                  Calculadora de IVA
+                  Calculadora de IVA Facturas
                 </h2>
               </div>
               <div className="p-4 pt-0">
