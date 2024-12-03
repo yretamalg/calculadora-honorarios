@@ -1,0 +1,24 @@
+---
+import Layout from '../layouts/Layout.astro';
+import ChangelogViewer from '../components/changelog/ChangelogViewer';
+import NavigationMenu from '../components/shared/NavigationMenu';
+import Footer from '../components/shared/Footer';
+
+const pageMetadata = {
+    title: 'Historial de Cambios | vBox Pro',
+    description: 'Registro de actualizaciones y mejoras de las Calculadoras Tributarias Chile.'
+};
+---
+
+<Layout
+    title={pageMetadata.title}
+    description={pageMetadata.description}
+>
+    <div class="min-h-screen bg-slate-950 flex flex-col">
+        <NavigationMenu client:load />
+        <main class="flex-grow">
+            <ChangelogViewer client:load />
+        </main>
+        <Footer client:load />
+    </div>
+</Layout>

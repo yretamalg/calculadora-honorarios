@@ -44,8 +44,8 @@ const FormularioItems = ({ items, setItems, onCalcular, onLimpiar }) => {
   return (
     <div className="bg-slate-800 border-slate-700 rounded-lg p-6">
       <div className="space-y-4">
-        {/* Encabezados */}
-        <div className="grid grid-cols-[1fr,80px,120px,40px] gap-2 text-sm text-slate-300 mb-2">
+        {/* Encabezados - Solo visibles en desktop */}
+        <div className="hidden md:grid md:grid-cols-[1fr,80px,120px,40px] gap-2 text-sm text-slate-300 mb-2">
           <div>Descripción del artículo</div>
           <div className="text-center">Cantidad</div>
           <div className="text-center">Valor Unit.</div>
@@ -61,25 +61,25 @@ const FormularioItems = ({ items, setItems, onCalcular, onLimpiar }) => {
               onDelete={eliminarItem}
               isLastItem={items.length === 1}
             />
-            {/* Subtotal por ítem */}
+            {/* Subtotal por ítem - Ajustado para móvil */}
             {parsearMonto(item.valorUnitario) > 0 && (
-              <div className="text-right text-sm text-slate-400 pr-10">
+              <div className="text-right text-sm text-slate-400 md:pr-10">
                 Subtotal: {formatearMonto(parsearMonto(item.valorUnitario) * item.cantidad)}
               </div>
             )}
           </div>
         ))}
         
-        <div className="flex gap-4">
+        <div className="flex flex-col md:flex-row gap-2 md:gap-4 mt-6">
           <button
             onClick={agregarItem}
-            className="flex-1 px-4 py-2 text-white bg-orange-700 rounded-md hover:bg-orange-600 focus:outline-none focus:ring-2 focus:ring-orange-500 focus:ring-offset-2"
+            className="px-4 py-1.5 md:py-2 text-sm text-white bg-orange-700 rounded-md hover:bg-orange-600 focus:outline-none focus:ring-2 focus:ring-orange-500 focus:ring-offset-2"
           >
             Agregar Artículo
           </button>
           <button
             onClick={onLimpiar}
-            className="flex-1 px-4 py-2 text-gray-900 bg-slate-300 border border-gray-300 rounded-md hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
+            className="px-4 py-1.5 md:py-2 text-sm text-gray-900 bg-slate-300 border border-gray-300 rounded-md hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
           >
             Limpiar
           </button>

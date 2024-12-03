@@ -5,7 +5,7 @@ const PoliticaPrivacidad = () => {
     <div className="space-y-8">
       <h1 className="text-3xl font-bold text-white mb-8">Política de Privacidad</h1>
 
-      <section className="bg-slate-800 rounded-lg p-6 space-y-4">
+      <section className="bg-slate-950 rounded-lg p-6 space-y-4">
         <h2 className="text-xl font-semibold text-orange-500">1. Recopilación de Datos y Análisis</h2>
         <p className="text-slate-300">
           Utilizamos Google Analytics para mejorar la experiencia del usuario y entender cómo se utiliza nuestra calculadora. Esta herramienta recopila información anónima sobre:

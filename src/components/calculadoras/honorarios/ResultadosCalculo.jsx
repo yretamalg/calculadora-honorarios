@@ -98,7 +98,7 @@ const ResultadosCalculo = ({ resultados, tasaRetencion }) => {
       const disclaimer = [
         'No nos hacemos responsable por decisiones tomadas basadas en los cálculos de esta herramienta.',
         'Siempre consulte con un profesional tributario para confirmación.',
-        'Para más información lea nuestros Términos de Uso en www.vbox.pro/terminos-de-uso'
+        'Para más información lea nuestros Términos de Uso.'
       ];
 
       let y = 260;

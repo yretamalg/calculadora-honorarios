@@ -1,0 +1,26 @@
+---
+import Layout from '../../layouts/Layout.astro';
+import ChangelogAdmin from '../../components/changelog/ChangelogAdmin';
+import NavigationMenu from '../../components/shared/NavigationMenu';
+import Footer from '../../components/shared/Footer';
+
+const pageMetadata = {
+    title: 'Administrar Changelog | vBox Pro',
+    description: 'Panel de administración del historial de cambios.',
+    noindex: true
+};
+---
+
+<Layout
+    title={pageMetadata.title}
+    description={pageMetadata.description}
+    noindex={pageMetadata.noindex}
+>
+    <div class="min-h-screen bg-slate-950 flex flex-col">
+        <NavigationMenu client:load />
+        <main class="flex-grow">
+            <ChangelogAdmin client:load />
+        </main>
+        <Footer client:load />
+    </div>
+</Layout>

@@ -14,7 +14,7 @@ export const STRUCTURED_DATA = {
     webApplication: {
         "@context": "https://schema.org",
         "@type": "WebApplication",
-        "name": "Calculadoras de Impuestos (Chile)",
+        "name": "Calculadoras Tributarias Chile",
         "applicationCategory": "FinanceApplication",
         "operatingSystem": "Web",
         "offers": {
@@ -26,7 +26,7 @@ export const STRUCTURED_DATA = {
 };
 
 export const SEO_CONFIG = {
-    defaultTitle: 'Calculadoras de Impuestos (Chile) | vBox Pro',
+    defaultTitle: 'Calculadoras Tributarias Chile | vBox Pro',
     titleTemplate: '%s | vBox Pro',
     defaultDescription: 'Herramientas gratuitas para el cálculo de retención de honorarios e IVA en Chile.',
     siteUrl: APP_CONFIG.domain,
@@ -52,7 +52,7 @@ export const SEO_CONFIG = {
 
 export const PAGE_METADATA = {
     home: {
-        title: 'Calculadoras de Impuestos (Chile)',
+        title: 'Calculadoras Tributarias Chile',
         description: 'Herramientas gratuitas para el cálculo de retención de honorarios e IVA en Chile.',
         path: '/',
         priority: '1.0'
@@ -80,5 +80,53 @@ export const PAGE_METADATA = {
         description: 'Términos y condiciones de uso de las Calculadoras Tributarias.',
         path: '/terminos-de-uso',
         priority: '0.5'
+    },
+    changelog: {
+        title: 'Historial de Cambios',
+        description: 'Registro de actualizaciones y mejoras de las Calculadoras Tributarias Chile.',
+        path: '/changelog',
+        priority: '0.7'
+    },
+    changelogAdmin: {
+        title: 'Administrar Changelog',
+        description: 'Panel de administración del historial de cambios.',
+        path: '/admin/changelog',
+        priority: '0.1',
+        noindex: true
     }
+};
+
+export const generateMetaTags = ({ title, description, image, path }) => {
+    return {
+        canonical: path,
+        title: title,
+        meta: [
+            { name: 'description', content: description },
+            { property: 'og:type', content: 'website' },
+            { property: 'og:title', content: title },
+            { property: 'og:description', content: description },
+            { property: 'og:image', content: image },
+            { name: 'twitter:card', content: 'summary_large_image' },
+            { name: 'twitter:title', content: title },
+            { name: 'twitter:description', content: description },
+            { name: 'twitter:image', content: image }
+        ]
+    };
+};
+
+export const validateSEOParams = ({ title, description, image }) => {
+    const errors = [];
+    
+    if (title && title.length > 60) {
+        errors.push('Title should be less than 60 characters');
+    }
+    
+    if (description && description.length > 160) {
+        errors.push('Description should be less than 160 characters');
+    }
+    
+    return {
+        isValid: errors.length === 0,
+        errors
+    };
 };

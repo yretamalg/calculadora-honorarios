@@ -29,6 +29,12 @@ const NavigationMenu = () => {
             >
               19% IVA Facturas
             </a>
+            <a 
+  href="/changelog" 
+  className="px-4 py-2 text-sm bg-slate-800 text-slate-300 hover:text-white hover:bg-slate-700 transition-colors rounded-md border border-slate-600"
+>
+  Changelog
+</a>
           </div>
         </div>
       </div>

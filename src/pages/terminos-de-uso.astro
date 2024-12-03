@@ -3,6 +3,8 @@ import Layout from '../layouts/Layout.astro';
 import NavigationMenu from '../components/shared/NavigationMenu';
 import Footer from '../components/shared/Footer';
 import { PAGE_METADATA } from '../constants/seo';
+import ShareButtons from '../components/shared/ShareButtons';
+
 
 const { termsOfUse: pageMetadata } = PAGE_METADATA;
 ---
@@ -11,7 +13,7 @@ const { termsOfUse: pageMetadata } = PAGE_METADATA;
     title={pageMetadata.title}
     description={pageMetadata.description}
 >
-    <div class="min-h-screen bg-slate-900 text-gray-300 flex flex-col">
+    <div class="min-h-screen bg-slate-950 text-gray-300 flex flex-col">
         <NavigationMenu client:load />
         <main class="container mx-auto px-4 py-12 max-w-4xl flex-grow">
             <h1 class="text-3xl font-bold mb-6 text-white">Términos de Uso</h1>
@@ -150,6 +152,7 @@ const { termsOfUse: pageMetadata } = PAGE_METADATA;
                 </a>
             </div>
         </main>
+        <ShareButtons client:load />
         <Footer client:load />
     </div>
 </Layout>

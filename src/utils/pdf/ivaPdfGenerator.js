@@ -1,7 +1,6 @@
 import { jsPDF } from 'jspdf';
 import 'jspdf-autotable';
-import { formatearMonto, parsearMonto } from '../formatters';
-import { agregarFooter } from './common';
+import { formatearMonto } from '../formatters';
 
 const generarPDFIva = (items, resultados) => {
   const doc = new jsPDF();
@@ -22,8 +21,8 @@ const generarPDFIva = (items, resultados) => {
   const itemsParaTabla = items.map(item => [
     item.descripcion || 'Sin descripción',
     item.cantidad.toString(),
-    formatearMonto(parsearMonto(item.valorUnitario)),
-    formatearMonto(item.cantidad * parsearMonto(item.valorUnitario))
+    formatearMonto(Number(item.valorUnitario)),
+    formatearMonto(item.cantidad * Number(item.valorUnitario))
   ]);
 
   doc.autoTable({
@@ -57,8 +56,36 @@ const generarPDFIva = (items, resultados) => {
     }
   });
 
-  // Disclaimer y Logo
-  agregarFooter(doc);
+  // Disclaimer
+  doc.setFontSize(9);
+  doc.setTextColor(128);
+  const disclaimer = [
+    'No nos hacemos responsable por decisiones tomadas basadas en los cálculos de esta herramienta.',
+    'Siempre consulte con un profesional tributario para confirmación.'
+  ];
+
+  let y = 260;
+  disclaimer.forEach(line => {
+    const textWidth = doc.getTextWidth(line);
+    const startX = (pageWidth - textWidth) / 2;
+    doc.text(line, startX, y);
+    y += 6;
+  });
+
+  // Logo
+  try {
+    const logoWidth = 30;
+    doc.addImage(
+      'logoyr_b.png',
+      'PNG',
+      (pageWidth - logoWidth) / 2,
+      280,
+      logoWidth,
+      logoWidth
+    );
+  } catch (error) {
+    console.error('Error al agregar logo:', error);
+  }
 
   // Guardar PDF
   doc.save('calculo-iva.pdf');
