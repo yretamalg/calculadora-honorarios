@@ -1,41 +1,25 @@
-// src/api/changelog.js - Este es un endpoint independiente
+import fs from 'fs/promises';
+import path from 'path';
 
-export async function GET() {
-  return Response.json({
-    entries: [
-      {
-        version: "1.2.9",
-        date: "2024-11-29",
-        changes: {
-          new: [
-            "Agregado historial de cambios (changelog)",
-            "Nueva página de administración para el changelog"
-          ],
-          improved: [
-            "Mejorada la interfaz de usuario de las calculadoras",
-            "Optimizado el rendimiento general de la aplicación"
-          ],
-          fixed: [
-            "Corregidos problemas de visualización en dispositivos móviles",
-            "Solucionados errores en el formato de montos grandes"
-          ]
-        }
-      }
-    ]
-  });
+const CHANGELOG_PATH = path.join(process.cwd(), 'src/constants/changelog.json');
+
+export async function getChangelog() {
+  try {
+    const data = await fs.readFile(CHANGELOG_PATH, 'utf-8');
+    return JSON.parse(data);
+  } catch (error) {
+    console.error('Error reading changelog:', error);
+    return { entries: [] };
+  }
 }
 
-export async function POST({ request }) {
+export async function saveChangelog(entry) {
   try {
-    const body = await request.json();
-    console.log('Received data:', body);
-    
-    return Response.json({ success: true });
+    const changelog = await getChangelog();
+    changelog.entries.unshift(entry);
+    await fs.writeFile(CHANGELOG_PATH, JSON.stringify(changelog, null, 2));
   } catch (error) {
-    console.error('Error processing request:', error);
-    return Response.json(
-      { error: "Error al procesar la solicitud" },
-      { status: 500 }
-    );
+    console.error('Error saving changelog:', error);
+    throw new Error('Failed to save changelog');
   }
 }
