@@ -1,5 +1,3 @@
-// src/types/changelog.ts
-
 export type ChangeCategory = 'new' | 'improved' | 'fixed';
 
 export interface ChangelogEntry {

@@ -1,29 +1,20 @@
-// src/utils/changelog.js
+import type { Changelog, ChangelogEntry } from '../types/changelog';
 import fs from 'fs/promises';
 import path from 'path';
 
 const CHANGELOG_PATH = path.join(process.cwd(), 'src/constants/changelog.json');
 
-/**
- * Get the changelog data
- * @returns {Promise<Object>} The changelog data
- */
-export async function getChangelog() {
+export async function getChangelog(): Promise<Changelog> {
   try {
     const data = await fs.readFile(CHANGELOG_PATH, 'utf-8');
-    return JSON.parse(data);
+    return JSON.parse(data) as Changelog;
   } catch (error) {
     console.error('Error reading changelog:', error);
     return { entries: [] };
   }
 }
 
-/**
- * Save a new changelog entry
- * @param {Object} entry The changelog entry to save
- * @returns {Promise<void>}
- */
-export async function saveChangelog(entry) {
+export async function saveChangelog(entry: ChangelogEntry): Promise<void> {
   try {
     const changelog = await getChangelog();
     changelog.entries.unshift(entry);
