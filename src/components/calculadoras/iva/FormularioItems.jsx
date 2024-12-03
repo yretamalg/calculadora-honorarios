@@ -1,4 +1,5 @@
 import React from 'react';
+import { formatearMonto, parsearMonto } from '../../../utils/formatters';
 
 const ItemLista = ({ item, onUpdate, onDelete, isLastItem }) => {
   const handleMontoChange = (e) => {
@@ -25,7 +26,7 @@ const ItemLista = ({ item, onUpdate, onDelete, isLastItem }) => {
       </button>
 
       {/* Vista móvil */}
-      <div className="md:hidden space-y-2 pr-8"> {/* Añadido pr-8 para dar espacio al botón eliminar */}
+      <div className="md:hidden space-y-2 pr-8">
         <input
           type="text"
           value={item.descripcion}
