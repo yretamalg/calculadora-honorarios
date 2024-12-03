@@ -19,7 +19,6 @@ const {
     noindex = false
 } = Astro.props;
 
-// Construir la URL canónica correctamente
 const canonicalURL = new URL(path, Astro.site || 'https://honorario.netlify.app/').toString();
 const imageUrl = new URL(image, Astro.site || 'https://honorario.netlify.app/').toString();
 const languageAlternates = SEO_CONFIG.languageAlternates || [];
@@ -56,7 +55,7 @@ const languageAlternates = SEO_CONFIG.languageAlternates || [];
 {languageAlternates.map((alternate) => (
     <link 
         rel="alternate" 
-        hrefLang={alternate.hrefLang}
+        hreflang={alternate.hrefLang}
         href={new URL(alternate.href, Astro.site || 'https://honorario.netlify.app/').toString()}
     />
 ))}
@@ -73,17 +72,6 @@ const languageAlternates = SEO_CONFIG.languageAlternates || [];
 <meta name="theme-color" content="#ff5722" />
 
 <!-- Fonts -->
-<link 
-    rel="preconnect" 
-    href="https://fonts.googleapis.com" 
-    crossorigin="anonymous"
-/>
-<link 
-    rel="preconnect" 
-    href="https://fonts.gstatic.com" 
-    crossorigin="anonymous"
-/>
-<link 
-    href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" 
-    rel="stylesheet"
-/>
+<link rel="preconnect" href="https://fonts.googleapis.com" crossorigin="anonymous" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="anonymous" />
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
