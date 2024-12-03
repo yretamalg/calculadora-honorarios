@@ -1,12 +1,13 @@
 import { defineConfig } from 'astro/config';
 import react from '@astrojs/react';
 import tailwind from '@astrojs/tailwind';
-import netlify from '@astrojs/netlify/functions';
+import netlify from '@astrojs/netlify';
 
 export default defineConfig({
   integrations: [react(), tailwind()],
   output: 'server',
-  adapter: netlify(),
-  site: 'https://honorario.netlify.app',
-  base: '/',
+  adapter: netlify({
+    edgeMiddleware: true
+  }),
+  site: 'https://honorario.netlify.app'
 });
