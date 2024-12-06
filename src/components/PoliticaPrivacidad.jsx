@@ -12,7 +12,7 @@ const PoliticaPrivacidad = () => {
           <div className="bg-slate-700 p-4 rounded-lg">
             <h3 className="font-semibold text-white mb-2">1.1 Análisis y Métricas</h3>
             <p className="text-slate-300">
-              Utilizamos Google Analytics (ID: G-NKZ7YSQQ61) para mejorar la experiencia del usuario y comprender el uso de nuestras calculadoras. Recopilamos:
+              Utilizamos Google Analytics para mejorar la experiencia del usuario y comprender el uso de nuestras calculadoras. Recopilamos:
             </p>
             <ul className="list-disc pl-6 mt-2 text-slate-300 space-y-1">
               <li>Patrones de uso y navegación</li>
