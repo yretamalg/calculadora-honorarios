@@ -5,7 +5,6 @@ import Footer from '../components/shared/Footer';
 import { PAGE_METADATA } from '../constants/seo';
 import ShareButtons from '../components/shared/ShareButtons';
 
-
 const { termsOfUse: pageMetadata } = PAGE_METADATA;
 ---
 
@@ -22,7 +21,7 @@ const { termsOfUse: pageMetadata } = PAGE_METADATA;
                 <section>
                     <h2 class="text-xl font-semibold mb-2 text-orange-500">1. Introducción</h2>
                     <p>
-                        Bienvenido a la Calculadora de Retención de Honorarios. 
+                        Bienvenido a las Calculadoras de Impuestos y Finanzas (Chile). 
                         Al utilizar esta herramienta, aceptas los siguientes términos de uso.
                     </p>
                 </section>
@@ -30,23 +29,37 @@ const { termsOfUse: pageMetadata } = PAGE_METADATA;
                 <section>
                     <h2 class="text-xl font-semibold mb-2 text-orange-500">2. Uso de la Herramienta</h2>
                     <p>
-                        Esta calculadora proporciona estimaciones basadas en las tasas de retención 
-                        vigentes. Los resultados son solo referenciales y no constituyen 
-                        asesoramiento tributario oficial.
+                        Nuestras calculadoras están diseñadas para brindar estimaciones basadas en las tasas e información tributaria vigente. Los resultados obtenidos son de carácter referencial y no constituyen asesoramiento tributario oficial. Te recomendamos consultar a un profesional calificado para obtener orientación específica sobre tu situación.
                     </p>
                 </section>
                 
                 <section>
                     <h2 class="text-xl font-semibold mb-2 text-orange-500">3. Responsabilidad</h2>
                     <p>
-                        No nos hacemos responsable por decisiones tomadas basadas 
-                        en los cálculos de esta herramienta. Siempre consulte con un 
-                        profesional tributario para confirmación.
+                        No nos hacemos responsables por las decisiones que tomes en base a los cálculos proporcionados por esta aplicación. Siempre es recomendable consultar con un especialista tributario para confirmar y validar la información.
                     </p>
                 </section>
 
                 <section>
-                    <h2 class="text-xl font-semibold mb-2 text-orange-500">4. Guía Simple de Cálculos</h2>
+                    <h2 class="text-xl font-semibold mb-2 text-orange-500">4. Funcionalidades</h2>
+                    <p>
+                        Nuestra aplicación ofrece las siguientes funcionalidades:
+                    </p>
+                    <ul class="list-disc pl-6 space-y-2">
+                        <li>
+                            <strong>Calculadora de Retención de Honorarios</strong>: Calcula la retención de boletas de honorarios según las tasas vigentes entre 2024 y 2028.
+                        </li>
+                        <li>
+                            <strong>Calculadora de IVA</strong>: Calcula el Impuesto al Valor Agregado (IVA) del 19% para tus facturas y productos.
+                        </li>
+                        <li>
+                            <strong>Calculadora de Porcentajes</strong>: Realiza diversos cálculos porcentuales, como porcentaje de un número, encontrar el total desde un porcentaje, calcular variaciones porcentuales, y más.
+                        </li>
+                    </ul>
+                </section>
+
+                <section>
+                    <h2 class="text-xl font-semibold mb-2 text-orange-500">5. Guía Simple de Cálculos</h2>
                     <div class="bg-slate-800 p-6 rounded-lg space-y-4">
                         <h3 class="text-lg font-semibold text-white mb-2">¿Por qué aumenta la retención?</h3>
                         <div class="bg-slate-700 p-4 rounded-lg space-y-2">
@@ -132,14 +145,64 @@ const { termsOfUse: pageMetadata } = PAGE_METADATA;
                                 escenarios automáticamente. Solo ingresa el monto que conoces (sea líquido o bruto) y la calculadora 
                                 te mostrará todos los valores relevantes.
                             </p>
-                            <p class="text-sm">
-                                <span class="text-orange-500 font-semibold">Descargo de responsabilidad:</span> No tenemos
-                                ninguna relación ni afiliación con el Servicio de Impuestos Internos (SII), la Biblioteca del 
-                                Congreso Nacional de Chile (BCN), ni ninguna otra entidad gubernamental. Los enlaces proporcionados 
-                                son solo para fines informativos y de referencia.
-                            </p>
                         </div>
                     </div>
+                </section>
+
+                <section>
+                    <h2 class="text-xl font-semibold mb-2 text-orange-500">6. Información Adicional</h2>
+                    <p>
+                        Para obtener más detalles sobre el aumento gradual de la retención en boletas de honorarios, puedes consultar la siguiente información:
+                    </p>
+                    <ul class="list-disc pl-6 space-y-2">
+                        <li>
+                            <a 
+                                href="https://www.sii.cl/destacados/boletas_honorarios/aumenta_retencion.html" 
+                                target="_blank" 
+                                rel="noopener noreferrer"
+                                class="text-orange-400 hover:text-orange-300 underline"
+                            >
+                                Servicios de Impuestos Internos - Información sobre el aumento de la retención
+                            </a>
+                        </li>
+                        <li>
+                            <a 
+                                href="https://www.bcn.cl/leychile/navegar?idNorma=1128420" 
+                                target="_blank" 
+                                rel="noopener noreferrer"
+                                class="text-orange-400 hover:text-orange-300 underline"
+                            >
+                                Biblioteca del Congreso Nacional de Chile - Ley N°21.133
+                            </a>
+                        </li>
+                    </ul>
+                </section>
+
+                <section>
+                    <h2 class="text-xl font-semibold mb-2 text-orange-500">7. Descargo de Responsabilidad</h2>
+                    <p>
+                        No tenemos ninguna relación ni afiliación con el Servicio de Impuestos Internos (SII), la Biblioteca del Congreso Nacional de Chile (BCN), ni ninguna otra entidad gubernamental. Los enlaces proporcionados son solo para fines informativos y de referencia.
+                    </p>
+                </section>
+
+                <section>
+                    <h2 class="text-xl font-semibold mb-2 text-orange-500">8. Privacidad y Seguridad</h2>
+                    <p>
+                        Respetamos tu privacidad y los datos que ingreses en nuestras calculadoras. Toda la información se procesa localmente en tu dispositivo y no se almacena ni transmite a ningún servidor. Además, implementamos medidas de seguridad como conexión HTTPS y actualizaciones regulares para mantener protegida tu información.<br />Para mas detalles visita nuestra página de
+                        <a  href="/politica-de-privacidad" 
+                            target="_self" 
+                            rel="noopener noreferrer"
+                            class="text-orange-400 hover:text-orange-300 underline">
+                            Politicas de Privacidad
+                        </a>
+                    </p>
+                </section>
+
+                <section>
+                    <h2 class="text-xl font-semibold mb-2 text-orange-500">9. Modificaciones a los Términos</h2>
+                    <p>
+                        Nos reservamos el derecho de actualizar estos términos de uso en cualquier momento. Los cambios serán efectivos inmediatamente después de su publicación en esta página. Te recomendamos revisarlos periódicamente.
+                    </p>
                 </section>
             </div>
             

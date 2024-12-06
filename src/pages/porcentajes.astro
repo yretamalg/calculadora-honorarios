@@ -1,0 +1,20 @@
+---
+import Layout from '../layouts/Layout.astro';
+import CalculadoraPorcentajes from '../components/calculadoras/porcentajes/CalculadoraPorcentajes';
+import Footer from '../components/shared/Footer';
+import { PAGE_METADATA } from '../constants/seo';
+
+const { porcentajes: pageMetadata } = PAGE_METADATA;
+---
+
+<Layout
+    title={pageMetadata.title}
+    description={pageMetadata.description}
+>
+    <main class="flex-1 flex flex-col">
+        <div class="flex-1 pt-8">
+            <CalculadoraPorcentajes client:load />
+        </div>
+        <Footer client:load />
+    </main>
+</Layout>

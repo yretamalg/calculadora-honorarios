@@ -28,14 +28,14 @@ export const STRUCTURED_DATA = {
 export const SEO_CONFIG = {
     defaultTitle: 'Calculadoras Tributarias Chile | vBox Pro',
     titleTemplate: '%s | vBox Pro',
-    defaultDescription: 'Herramientas gratuitas para el cálculo de retención de honorarios e IVA en Chile.',
+    defaultDescription: 'Herramientas gratuitas para el cálculo de retención de honorarios, IVA y Porcentajes en Chile.',
     siteUrl: APP_CONFIG.domain,
     defaultImage: '/og-image.jpg',
     social: APP_CONFIG.social,
     additionalMetaTags: [
         {
             name: 'keywords',
-            content: 'calculadora, retención, honorarios, iva, impuestos, chile, boleta, SII'
+            content: 'calculadora, retención, honorarios, iva, impuestos, chile, boleta, SII, porcentajes'
         },
         {
             name: 'author',
@@ -53,20 +53,26 @@ export const SEO_CONFIG = {
 export const PAGE_METADATA = {
     home: {
         title: 'Calculadoras Tributarias Chile',
-        description: 'Herramientas gratuitas para el cálculo de retención de honorarios e IVA en Chile.',
+        description: 'Herramientas gratuitas para el cálculo de retención de honorarios, IVA y Porcentajes en Chile.',
         path: '/',
         priority: '1.0'
     },
     honorarios: {
-        title: 'Calculadora de Retención de Honorarios',
+        title: 'Calculadora de Retención de Honorarios 2024-2028',
         description: 'Calcula fácilmente tu retención de honorarios según las tasas vigentes 2024-2028.',
         path: '/honorarios',
         priority: '1.0'
     },
     iva: {
-        title: 'Calculadora de IVA Chile',
-        description: 'Calcula el IVA (19%) para tus productos y servicios en Chile.',
+        title: 'Calculadora de IVA Facturas Chile',
+        description: 'Calcula el IVA de tus facturas (19%) para tus productos y servicios en Chile.',
         path: '/iva',
+        priority: '1.0'
+    },
+    porcentajes: {
+        title: 'Calculadora de Porcentajes',
+        description: 'Calcula diferentes tipos de porcentajes para tus finanzas personales y profesionales.',
+        path: '/porcentajes',
         priority: '1.0'
     },
     privacyPolicy: {

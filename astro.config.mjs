@@ -8,6 +8,5 @@ export default defineConfig({
   output: 'server',
   adapter: netlify({
     edgeMiddleware: true
-  }),
-  site: 'https://honorario.netlify.app'
+  })
 });

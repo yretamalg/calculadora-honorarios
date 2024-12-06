@@ -37,6 +37,12 @@ const Footer = () => {
             >
               Privacidad
             </a>
+            <a
+              href="/changelog"
+              className="text-xs text-gray-300 hover:text-white transition-colors duration-300"
+            >
+              Changelog
+            </a>
             <a 
               href="#" 
               onClick={openModal}

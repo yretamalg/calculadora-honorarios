@@ -74,7 +74,7 @@ const CalculadoraRetencion = () => {
         <div className="max-w-4xl mx-auto">
           <div className="bg-slate-800 rounded-lg shadow-xl p-6 mb-6">
             <h1 className="text-slate-300 text-2xl font-bold text-center mb-6">
-              Retención Boleta
+              Retención Boleta Honorarios 2024-2028
             </h1>
             <div className="space-y-6">
               <FormularioIngreso

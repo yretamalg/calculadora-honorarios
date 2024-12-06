@@ -6,6 +6,6 @@ export const siteConfig = {
     ogImage: '/images/og-image.jpg',
     locale: 'es_CL',
     author: 'Yerson',
-    version: '1.2.9',
+    version: '1.4.1',
     contact: 'hola@vbox.pro'
   };
