@@ -3,7 +3,7 @@ import React from 'react';
 const DataSourceInfo = () => {
   return (
     <div className="text-center text-xs text-slate-400 mt-4">
-      Los datos se extraen desde el Banco Central de Chile. Para comprobar los datos puede visitar{' '}
+      Los datos se extraen desde el Banco Central de Chile.{' '}
       <a 
         href="https://si3.bcentral.cl/Indicadoressiete/secure/Indicadoresdiarios.aspx" 
         target="_blank" 
