@@ -1,105 +1,64 @@
-/**
- * Servicio para manejar las llamadas a la API de indicadores
- */
+// src/components/calculadoras/indicadores/services/indicadoresService.js
 
-const CACHE_KEY = 'indicadores_cache';
-const CACHE_DURATION = 3600000; // 1 hora en milisegundos
+import { SERIES_CODES } from '../constants/indicadores';
+import { getDateRange } from '../utils/dateUtils';
 
 class IndicadoresService {
-    constructor() {
-      this.baseUrl = import.meta.env.DEV 
-        ? 'http://localhost:3001/api/indicadores'
-        : '/.netlify/functions/indicadores';
-    }
-  
-    async getIndicadores() {
-      try {
-        // Intentar obtener del cache primero
-        const cachedData = this.getFromCache();
-        if (cachedData) {
-          return cachedData;
-        }
-  
-        const response = await fetch(this.baseUrl);
-        if (!response.ok) {
-          throw new Error('Error fetching indicators');
-        }
-  
-        const data = await response.json();
-        
-        // Guardar en cache
-        this.saveToCache(data);
-        
-        return data;
-      } catch (error) {
-        console.error('Error in getIndicadores:', error);
-        throw error;
-      }
-    }
+  constructor() {
+    this.baseUrl = 'https://si3.bcentral.cl/SieteRestWS/SieteRestWS.ashx';
+    this.credentials = {
+      user: import.meta.env.BANCO_CENTRAL_API_USER,
+      pass: import.meta.env.BANCO_CENTRAL_API_PASS
+    };
+  }
 
-  getFromCache() {
+  async getIndicadores() {
     try {
-      const cached = localStorage.getItem(CACHE_KEY);
-      if (!cached) return null;
+      // Obtener rango de fechas (hoy o último día hábil)
+      const { firstdate, lastdate } = getDateRange();
 
-      const { data, timestamp } = JSON.parse(cached);
-      const now = Date.now();
+      // Hacer las peticiones en paralelo para cada indicador
+      const promises = Object.entries(SERIES_CODES).map(([key, seriesCode]) => 
+        this.fetchSeries(seriesCode, firstdate, lastdate)
+          .then(data => [key, this.processSeriesData(data)])
+      );
 
-      // Verificar si el cache expiró
-      if (now - timestamp > CACHE_DURATION) {
-        localStorage.removeItem(CACHE_KEY);
-        return null;
-      }
-
-      return data;
+      const results = await Promise.all(promises);
+      return Object.fromEntries(results);
     } catch (error) {
-      console.error('Error reading from cache:', error);
-      return null;
+      console.error('Error fetching indicators:', error);
+      throw error;
     }
   }
 
-  saveToCache(data) {
-    try {
-      const cacheData = {
-        data,
-        timestamp: Date.now()
-      };
-      localStorage.setItem(CACHE_KEY, JSON.stringify(cacheData));
-    } catch (error) {
-      console.error('Error saving to cache:', error);
+  async fetchSeries(seriesCode, firstdate, lastdate) {
+    const params = new URLSearchParams({
+      user: this.credentials.user,
+      pass: this.credentials.pass,
+      firstdate,
+      lastdate,
+      timeseries: seriesCode,
+      function: 'GetSeries'
+    });
+
+    const response = await fetch(`${this.baseUrl}?${params}`);
+    if (!response.ok) {
+      throw new Error(`Error fetching series ${seriesCode}`);
     }
+
+    return response.json();
   }
 
-  // Convertir entre diferentes monedas/indicadores
-  convertir(monto, desde, hacia, tasas) {
-    if (!monto || !desde || !hacia || !tasas) {
-      throw new Error('Parámetros inválidos para conversión');
+  processSeriesData(data) {
+    if (!data?.Series?.[0]?.Obs?.[0]) {
+      throw new Error('Invalid series data format');
     }
 
-    // Si la conversión es a la misma moneda
-    if (desde === hacia) {
-      return monto;
-    }
-
-    // Convertir a CLP primero si es necesario
-    let montoEnCLP = monto;
-    if (desde !== 'CLP') {
-      if (!tasas[desde]) {
-        throw new Error(`Tasa no disponible para ${desde}`);
-      }
-      montoEnCLP = monto * tasas[desde].valor;
-    }
-
-    // Si el destino es CLP, ya tenemos el resultado
-    if (hacia === 'CLP') {
-      return montoEnCLP;
-    }
-
-    // Convertir de CLP a la moneda destino
-    if (!tasas[hacia]) {
-      throw new Error(`Tasa no disponible para ${hacia}`);
-    }
-    return montoEnCLP / tasas[hacia].valor;
+    const observation = data.Series[0].Obs[0];
+    return {
+      valor: parseFloat(observation.value),
+      fecha: observation.DateTime
+    };
   }
 }
 
