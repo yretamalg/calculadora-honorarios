@@ -1,11 +1,11 @@
 import { useState, useEffect } from 'react';
-import { MOCK_DATA } from '../constants/indicadores';
 
 export const useIndicadores = () => {
   const [data, setData] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [lastUpdate, setLastUpdate] = useState(null);
+  const [metadata, setMetadata] = useState(null);
 
   const fetchIndicadores = async () => {
     try {
@@ -13,37 +13,23 @@ export const useIndicadores = () => {
       setError(null);
 
       const response = await fetch('/api/indicadores');
-      
+      const result = await response.json();
+
       if (!response.ok) {
-        const errorData = await response.json();
-        console.error('API Error Response:', errorData);
-        
-        if (import.meta.env.DEV) {
-          console.log('Using mock data in development');
-          setData(MOCK_DATA);
-          setLastUpdate(new Date());
-          return;
-        }
-        
-        throw new Error(errorData.details || 'Error al obtener indicadores');
+        throw new Error(result.message || 'Error al obtener indicadores');
       }
 
-      const result = await response.json();
-      console.log('API Success Response:', result);
+      // Extraer metadata y datos
+      const { _metadata, ...indicatorsData } = result;
 
-      setData(result);
+      setMetadata(_metadata);
+      setData(indicatorsData);
       setLastUpdate(new Date());
+      setError(null);
 
     } catch (err) {
-      console.error('Error in useIndicadores:', err);
+      console.error('Error fetching indicadores:', err);
       setError(err.message);
-      
-      // En desarrollo, usar datos mock como fallback
-      if (import.meta.env.DEV) {
-        console.warn('Using mock data after error in development');
-        setData(MOCK_DATA);
-        setLastUpdate(new Date());
-      }
     } finally {
       setLoading(false);
     }
@@ -57,13 +43,29 @@ export const useIndicadores = () => {
     return () => clearInterval(interval);
   }, []);
 
-  const refresh = () => fetchIndicadores();
+  // Helper para verificar si un indicador está actualizado
+  const isIndicadorActualizado = (fecha, tipo) => {
+    if (!metadata) return true;
+    
+    const fechaIndicador = new Date(fecha).toISOString().split('T')[0];
+    const { currentDate, lastBusinessDay, isBusinessDay } = metadata;
+
+    if (tipo === 'UF' || tipo === 'UTM') {
+      return fechaIndicador === currentDate;
+    }
+
+    return isBusinessDay 
+      ? fechaIndicador === currentDate 
+      : fechaIndicador === lastBusinessDay;
+  };
 
   return {
     data,
     loading,
     error,
     lastUpdate,
-    refresh
+    metadata,
+    isIndicadorActualizado,
+    refresh: fetchIndicadores
   };
 };
