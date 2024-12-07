@@ -8,53 +8,62 @@ export async function GET() {
       throw new Error('Credenciales no configuradas');
     }
 
-    // Obtener fecha actual en Chile
+    // Fechas en zona horaria de Chile
     const now = new Date();
-    const today = now.toLocaleString('en-CA', { 
-      timeZone: 'America/Santiago' 
-    }).split(',')[0];
-
-    // Obtener último día hábil
+    const chileanDate = new Date(now.toLocaleString('en-US', { timeZone: 'America/Santiago' }));
+    
+    // Fecha actual para UF
+    const today = chileanDate.toISOString().split('T')[0];
+    
+    // Último día hábil para divisas
     const getLastBusinessDay = (date) => {
       const d = new Date(date);
-      d.setHours(0, 0, 0, 0);
-      
       while (d.getDay() === 0 || d.getDay() === 6) {
         d.setDate(d.getDate() - 1);
       }
-      
-      return d.toLocaleString('en-CA', { timeZone: 'America/Santiago' }).split(',')[0];
+      return d.toISOString().split('T')[0];
     };
+    
+    // Primer día del mes para UTM
+    const firstDayOfMonth = new Date(
+      chileanDate.getFullYear(),
+      chileanDate.getMonth(),
+      1
+    ).toISOString().split('T')[0];
 
-    const lastBusinessDay = getLastBusinessDay(now);
+    const lastBusinessDay = getLastBusinessDay(chileanDate);
 
     // Configurar las series con sus fechas correspondientes
     const series = [
       { 
         code: 'F073.UFF.PRE.Z.D', 
         key: 'UF',
-        date: today  // UF siempre usa la fecha actual
+        date: today,
+        isDaily: true
       },
       { 
         code: 'F073.TCO.PRE.Z.D', 
         key: 'DOLAR',
-        date: lastBusinessDay  // Dólar usa último día hábil
+        date: lastBusinessDay,
+        isDaily: true
       },
       { 
         code: 'F072.CLP.EUR.N.O.D', 
         key: 'EURO',
-        date: lastBusinessDay  // Euro usa último día hábil
+        date: lastBusinessDay,
+        isDaily: true
       },
       { 
         code: 'F073.UTR.PRE.Z.M', 
         key: 'UTM',
-        date: today  // UTM siempre usa la fecha actual
+        date: firstDayOfMonth,
+        isDaily: false
       }
     ];
 
     // Obtener datos para cada serie
     const results = await Promise.all(
-      series.map(async ({ code, key, date }) => {
+      series.map(async ({ code, key, date, isDaily }) => {
         const params = new URLSearchParams({
           user: API_USER,
           pass: API_PASS,
@@ -64,10 +73,19 @@ export async function GET() {
           function: 'GetSeries'
         });
 
+        console.log(`Fetching ${key} for date:`, date);
+
         const response = await fetch(`${API_BASE_URL}?${params}`);
+        
+        if (!response.ok) {
+          console.error(`Error fetching ${key}:`, await response.text());
+          throw new Error(`Error al obtener ${key}`);
+        }
+
         const data = await response.json();
 
-        if (!response.ok || !data?.Series?.[0]?.Obs?.[0]) {
+        if (!data?.Series?.[0]?.Obs?.[0]) {
+          console.error(`No data for ${key}:`, data);
           throw new Error(`No hay datos disponibles para ${key}`);
         }
 
@@ -75,7 +93,8 @@ export async function GET() {
           key,
           {
             valor: parseFloat(data.Series[0].Obs[0].value),
-            fecha: data.Series[0].Obs[0].DateTime
+            fecha: data.Series[0].Obs[0].DateTime,
+            isDaily
           }
         ];
       })
@@ -89,7 +108,8 @@ export async function GET() {
         _metadata: {
           currentDate: today,
           lastBusinessDay,
-          isBusinessDay: !['0', '6'].includes(new Date().getDay().toString())
+          firstDayOfMonth,
+          isBusinessDay: ![0, 6].includes(chileanDate.getDay())
         }
       }), 
       {
@@ -102,7 +122,10 @@ export async function GET() {
     );
 
   } catch (error) {
-    console.error('API Error:', error);
+    console.error('API Error:', {
+      message: error.message,
+      stack: error.stack
+    });
     
     return new Response(
       JSON.stringify({
