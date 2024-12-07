@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { CACHE_DURATION, MOCK_DATA } from '../constants/indicadores';
+import { MOCK_DATA } from '../constants/indicadores';
 
 export const useIndicadores = () => {
   const [data, setData] = useState(null);
@@ -7,95 +7,40 @@ export const useIndicadores = () => {
   const [error, setError] = useState(null);
   const [lastUpdate, setLastUpdate] = useState(null);
 
-  const getCachedData = () => {
-    try {
-      const cached = localStorage.getItem('indicadores_cache');
-      if (!cached) return null;
-
-      const { data, timestamp } = JSON.parse(cached);
-      const now = new Date();
-      const cacheDate = new Date(timestamp);
-      
-      // Solo usar caché si es del mismo día
-      if (now.toDateString() !== cacheDate.toDateString()) {
-        localStorage.removeItem('indicadores_cache');
-        return null;
-      }
-
-      return { data, timestamp };
-    } catch (error) {
-      console.error('Error reading cache:', error);
-      localStorage.removeItem('indicadores_cache');
-      return null;
-    }
-  };
-
-  const cacheData = (data) => {
-    try {
-      localStorage.setItem('indicadores_cache', JSON.stringify({
-        data,
-        timestamp: Date.now()
-      }));
-    } catch (error) {
-      console.error('Error caching data:', error);
-    }
-  };
-
-  const isDataFromToday = (responseData) => {
-    const today = new Date().toISOString().split('T')[0];
-    
-    // Verificar cada indicador
-    return Object.values(responseData).every(indicador => {
-      const indicadorDate = new Date(indicador.fecha).toISOString().split('T')[0];
-      return indicadorDate === today;
-    });
-  };
-
   const fetchIndicadores = async () => {
     try {
       setLoading(true);
       setError(null);
 
-      // Intentar obtener datos del caché del mismo día
-      const cachedData = getCachedData();
-      if (cachedData) {
-        setData(cachedData.data);
-        setLastUpdate(new Date(cachedData.timestamp));
-        setLoading(false);
-        return;
-      }
-
-      // En desarrollo, usar datos de ejemplo
-      if (import.meta.env.DEV) {
-        setData(MOCK_DATA);
-        setLastUpdate(new Date());
-        cacheData(MOCK_DATA);
-        setLoading(false);
-        return;
-      }
-
-      // Si no hay caché, hacer la petición
       const response = await fetch('/api/indicadores');
-      const result = await response.json();
-
+      
       if (!response.ok) {
-        throw new Error(result.error || 'Error al obtener los indicadores');
+        const errorData = await response.json();
+        console.error('API Error Response:', errorData);
+        
+        if (import.meta.env.DEV) {
+          console.log('Using mock data in development');
+          setData(MOCK_DATA);
+          setLastUpdate(new Date());
+          return;
+        }
+        
+        throw new Error(errorData.details || 'Error al obtener indicadores');
       }
 
-      // Verificar que los datos sean del día actual
-      if (!isDataFromToday(result)) {
-        throw new Error('Los indicadores no están actualizados para hoy');
-      }
+      const result = await response.json();
+      console.log('API Success Response:', result);
 
       setData(result);
       setLastUpdate(new Date());
-      cacheData(result);
+
     } catch (err) {
-      console.error('Error fetching indicadores:', err);
+      console.error('Error in useIndicadores:', err);
       setError(err.message);
       
-      // Si hay un error, usar datos de ejemplo como fallback solo en desarrollo
-      if (import.meta.env.DEV && !data) {
+      // En desarrollo, usar datos mock como fallback
+      if (import.meta.env.DEV) {
+        console.warn('Using mock data after error in development');
         setData(MOCK_DATA);
         setLastUpdate(new Date());
       }
@@ -107,15 +52,12 @@ export const useIndicadores = () => {
   useEffect(() => {
     fetchIndicadores();
     
-    // Actualizar cada hora
-    const interval = setInterval(fetchIndicadores, CACHE_DURATION);
+    // Actualizar cada 5 minutos
+    const interval = setInterval(fetchIndicadores, 300000);
     return () => clearInterval(interval);
   }, []);
 
-  const refresh = () => {
-    localStorage.removeItem('indicadores_cache');
-    return fetchIndicadores();
-  };
+  const refresh = () => fetchIndicadores();
 
   return {
     data,
