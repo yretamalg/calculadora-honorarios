@@ -8,6 +8,8 @@ import IndicadoresDisplay from './components/IndicadoresDisplay';
 import { useIndicadores } from './hooks/useIndicadores';
 import { parsearMonto } from './utils/formatters';
 import { formatDate } from './utils/dateUtils';
+import DataSourceInfo from './DataSourceInfo';
+
 
 const CalculadoraIndicadores = () => {
   const { data: indicadores, loading, error, lastUpdate } = useIndicadores();
@@ -88,6 +90,8 @@ const CalculadoraIndicadores = () => {
               loading={loading}
               error={error}
             />
+
+            <DataSourceInfo />
 
             <div className="mt-8 border-t border-slate-700 pt-6">
               <div className="space-y-6">
