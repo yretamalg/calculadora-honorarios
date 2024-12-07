@@ -13,10 +13,11 @@ export const useIndicadores = () => {
       if (!cached) return null;
 
       const { data, timestamp } = JSON.parse(cached);
-      const now = Date.now();
-      const cacheAge = now - timestamp;
-
-      if (cacheAge > CACHE_DURATION) {
+      const now = new Date();
+      const cacheDate = new Date(timestamp);
+      
+      // Solo usar caché si es del mismo día
+      if (now.toDateString() !== cacheDate.toDateString()) {
         localStorage.removeItem('indicadores_cache');
         return null;
       }
@@ -40,12 +41,22 @@ export const useIndicadores = () => {
     }
   };
 
+  const isDataFromToday = (responseData) => {
+    const today = new Date().toISOString().split('T')[0];
+    
+    // Verificar cada indicador
+    return Object.values(responseData).every(indicador => {
+      const indicadorDate = new Date(indicador.fecha).toISOString().split('T')[0];
+      return indicadorDate === today;
+    });
+  };
+
   const fetchIndicadores = async () => {
     try {
       setLoading(true);
       setError(null);
 
-      // Intentar obtener datos del caché primero
+      // Intentar obtener datos del caché del mismo día
       const cachedData = getCachedData();
       if (cachedData) {
         setData(cachedData.data);
@@ -71,6 +82,11 @@ export const useIndicadores = () => {
         throw new Error(result.error || 'Error al obtener los indicadores');
       }
 
+      // Verificar que los datos sean del día actual
+      if (!isDataFromToday(result)) {
+        throw new Error('Los indicadores no están actualizados para hoy');
+      }
+
       setData(result);
       setLastUpdate(new Date());
       cacheData(result);
@@ -78,8 +94,8 @@ export const useIndicadores = () => {
       console.error('Error fetching indicadores:', err);
       setError(err.message);
       
-      // Si hay un error, usar datos de ejemplo como fallback
-      if (!data) {
+      // Si hay un error, usar datos de ejemplo como fallback solo en desarrollo
+      if (import.meta.env.DEV && !data) {
         setData(MOCK_DATA);
         setLastUpdate(new Date());
       }
@@ -91,6 +107,7 @@ export const useIndicadores = () => {
   useEffect(() => {
     fetchIndicadores();
     
+    // Actualizar cada hora
     const interval = setInterval(fetchIndicadores, CACHE_DURATION);
     return () => clearInterval(interval);
   }, []);

@@ -1,55 +1,100 @@
-import { SERIES_CODES } from '../../components/calculadoras/indicadores/constants/indicadores';
-import { getDateRange } from '../../components/calculadoras/indicadores/utils/dateUtils';
-
-const API_BASE_URL = 'https://si3.bcentral.cl/SieteRestWS/SieteRestWS.ashx';
-
-export async function GET() {
+export async function GET({ request }) {
   try {
-    const { firstdate, lastdate } = getDateRange();
+    const API_BASE_URL = 'https://si3.bcentral.cl/SieteRestWS/SieteRestWS.ashx';
+    const API_USER = import.meta.env.BANCO_CENTRAL_API_USER;
+    const API_PASS = import.meta.env.BANCO_CENTRAL_API_PASS;
 
-    const promises = Object.entries(SERIES_CODES).map(async ([key, seriesCode]) => {
-      const params = new URLSearchParams({
-        user: process.env.BANCO_CENTRAL_API_USER,
-        pass: process.env.BANCO_CENTRAL_API_PASS,
-        firstdate,
-        lastdate,
-        timeseries: seriesCode,
-        function: 'GetSeries'
+    // Obtener solo la fecha de hoy
+    const today = new Date();
+    const formattedToday = today.toISOString().split('T')[0];
+
+    // Verificar si estamos en un día hábil
+    const isWeekend = today.getDay() === 0 || today.getDay() === 6;
+    
+    if (isWeekend) {
+      return new Response(JSON.stringify({
+        error: 'No hay datos disponibles en días no hábiles'
+      }), {
+        status: 503,
+        headers: {
+          'Content-Type': 'application/json'
+        }
       });
+    }
 
-      const response = await fetch(`${API_BASE_URL}?${params}`);
-      if (!response.ok) {
-        throw new Error(`Error fetching ${key}`);
-      }
+    const series = [
+      { code: 'F073.UFF.PRE.Z.D', key: 'UF' },      // UF diaria
+      { code: 'F073.TCO.PRE.Z.D', key: 'DOLAR' },   // Dólar observado
+      { code: 'F072.CLP.EUR.N.O.D', key: 'EURO' },  // Euro
+      { code: 'F073.UTR.PRE.Z.M', key: 'UTM' }      // UTM mensual
+    ];
 
-      const data = await response.json();
-      if (!data?.Series?.[0]?.Obs?.[0]) {
-        throw new Error(`Invalid data for ${key}`);
-      }
+    const results = await Promise.all(
+      series.map(async ({ code, key }) => {
+        const params = new URLSearchParams({
+          user: API_USER,
+          pass: API_PASS,
+          firstdate: formattedToday,
+          lastdate: formattedToday,
+          timeseries: code,
+          function: 'GetSeries'
+        });
 
-      return [key, {
-        valor: parseFloat(data.Series[0].Obs[0].value),
-        fecha: data.Series[0].Obs[0].DateTime
-      }];
+        const url = `${API_BASE_URL}?${params}`;
+        const response = await fetch(url);
+
+        if (!response.ok) {
+          throw new Error(`No hay datos disponibles para ${key} hoy`);
+        }
+
+        const data = await response.json();
+        
+        if (!data?.Series?.[0]?.Obs?.[0]) {
+          throw new Error(`No hay datos disponibles para ${key} hoy`);
+        }
+
+        const fecha = new Date(data.Series[0].Obs[0].DateTime);
+        // Verificar que el dato sea de hoy
+        if (fecha.toISOString().split('T')[0] !== formattedToday) {
+          throw new Error(`Los datos de ${key} no están actualizados para hoy`);
+        }
+
+        return [
+          key,
+          {
+            valor: parseFloat(data.Series[0].Obs[0].value),
+            fecha: data.Series[0].Obs[0].DateTime
+          }
+        ];
+      })
+    ).catch(error => {
+      throw new Error(`Error obteniendo indicadores: ${error.message}`);
     });
 
-    const results = await Promise.all(promises);
     const indicators = Object.fromEntries(results);
 
     return new Response(JSON.stringify(indicators), {
       status: 200,
       headers: {
         'Content-Type': 'application/json',
-        'Cache-Control': 'public, max-age=3600'
+        'Cache-Control': 'no-store' // Deshabilitar caché para siempre obtener datos frescos
       }
     });
+
   } catch (error) {
-    console.error('Error fetching indicators:', error);
-    return new Response(JSON.stringify({ error: error.message }), {
-      status: 500,
-      headers: {
-        'Content-Type': 'application/json'
+    console.error('API Error:', error);
+    
+    return new Response(
+      JSON.stringify({
+        error: 'Datos no disponibles para hoy',
+        details: error.message
+      }),
+      {
+        status: 503,
+        headers: {
+          'Content-Type': 'application/json'
+        }
       }
-    });
+    );
   }
 }
