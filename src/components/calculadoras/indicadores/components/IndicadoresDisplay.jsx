@@ -12,7 +12,14 @@ const IndicadoresDisplay = ({ indicadores, loading, error }) => {
   const formatearIndicador = (valor, tipo) => {
     if (!valor && valor !== 0) return '-';
     const formateado = formatearNumero(valor);
-    return tipo === 'EURO' ? `€ ${formateado}` : `$ ${formateado}`;
+    switch (tipo) {
+      case 'EURO':
+        return `€ ${formateado}`;
+      case 'UTM':
+        return `$ ${Math.round(valor).toLocaleString('es-CL')}`;
+      default:
+        return `$ ${formateado}`;
+    }
   };
 
   if (error) {
@@ -27,8 +34,8 @@ const IndicadoresDisplay = ({ indicadores, loading, error }) => {
 
   if (loading || !indicadores) {
     return (
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-        {[...Array(3)].map((_, i) => (
+      <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+        {[...Array(4)].map((_, i) => (
           <div 
             key={i} 
             className="bg-slate-700/50 animate-pulse rounded-lg p-4 h-[76px]"
@@ -56,15 +63,21 @@ const IndicadoresDisplay = ({ indicadores, loading, error }) => {
       nombre: 'Euro', 
       valor: indicadores.EURO?.valor,
       tipo: 'EURO'
+    },
+    { 
+      id: 'UTM', 
+      nombre: 'UTM', 
+      valor: indicadores.UTM?.valor,
+      tipo: 'UTM'
     }
   ];
 
   return (
-    <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+    <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
       {INDICADORES.map(indicador => (
         <div 
           key={indicador.id}
-          className="bg-slate-700 rounded-lg p-4"
+          className="bg-slate-700 rounded-lg p-4 transition-all hover:bg-slate-600"
         >
           <p className="text-sm text-slate-400 mb-1">
             {indicador.nombre}
