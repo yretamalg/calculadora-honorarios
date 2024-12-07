@@ -1,6 +1,6 @@
 // src/pages/api/indicadores.js
 import { SERIES_CODES, MOCK_DATA } from '../../components/calculadoras/indicadores/constants/indicadores';
-import { getDateRange, isBusinessDay } from '../../components/calculadoras/indicadores/utils/dateUtils';
+import { getDateRange, getCurrentDate, isBusinessDay, getLastBusinessDay } from '../../components/calculadoras/indicadores/utils/dateUtils';
 
 const API_USER = process.env.BANCO_CENTRAL_API_USER;
 const API_PASS = process.env.BANCO_CENTRAL_API_PASS;
@@ -19,12 +19,15 @@ const buildApiUrl = (timeseries, firstdate, lastdate) => {
   return `${API_BASE_URL}?${params.toString()}`;
 };
 
-const fetchIndicator = async (code, dates) => {
+const fetchIndicator = async (code, indicadorType) => {
   try {
+    const dates = getDateRange(indicadorType);
     const response = await fetch(buildApiUrl(code, dates.firstdate, dates.lastdate));
+    
     if (!response.ok) {
       throw new Error(`HTTP error! status: ${response.status}`);
     }
+    
     const data = await response.json();
     
     if (!data?.Series?.[0]?.Obs?.[0]) {
@@ -42,15 +45,14 @@ const fetchIndicator = async (code, dates) => {
 };
 
 const getCurrentMetadata = () => {
+  const currentDate = getCurrentDate();
+  const lastBusinessDay = getLastBusinessDay();
   const now = new Date();
-  const currentDate = now.toISOString().split('T')[0];
-  const isCurrentBusinessDay = isBusinessDay(now);
-  const lastBusinessDate = getDateRange().firstdate;
-
+  
   return {
     currentDate,
-    lastBusinessDay: lastBusinessDate,
-    isBusinessDay: isCurrentBusinessDay,
+    lastBusinessDay,
+    isBusinessDay: isBusinessDay(now),
     timestamp: now.toISOString()
   };
 };
@@ -60,27 +62,24 @@ export async function GET() {
     const metadata = getCurrentMetadata();
     const results = {};
 
-    // Intentar obtener datos reales para cada indicador
-    for (const [key, code] of Object.entries(SERIES_CODES)) {
-      const dates = getDateRange(code);
-      const data = await fetchIndicator(code, dates);
+    // Procesar cada indicador
+    const indicadores = [
+      { key: 'UF', type: 'UF' },
+      { key: 'DOLAR', type: 'default' },
+      { key: 'EURO', type: 'default' },
+      { key: 'UTM', type: 'UTM' }
+    ];
 
-      if (data) {
-        results[key] = data;
-      } else {
-        // Si no hay datos reales, usar datos de respaldo
-        if (MOCK_DATA[key]) {
-          results[key] = {
-            ...MOCK_DATA[key],
-            isMock: true
-          };
-        } else {
-          throw new Error(`No hay datos disponibles para ${key}`);
-        }
-      }
+    for (const { key, type } of indicadores) {
+      const code = SERIES_CODES[key];
+      const data = await fetchIndicator(code, type);
+
+      results[key] = data || {
+        ...MOCK_DATA[key],
+        isMock: true
+      };
     }
 
-    // Agregar metadata a la respuesta
     const response = {
       _metadata: metadata,
       ...results
@@ -90,21 +89,20 @@ export async function GET() {
       status: 200,
       headers: {
         'Content-Type': 'application/json',
-        'Cache-Control': 'public, max-age=300' // Cache por 5 minutos
+        'Cache-Control': 'public, max-age=300'
       }
     });
 
   } catch (error) {
     console.error('Error in indicadores endpoint:', error);
     
-    // Si hay un error, devolver los datos de respaldo completos
     const fallbackResponse = {
       _metadata: getCurrentMetadata(),
       ...MOCK_DATA
     };
 
     return new Response(JSON.stringify(fallbackResponse), {
-      status: 200, // Devolvemos 200 con datos de respaldo en lugar de 500
+      status: 200,
       headers: {
         'Content-Type': 'application/json',
         'Cache-Control': 'public, max-age=300'
