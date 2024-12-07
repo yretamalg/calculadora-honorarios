@@ -11,6 +11,9 @@ export default defineConfig({
   }),
   vite: {
     // Asegurar que las variables de entorno estén disponibles
-    envPrefix: 'BANCO_CENTRAL_'
+    envPrefix: ['BANCO_CENTRAL_'],
+    ssr: {
+      noExternal: ['node-fetch']
+    }
   }
 });
