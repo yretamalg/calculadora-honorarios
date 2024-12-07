@@ -1,7 +1,6 @@
 ---
 import MainHead from './MainHead.astro';
 import { SEO_CONFIG, STRUCTURED_DATA } from '../constants/seo';
-import { ANALYTICS_CONFIG } from '../constants/analytics';
 
 interface Props {
     title?: string;
@@ -38,22 +37,6 @@ const pageStructuredData = {
         <!-- Structured Data -->
         <script type="application/ld+json" set:html={JSON.stringify(pageStructuredData)} />
         <script type="application/ld+json" set:html={JSON.stringify(STRUCTURED_DATA.organization)} />
-        
-        <!-- Google Analytics -->
-        {import.meta.env.PROD && (
-            <>
-                <script type="text/javascript" async src={`https://www.googletagmanager.com/gtag/js?id=${ANALYTICS_CONFIG.GA_MEASUREMENT_ID}`}></script>
-                <script define:vars={{ measurementId: ANALYTICS_CONFIG.GA_MEASUREMENT_ID }}>
-                    window.dataLayer = window.dataLayer || [];
-                    function gtag(){dataLayer.push(arguments);}
-                    gtag('js', new Date());
-                    gtag('config', measurementId, {
-                        page_path: window.location.pathname,
-                        cookie_flags: 'SameSite=None;Secure'
-                    });
-                </script>
-            </>
-        )}
         
         <!-- Critical CSS -->
         <style is:global>
