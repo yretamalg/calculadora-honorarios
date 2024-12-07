@@ -1,49 +1,80 @@
-const fetch = require('node-fetch');
+import fetch from 'node-fetch';
 
-const handler = async (event, context) => {
+export const handler = async (event, context) => {
+  // Configurar CORS
+  const headers = {
+    'Access-Control-Allow-Origin': '*',
+    'Access-Control-Allow-Headers': 'Content-Type',
+    'Access-Control-Allow-Methods': 'GET',
+    'Content-Type': 'application/json'
+  };
+
+  // Manejar OPTIONS para CORS
+  if (event.httpMethod === 'OPTIONS') {
+    return {
+      statusCode: 200,
+      headers
+    };
+  }
+
   try {
-    const API_BASE_URL = 'https://si3.bcentral.cl/SieteRestWS/SieteRestWS.ashx';
-    const API_USER = process.env.BANCO_CENTRAL_API_USER;
-    const API_PASS = process.env.BANCO_CENTRAL_API_PASS;
-
-    if (!API_USER || !API_PASS) {
-      throw new Error('Credenciales del Banco Central no configuradas');
+    // Verificar credenciales
+    if (!process.env.BANCO_CENTRAL_API_USER || !process.env.BANCO_CENTRAL_API_PASS) {
+      throw new Error('Credenciales de API no configuradas');
     }
 
-    // Obtener la fecha actual en Chile
-    const now = new Date();
-    const formatter = new Intl.DateTimeFormat('en-CA', { // formato YYYY-MM-DD
+    const API_BASE_URL = 'https://si3.bcentral.cl/SieteRestWS/SieteRestWS.ashx';
+    
+    // Obtener fecha actual en zona horaria de Chile
+    const today = new Date().toLocaleString('en-CA', {
       timeZone: 'America/Santiago',
       year: 'numeric',
       month: '2-digit',
       day: '2-digit'
-    });
-    
-    const today = formatter.format(now);
+    }).split(',')[0];
 
-    // Series que queremos obtener
-    const series = [
-      { code: 'F073.UFF.PRE.Z.D', key: 'UF' },
-      { code: 'F073.TCO.PRE.Z.D', key: 'DOLAR' },
-      { code: 'F072.CLP.EUR.N.O.D', key: 'EURO' },
-      { code: 'F073.UTR.PRE.Z.M', key: 'UTM' }
+    // Definir las series a consultar
+    const indicators = [
+      {
+        code: 'F073.UFF.PRE.Z.D',
+        key: 'UF',
+        required: true
+      },
+      {
+        code: 'F073.TCO.PRE.Z.D',
+        key: 'DOLAR',
+        required: true
+      },
+      {
+        code: 'F072.CLP.EUR.N.O.D',
+        key: 'EURO',
+        required: true
+      },
+      {
+        code: 'F073.UTR.PRE.Z.M',
+        key: 'UTM',
+        required: true
+      }
     ];
 
+    // Obtener datos para cada indicador
     const results = await Promise.all(
-      series.map(async ({ code, key }) => {
+      indicators.map(async ({ code, key }) => {
         const params = new URLSearchParams({
-          user: API_USER,
-          pass: API_PASS,
+          user: process.env.BANCO_CENTRAL_API_USER,
+          pass: process.env.BANCO_CENTRAL_API_PASS,
           firstdate: today,
           lastdate: today,
           timeseries: code,
           function: 'GetSeries'
         });
 
-        const response = await fetch(`${API_BASE_URL}?${params}`);
+        const url = `${API_BASE_URL}?${params}`;
+        const response = await fetch(url);
         
         if (!response.ok) {
-          throw new Error(`Error al obtener ${key}: ${response.status}`);
+          console.error(`Error fetching ${key}:`, await response.text());
+          throw new Error(`Error al obtener ${key}`);
         }
 
         const data = await response.json();
@@ -62,30 +93,28 @@ const handler = async (event, context) => {
       })
     );
 
-    const indicators = Object.fromEntries(results);
+    const indicatorsData = Object.fromEntries(results);
 
     return {
       statusCode: 200,
       headers: {
-        'Content-Type': 'application/json',
+        ...headers,
         'Cache-Control': 'no-cache'
       },
-      body: JSON.stringify(indicators)
+      body: JSON.stringify(indicatorsData)
     };
 
   } catch (error) {
     console.error('Function error:', error);
+    
     return {
       statusCode: 500,
-      headers: {
-        'Content-Type': 'application/json'
-      },
+      headers,
       body: JSON.stringify({
         error: 'Error al obtener indicadores',
-        message: error.message
+        message: error.message,
+        timestamp: new Date().toISOString()
       })
     };
   }
 };
-
-module.exports = { handler };
