@@ -1,131 +1,114 @@
+// src/pages/api/indicadores.js
+import { SERIES_CODES, MOCK_DATA } from '../../components/calculadoras/indicadores/constants/indicadores';
+import { getDateRange, isBusinessDay } from '../../components/calculadoras/indicadores/utils/dateUtils';
+
+const API_USER = process.env.BANCO_CENTRAL_API_USER;
+const API_PASS = process.env.BANCO_CENTRAL_API_PASS;
+const API_BASE_URL = 'https://si3.bcentral.cl/SieteRestWS/SieteRestWS.ashx';
+
+const buildApiUrl = (timeseries, firstdate, lastdate) => {
+  const params = new URLSearchParams({
+    user: API_USER,
+    pass: API_PASS,
+    firstdate,
+    lastdate,
+    timeseries,
+    function: 'GetSeries'
+  });
+
+  return `${API_BASE_URL}?${params.toString()}`;
+};
+
+const fetchIndicator = async (code, dates) => {
+  try {
+    const response = await fetch(buildApiUrl(code, dates.firstdate, dates.lastdate));
+    if (!response.ok) {
+      throw new Error(`HTTP error! status: ${response.status}`);
+    }
+    const data = await response.json();
+    
+    if (!data?.Series?.[0]?.Obs?.[0]) {
+      throw new Error('No data available');
+    }
+
+    return {
+      valor: parseFloat(data.Series[0].Obs[0].value),
+      fecha: data.Series[0].Obs[0].DateTime
+    };
+  } catch (error) {
+    console.error(`Error fetching ${code}:`, error);
+    return null;
+  }
+};
+
+const getCurrentMetadata = () => {
+  const now = new Date();
+  const currentDate = now.toISOString().split('T')[0];
+  const isCurrentBusinessDay = isBusinessDay(now);
+  const lastBusinessDate = getDateRange().firstdate;
+
+  return {
+    currentDate,
+    lastBusinessDay: lastBusinessDate,
+    isBusinessDay: isCurrentBusinessDay,
+    timestamp: now.toISOString()
+  };
+};
+
 export async function GET() {
   try {
-    const API_BASE_URL = 'https://si3.bcentral.cl/SieteRestWS/SieteRestWS.ashx';
-    const API_USER = import.meta.env.BANCO_CENTRAL_API_USER;
-    const API_PASS = import.meta.env.BANCO_CENTRAL_API_PASS;
+    const metadata = getCurrentMetadata();
+    const results = {};
 
-    if (!API_USER || !API_PASS) {
-      throw new Error('Credenciales no configuradas');
-    }
+    // Intentar obtener datos reales para cada indicador
+    for (const [key, code] of Object.entries(SERIES_CODES)) {
+      const dates = getDateRange(code);
+      const data = await fetchIndicator(code, dates);
 
-    // Función para obtener fecha formateada
-    const formatDate = (date) => date.toISOString().split('T')[0];
-
-    // Función para obtener datos de un indicador
-    const fetchIndicador = async (code, date) => {
-      const params = new URLSearchParams({
-        user: API_USER,
-        pass: API_PASS,
-        firstdate: formatDate(date),
-        lastdate: formatDate(date),
-        timeseries: code,
-        function: 'GetSeries'
-      });
-
-      const response = await fetch(`${API_BASE_URL}?${params}`);
-      const data = await response.json();
-
-      if (data?.Series?.[0]?.Obs?.[0]) {
-        return {
-          valor: parseFloat(data.Series[0].Obs[0].value),
-          fecha: data.Series[0].Obs[0].DateTime
-        };
-      }
-      return null;
-    };
-
-    // Obtener fecha actual en Chile
-    const now = new Date();
-    const chileanNow = new Date(now.toLocaleString('en-US', { timeZone: 'America/Santiago' }));
-
-    // Función específica para obtener UTM
-    const fetchUTM = async () => {
-      // Intentar obtener UTM del mes actual
-      const firstDayOfMonth = new Date(chileanNow.getFullYear(), chileanNow.getMonth(), 1);
-      let utmData = await fetchIndicador('F073.UTR.PRE.Z.M', firstDayOfMonth);
-
-      if (!utmData) {
-        // Si no hay datos del mes actual, obtener del mes anterior
-        const firstDayOfLastMonth = new Date(chileanNow.getFullYear(), chileanNow.getMonth() - 1, 1);
-        utmData = await fetchIndicador('F073.UTR.PRE.Z.M', firstDayOfLastMonth);
-      }
-
-      if (!utmData) {
-        throw new Error('No se pudo obtener el valor de la UTM');
-      }
-
-      return utmData;
-    };
-
-    // Función para obtener último día hábil
-    const getLastBusinessDay = (date) => {
-      const d = new Date(date);
-      while (d.getDay() === 0 || d.getDay() === 6) {
-        d.setDate(d.getDate() - 1);
-      }
-      return d;
-    };
-
-    // Obtener los datos de todos los indicadores
-    const [ufData, dolarData, euroData, utmData] = await Promise.all([
-      // UF - usar fecha actual
-      fetchIndicador('F073.UFF.PRE.Z.D', chileanNow),
-      // Dólar - usar último día hábil si es necesario
-      fetchIndicador('F073.TCO.PRE.Z.D', getLastBusinessDay(chileanNow)),
-      // Euro - usar último día hábil si es necesario
-      fetchIndicador('F072.CLP.EUR.N.O.D', getLastBusinessDay(chileanNow)),
-      // UTM - lógica especial
-      fetchUTM()
-    ]);
-
-    if (!ufData || !dolarData || !euroData || !utmData) {
-      throw new Error('No se pudieron obtener todos los indicadores');
-    }
-
-    const indicators = {
-      UF: ufData,
-      DOLAR: dolarData,
-      EURO: euroData,
-      UTM: utmData
-    };
-
-    return new Response(
-      JSON.stringify({
-        ...indicators,
-        _metadata: {
-          currentDate: formatDate(chileanNow),
-          timestamp: new Date().toISOString(),
-          timezone: 'America/Santiago',
-          currentMonth: chileanNow.getMonth() + 1
-        }
-      }),
-      {
-        status: 200,
-        headers: {
-          'Content-Type': 'application/json',
-          'Cache-Control': 'no-store'
+      if (data) {
+        results[key] = data;
+      } else {
+        // Si no hay datos reales, usar datos de respaldo
+        if (MOCK_DATA[key]) {
+          results[key] = {
+            ...MOCK_DATA[key],
+            isMock: true
+          };
+        } else {
+          throw new Error(`No hay datos disponibles para ${key}`);
         }
       }
-    );
+    }
 
-  } catch (error) {
-    console.error('API Error:', {
-      message: error.message,
-      stack: error.stack
+    // Agregar metadata a la respuesta
+    const response = {
+      _metadata: metadata,
+      ...results
+    };
+
+    return new Response(JSON.stringify(response), {
+      status: 200,
+      headers: {
+        'Content-Type': 'application/json',
+        'Cache-Control': 'public, max-age=300' // Cache por 5 minutos
+      }
     });
 
-    return new Response(
-      JSON.stringify({
-        error: 'Error al obtener indicadores',
-        message: error.message,
-        timestamp: new Date().toISOString()
-      }),
-      {
-        status: 500,
-        headers: {
-          'Content-Type': 'application/json'
-        }
+  } catch (error) {
+    console.error('Error in indicadores endpoint:', error);
+    
+    // Si hay un error, devolver los datos de respaldo completos
+    const fallbackResponse = {
+      _metadata: getCurrentMetadata(),
+      ...MOCK_DATA
+    };
+
+    return new Response(JSON.stringify(fallbackResponse), {
+      status: 200, // Devolvemos 200 con datos de respaldo en lugar de 500
+      headers: {
+        'Content-Type': 'application/json',
+        'Cache-Control': 'public, max-age=300'
       }
-    );
+    });
   }
 }
