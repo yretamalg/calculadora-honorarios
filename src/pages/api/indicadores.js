@@ -1,5 +1,4 @@
-// src/pages/api/indicadores.js
-
+// netlify/functions/indicadores.js
 const SERIES_CODES = {
   UF: 'F073.UFF.PRE.Z.D',
   DOLAR: 'F073.TCO.PRE.Z.D',
@@ -9,161 +8,105 @@ const SERIES_CODES = {
 
 const API_BASE_URL = 'https://si3.bcentral.cl/SieteRestWS/SieteRestWS.ashx';
 
-// Funciones de utilidad para fechas
-const isWeekend = (date) => {
-  const day = date.getDay();
-  return day === 0 || day === 6;
-};
-
-const formatDateForAPI = (date) => {
-  return date.toISOString().split('T')[0];
-};
-
-const formatDateForDisplay = (dateStr) => {
-  const [year, month, day] = dateStr.split('-');
-  return `${day}-${month}-${year}`;
-};
-
-const getPreviousBusinessDay = (date) => {
-  const previousDay = new Date(date);
-  previousDay.setDate(previousDay.getDate() - 1);
+const getDateInfo = () => {
+  const today = new Date();
+  const isWeekend = today.getDay() === 0 || today.getDay() === 6;
   
-  while (isWeekend(previousDay)) {
-    previousDay.setDate(previousDay.getDate() - 1);
+  // Si es fin de semana, retroceder al viernes
+  if (isWeekend) {
+    today.setDate(today.getDate() - (today.getDay() === 0 ? 2 : 1));
   }
   
-  return previousDay;
+  const formatDate = (date) => {
+    return date.toISOString().split('T')[0];
+  };
+
+  return {
+    date: formatDate(today),
+    isWeekend
+  };
 };
 
-// Construir URL de la API con manejo de fechas
-const buildApiUrl = (code, date) => {
+const fetchIndicator = async (code, date) => {
   const params = new URLSearchParams({
     user: process.env.BANCO_CENTRAL_API_USER,
     pass: process.env.BANCO_CENTRAL_API_PASS,
-    firstdate: formatDateForAPI(date),
-    lastdate: formatDateForAPI(date),
+    firstdate: date,
+    lastdate: date,
     timeseries: code,
     function: 'GetSeries'
   });
 
-  return `${API_BASE_URL}?${params}`;
-};
-
-// Función para obtener datos con reintentos
-const fetchWithRetries = async (code, initialDate, maxAttempts = 5) => {
-  let currentDate = new Date(initialDate);
-  let attempts = 0;
-
-  while (attempts < maxAttempts) {
-    try {
-      const response = await fetch(buildApiUrl(code, currentDate));
-      if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
-      }
-
-      const data = await response.json();
-      
-      if (data.Series?.Obs?.length > 0) {
-        const observation = data.Series.Obs[0];
-        return {
-          valor: parseFloat(observation.value),
-          fecha: formatDateForAPI(currentDate),
-          fechaStr: observation.indexDateString,
-          descripcion: data.Series.descripEsp
-        };
-      }
-
-      // Si no hay datos, probar con el día hábil anterior
-      currentDate = getPreviousBusinessDay(currentDate);
-      attempts++;
-      
-    } catch (error) {
-      console.error(`Error fetching ${code} for date ${formatDateForAPI(currentDate)}:`, error);
-      currentDate = getPreviousBusinessDay(currentDate);
-      attempts++;
-    }
-  }
-
-  throw new Error(`No se encontraron datos para ${code} después de ${maxAttempts} intentos`);
-};
-
-// Función específica para UTM (siempre primer día del mes)
-const fetchUTM = async (date) => {
-  const firstDayOfMonth = new Date(date.getFullYear(), date.getMonth(), 1);
+  const url = `${API_BASE_URL}?${params}`;
   
   try {
-    const response = await fetch(buildApiUrl(SERIES_CODES.UTM, firstDayOfMonth));
+    const response = await fetch(url);
     if (!response.ok) {
       throw new Error(`HTTP error! status: ${response.status}`);
     }
-
+    
     const data = await response.json();
     
-    if (data.Series?.Obs?.length > 0) {
-      const observation = data.Series.Obs[0];
-      return {
-        valor: parseFloat(observation.value),
-        fecha: formatDateForAPI(firstDayOfMonth),
-        fechaStr: observation.indexDateString,
-        descripcion: data.Series.descripEsp
-      };
+    if (!data.Series?.Obs?.[0]) {
+      throw new Error('No data available');
     }
-    
-    throw new Error('No hay datos de UTM disponibles');
-    
+
+    return {
+      valor: parseFloat(data.Series.Obs[0].value),
+      fecha: data.Series.Obs[0].indexDateString,
+      descripcion: data.Series.descripEsp
+    };
   } catch (error) {
-    console.error('Error fetching UTM:', error);
+    console.error(`Error fetching ${code}:`, error);
     throw error;
   }
 };
 
-export async function GET() {
+exports.handler = async function(event, context) {
   try {
-    const today = new Date();
+    const { date, isWeekend } = getDateInfo();
     
-    // Si es fin de semana, usar el último día hábil
-    const startDate = isWeekend(today) ? getPreviousBusinessDay(today) : today;
-
-    // Obtener todos los indicadores en paralelo
-    const [uf, dolar, euro, utm] = await Promise.all([
-      fetchWithRetries(SERIES_CODES.UF, startDate),
-      fetchWithRetries(SERIES_CODES.DOLAR, startDate),
-      fetchWithRetries(SERIES_CODES.EURO, startDate),
-      fetchUTM(startDate)
+    const results = await Promise.all([
+      fetchIndicator(SERIES_CODES.UF, date),
+      fetchIndicator(SERIES_CODES.DOLAR, date),
+      fetchIndicator(SERIES_CODES.EURO, date),
+      fetchIndicator(SERIES_CODES.UTM, date)
     ]);
 
     const response = {
+      UF: results[0],
+      DOLAR: results[1],
+      EURO: results[2],
+      UTM: results[3],
       _metadata: {
         timestamp: new Date().toISOString(),
-        currentDate: formatDateForAPI(today),
-        isWeekend: isWeekend(today)
-      },
-      UF: uf,
-      DOLAR: dolar,
-      EURO: euro,
-      UTM: utm
+        isWeekend,
+        date
+      }
     };
 
-    return new Response(JSON.stringify(response), {
-      status: 200,
+    return {
+      statusCode: 200,
       headers: {
         'Content-Type': 'application/json',
         'Cache-Control': 'public, max-age=300'
-      }
-    });
+      },
+      body: JSON.stringify(response)
+    };
 
   } catch (error) {
-    console.error('Error general en el endpoint:', error);
+    console.error('Error in indicadores function:', error);
     
-    return new Response(JSON.stringify({
-      error: true,
-      message: error.message,
-      timestamp: new Date().toISOString()
-    }), {
-      status: 200, // Devolvemos 200 en lugar de 500 para manejar el error en el cliente
+    return {
+      statusCode: 200, // Usar 200 incluso para errores
       headers: {
         'Content-Type': 'application/json'
-      }
-    });
+      },
+      body: JSON.stringify({
+        error: true,
+        message: error.message,
+        timestamp: new Date().toISOString()
+      })
+    };
   }
-}
+};

@@ -7,13 +7,20 @@
   from = "/api/*"
   to = "/.netlify/functions/:splat"
   status = 200
-  force = true
 
-[build.environment]
-  NODE_VERSION = "18"
+[[redirects]]
+  from = "/*"
+  to = "/index.html"
+  status = 200
+
+[dev]
+  framework = "astro"
+  targetPort = 3000
 
 [functions]
   node_bundler = "esbuild"
+  included_files = ["src/components/calculadoras/indicadores/constants/*"]
+  external_node_modules = ["node-fetch"]
 
-[[plugins]]
-  package = "@netlify/plugin-functions-install-core"
+[build.environment]
+  NODE_VERSION = "20"

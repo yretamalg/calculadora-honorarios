@@ -1,3 +1,4 @@
+// astro.config.mjs
 import { defineConfig } from 'astro/config';
 import react from '@astrojs/react';
 import tailwind from '@astrojs/tailwind';
@@ -10,10 +11,14 @@ export default defineConfig({
     edgeMiddleware: true
   }),
   vite: {
-    // Asegurar que las variables de entorno estén disponibles
-    envPrefix: ['BANCO_CENTRAL_'],
-    ssr: {
-      noExternal: ['node-fetch']
+    // Configuración para desarrollo local
+    server: {
+      proxy: {
+        '/api': {
+          target: 'http://localhost:3000',
+          changeOrigin: true
+        }
+      }
     }
   }
 });
