@@ -17,6 +17,7 @@ const NavigationMenu = () => {
 
           {/* Botones de navegación con iconos a la derecha */}
           <div className="flex gap-2">
+          <span class="text-xs align-middle pt-[15px]">Elige tu Herramienta</span>
             <a 
               href="/honorarios" 
               className="p-2 text-slate-300 hover:text-white hover:bg-slate-700 transition-colors rounded-md border border-slate-600"

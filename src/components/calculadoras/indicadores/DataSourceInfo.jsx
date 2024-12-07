@@ -10,7 +10,7 @@ const DataSourceInfo = () => {
         rel="noopener noreferrer"
         className="text-orange-400 hover:text-orange-300 transition-colors underline"
       >
-        Indicadores diarios del Banco Central
+        Indicadores Banco Central
       </a>
     </div>
   );
