@@ -8,99 +8,95 @@ export async function GET() {
       throw new Error('Credenciales no configuradas');
     }
 
-    // Función para obtener fecha en formato YYYY-MM-DD
-    const formatDate = (date) => {
-      return date.toISOString().split('T')[0];
-    };
+    // Función para obtener fecha formateada
+    const formatDate = (date) => date.toISOString().split('T')[0];
 
-    // Función para retroceder días hasta encontrar datos válidos
-    const fetchWithFallback = async (code, key, startDate, maxAttempts = 5) => {
-      let attempts = 0;
-      let currentDate = new Date(startDate);
-      
-      while (attempts < maxAttempts) {
-        try {
-          const dateStr = formatDate(currentDate);
-          const params = new URLSearchParams({
-            user: API_USER,
-            pass: API_PASS,
-            firstdate: dateStr,
-            lastdate: dateStr,
-            timeseries: code,
-            function: 'GetSeries'
-          });
+    // Función para obtener datos de un indicador
+    const fetchIndicador = async (code, date) => {
+      const params = new URLSearchParams({
+        user: API_USER,
+        pass: API_PASS,
+        firstdate: formatDate(date),
+        lastdate: formatDate(date),
+        timeseries: code,
+        function: 'GetSeries'
+      });
 
-          const response = await fetch(`${API_BASE_URL}?${params}`);
-          const data = await response.json();
+      const response = await fetch(`${API_BASE_URL}?${params}`);
+      const data = await response.json();
 
-          if (data?.Series?.[0]?.Obs?.[0]) {
-            return {
-              valor: parseFloat(data.Series[0].Obs[0].value),
-              fecha: data.Series[0].Obs[0].DateTime
-            };
-          }
-        } catch (error) {
-          console.warn(`Attempt ${attempts + 1} failed for ${key}`);
-        }
-
-        // Retroceder un día
-        currentDate.setDate(currentDate.getDate() - 1);
-        attempts++;
+      if (data?.Series?.[0]?.Obs?.[0]) {
+        return {
+          valor: parseFloat(data.Series[0].Obs[0].value),
+          fecha: data.Series[0].Obs[0].DateTime
+        };
       }
-
-      throw new Error(`No se encontraron datos para ${key} en los últimos ${maxAttempts} días`);
+      return null;
     };
 
     // Obtener fecha actual en Chile
     const now = new Date();
     const chileanNow = new Date(now.toLocaleString('en-US', { timeZone: 'America/Santiago' }));
-    
-    // Configurar los indicadores
-    const indicators = {
-      UF: {
-        code: 'F073.UFF.PRE.Z.D',
-        date: chileanNow,
-        maxAttempts: 1 // UF debe ser del día actual
-      },
-      DOLAR: {
-        code: 'F073.TCO.PRE.Z.D',
-        date: chileanNow,
-        maxAttempts: 5
-      },
-      EURO: {
-        code: 'F072.CLP.EUR.N.O.D',
-        date: chileanNow,
-        maxAttempts: 5
-      },
-      UTM: {
-        code: 'F073.UTR.PRE.Z.M',
-        date: new Date(chileanNow.getFullYear(), chileanNow.getMonth(), 1),
-        maxAttempts: 10
+
+    // Función específica para obtener UTM
+    const fetchUTM = async () => {
+      // Intentar obtener UTM del mes actual
+      const firstDayOfMonth = new Date(chileanNow.getFullYear(), chileanNow.getMonth(), 1);
+      let utmData = await fetchIndicador('F073.UTR.PRE.Z.M', firstDayOfMonth);
+
+      if (!utmData) {
+        // Si no hay datos del mes actual, obtener del mes anterior
+        const firstDayOfLastMonth = new Date(chileanNow.getFullYear(), chileanNow.getMonth() - 1, 1);
+        utmData = await fetchIndicador('F073.UTR.PRE.Z.M', firstDayOfLastMonth);
       }
+
+      if (!utmData) {
+        throw new Error('No se pudo obtener el valor de la UTM');
+      }
+
+      return utmData;
     };
 
-    // Obtener datos para cada indicador
-    const results = await Promise.all(
-      Object.entries(indicators).map(async ([key, config]) => {
-        const data = await fetchWithFallback(
-          config.code,
-          key,
-          config.date,
-          config.maxAttempts
-        );
-        return [key, data];
-      })
-    );
+    // Función para obtener último día hábil
+    const getLastBusinessDay = (date) => {
+      const d = new Date(date);
+      while (d.getDay() === 0 || d.getDay() === 6) {
+        d.setDate(d.getDate() - 1);
+      }
+      return d;
+    };
 
-    const indicatorsData = Object.fromEntries(results);
+    // Obtener los datos de todos los indicadores
+    const [ufData, dolarData, euroData, utmData] = await Promise.all([
+      // UF - usar fecha actual
+      fetchIndicador('F073.UFF.PRE.Z.D', chileanNow),
+      // Dólar - usar último día hábil si es necesario
+      fetchIndicador('F073.TCO.PRE.Z.D', getLastBusinessDay(chileanNow)),
+      // Euro - usar último día hábil si es necesario
+      fetchIndicador('F072.CLP.EUR.N.O.D', getLastBusinessDay(chileanNow)),
+      // UTM - lógica especial
+      fetchUTM()
+    ]);
+
+    if (!ufData || !dolarData || !euroData || !utmData) {
+      throw new Error('No se pudieron obtener todos los indicadores');
+    }
+
+    const indicators = {
+      UF: ufData,
+      DOLAR: dolarData,
+      EURO: euroData,
+      UTM: utmData
+    };
 
     return new Response(
       JSON.stringify({
-        ...indicatorsData,
+        ...indicators,
         _metadata: {
           currentDate: formatDate(chileanNow),
           timestamp: new Date().toISOString(),
-          timezone: 'America/Santiago'
+          timezone: 'America/Santiago',
+          currentMonth: chileanNow.getMonth() + 1
         }
       }),
       {
