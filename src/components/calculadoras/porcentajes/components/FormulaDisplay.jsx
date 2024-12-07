@@ -19,9 +19,38 @@ const CopyButton = ({ valor, tipo, copiado, onCopy }) => (
 const FormulaDisplay = ({ activeCalculator, data = {}, result }) => {
   const [copiado, setCopiado] = useState('');
 
+  // Función auxiliar para parsear números con manejo de errores
+  const parseNumber = (value, defaultValue = 0) => {
+    if (!value) return defaultValue;
+    try {
+      // Limpia el string de cualquier formato y convierte comas en puntos
+      const cleaned = value.toString()
+        .replace(/[^0-9,.-]/g, '')
+        .replace(/\./g, '')
+        .replace(',', '.');
+      
+      const number = parseFloat(cleaned);
+      return isNaN(number) ? defaultValue : number;
+    } catch (error) {
+      console.error('Error parsing number:', error);
+      return defaultValue;
+    }
+  };
+
+  // Función para formatear números con separadores de miles
+  const formatLocaleNumber = (number) => {
+    try {
+      return number.toLocaleString('es-CL');
+    } catch {
+      return '0';
+    }
+  };
+
   const copiarAlPortapapeles = async (valor, tipo) => {
     try {
-      const valorFormateado = formatChileanNumber(valor).replace(/\s/g, '');
+      // Asegura que el valor sea numérico antes de formatear
+      const numeroParseado = parseNumber(valor);
+      const valorFormateado = formatLocaleNumber(numeroParseado);
       await navigator.clipboard.writeText(valorFormateado);
       setCopiado(tipo);
       setTimeout(() => setCopiado(''), 2000);
@@ -34,34 +63,29 @@ const FormulaDisplay = ({ activeCalculator, data = {}, result }) => {
     try {
       switch (activeCalculator) {
         case 1: {
-          const percentage = parseFloat(data?.percentage?.toString()?.replace(',', '.')) || 0;
+          const percentage = parseNumber(data?.percentage);
           return Math.min(Math.max(percentage, 0), 100);
         }
         case 2: {
-          const percentage = parseFloat(data?.percentage?.toString()?.replace(',', '.')) || 0;
+          const percentage = parseNumber(data?.percentage);
           return Math.min(Math.max(percentage, 0), 100);
         }
         case 3: {
-          const targetPerc = parseFloat(data?.targetPercentage?.toString()?.replace(',', '.')) || 0;
+          const targetPerc = parseNumber(data?.targetPercentage);
           return Math.min(Math.max(targetPerc, 0), 100);
         }
         case 4: {
-          // Corregido: Calcular el porcentaje basado en los valores de amount y total
-          const amount = parseFloat(data?.amount?.toString().replace(/[^\d.-]/g, '')) || 0;
-          const total = parseFloat(data?.total?.toString().replace(/[^\d.-]/g, '')) || 0;
-          if (total === 0) return 0;
-          const percentage = (amount / total) * 100;
+          // Remueve el símbolo % si existe antes de parsear
+          const percentage = parseNumber(result?.toString().replace('%', ''));
           return Math.min(Math.max(percentage, 0), 100);
         }
         case 5: {
-          const discountStr = data?.discount?.toString().replace(',', '.');
-          const percentage = parseFloat(discountStr) || 0;
-          return Math.min(Math.max(percentage, 0), 100);
+          const discount = parseNumber(data?.discount);
+          return Math.min(Math.max(discount, 0), 100);
         }
         case 6: {
-          const increaseStr = data?.increase?.toString().replace(',', '.');
-          const percentage = parseFloat(increaseStr) || 0;
-          return Math.min(Math.max(percentage, 0), 100);
+          const increase = parseNumber(data?.increase);
+          return Math.min(Math.max(increase, 0), 100);
         }
         default:
           return 0;
@@ -72,85 +96,118 @@ const FormulaDisplay = ({ activeCalculator, data = {}, result }) => {
     }
   };
 
+  const getBaseValue = () => {
+    if (!data) return 0;
+    const knownPerc = parseNumber(data.knownPercentage);
+    const knownVal = parseNumber(data.knownValue);
+    
+    if (knownPerc === 0) return 0;
+    return knownVal / (knownPerc / 100);
+  };
+
   const getFormula = () => {
     switch (activeCalculator) {
-      case 1:
+      case 1: {
+        const percentage = parseNumber(data.percentage);
+        const amount = parseNumber(data.amount);
+        const parsedResult = parseNumber(result);
+        
         return (
           <div className="flex items-center justify-center">
             <span>x = </span>
             <div className="mx-2 text-center">
-              <div className="border-b border-slate-400">{`${data.percentage} · ${data.amount}`}</div>
+              <div className="border-b border-slate-400">
+                {`${formatLocaleNumber(percentage)} · ${formatLocaleNumber(amount)}`}
+              </div>
               <div>100</div>
             </div>
-            <span>= {result}</span>
+            <span>= {formatLocaleNumber(parsedResult)}</span>
           </div>
         );
+      }
 
-      case 2:
+      case 2: {
+        const knownAmount = parseNumber(data.knownAmount);
+        const percentage = parseNumber(data.percentage);
+        const parsedResult = parseNumber(result);
+        
         return (
           <div className="flex items-center justify-center">
             <span>x = </span>
             <div className="mx-2 text-center">
-              <div className="border-b border-slate-400">{`${data.knownAmount} · 100`}</div>
-              <div>{data.percentage}</div>
+              <div className="border-b border-slate-400">
+                {`${formatLocaleNumber(knownAmount)} · 100`}
+              </div>
+              <div>{formatLocaleNumber(percentage)}</div>
             </div>
-            <span>= {result}</span>
+            <span>= {formatLocaleNumber(parsedResult)}</span>
           </div>
         );
+      }
 
       case 3: {
         const baseValue = getBaseValue();
-        const targetPerc = parseFloat(data?.targetPercentage?.toString()?.replace(',', '.')) || 0;
-        const formattedBaseValue = formatChileanNumber(baseValue);
+        const targetPerc = parseNumber(data.targetPercentage);
+        const parsedResult = parseNumber(result);
         
         return (
           <div className="flex flex-col items-center space-y-4">
             <p className="text-sm text-slate-400">
-              Si {data.knownPercentage}% es {data.knownValue}, el valor base es {formattedBaseValue}
+              Si {formatLocaleNumber(parseNumber(data.knownPercentage))}% es{' '}
+              {formatLocaleNumber(parseNumber(data.knownValue))}, el valor base es{' '}
+              {formatLocaleNumber(baseValue)}
             </p>
             <div className="flex items-center">
               <span>x = </span>
               <div className="mx-2 text-center">
                 <div className="border-b border-slate-400">
-                  {`${formattedBaseValue} · ${targetPerc}`}
+                  {`${formatLocaleNumber(baseValue)} · ${formatLocaleNumber(targetPerc)}`}
                 </div>
                 <div>100</div>
               </div>
-              <span>= {result}</span>
+              <span>= {formatLocaleNumber(parsedResult)}</span>
             </div>
           </div>
         );
       }
 
-      case 4:
+      case 4: {
+        const amount = parseNumber(data.amount);
+        const total = parseNumber(data.total);
+        const parsedResult = parseNumber(result);
+        
         return (
           <div className="flex items-center justify-center">
             <span>x = </span>
             <div className="mx-2 text-center">
-              <div className="border-b border-slate-400">{`${formatChileanNumber(data.amount)} · 100`}</div>
-              <div>{formatChileanNumber(data.total)}</div>
+              <div className="border-b border-slate-400">
+                {`${formatLocaleNumber(amount)} · 100`}
+              </div>
+              <div>{formatLocaleNumber(total)}</div>
             </div>
-            <span>= {result}</span>
+            <span>= {parsedResult}%</span>
           </div>
         );
+      }
 
       case 5: {
-        const discount = parseFloat(data?.discount) || 0;
-        const price = parseFloat(data?.initialPrice?.replace(/\D/g, '')) || 0;
+        const discount = parseNumber(data.discount);
+        const price = parseNumber(data.initialPrice);
         const discountAmount = Math.round((price * discount) / 100);
         const finalPrice = price - discountAmount;
-        const pricePercentage = (finalPrice / price) * 100;
 
         return (
           <div className="flex flex-col items-center space-y-4">
             <div className="flex items-center">
               <span>x = </span>
               <div className="mx-2 text-center">
-                <div className="border-b border-slate-400">{`${100 - discount} · $${price.toLocaleString('es-CL')}`}</div>
+                <div className="border-b border-slate-400">
+                  {`${formatLocaleNumber(100 - discount)} · $${formatLocaleNumber(price)}`}
+                </div>
                 <div>100</div>
               </div>
               <span className="flex items-center gap-2">
-                = <span className="text-orange-400">${formatChileanNumber(Math.round(finalPrice))}</span>
+                = <span className="text-orange-400">${formatLocaleNumber(finalPrice)}</span>
                 <CopyButton
                   valor={finalPrice}
                   tipo="resultado5"
@@ -160,15 +217,15 @@ const FormulaDisplay = ({ activeCalculator, data = {}, result }) => {
               </span>
             </div>
             <div className="text-slate-400">
-              Descuento: ${formatChileanNumber(discountAmount)}
+              Descuento: ${formatLocaleNumber(discountAmount)}
             </div>
           </div>
         );
       }
 
       case 6: {
-        const increase = parseFloat(data?.increase) || 0;
-        const price = parseFloat(data?.initialPrice?.replace(/\D/g, '')) || 0;
+        const increase = parseNumber(data.increase);
+        const price = parseNumber(data.initialPrice);
         const increaseAmount = Math.round((price * increase) / 100);
         const finalPrice = price + increaseAmount;
 
@@ -178,12 +235,12 @@ const FormulaDisplay = ({ activeCalculator, data = {}, result }) => {
               <span>x = </span>
               <div className="mx-2 text-center">
                 <div className="border-b border-slate-400">
-                  {`${increase + 100} · $${price.toLocaleString('es-CL')}`}
+                  {`${formatLocaleNumber(increase + 100)} · $${formatLocaleNumber(price)}`}
                 </div>
                 <div>100</div>
               </div>
               <span className="flex items-center gap-2">
-                = <span className="text-orange-400">${formatChileanNumber(Math.round(finalPrice))}</span>
+                = <span className="text-orange-400">${formatLocaleNumber(finalPrice)}</span>
                 <CopyButton
                   valor={finalPrice}
                   tipo="resultado6"
@@ -193,15 +250,15 @@ const FormulaDisplay = ({ activeCalculator, data = {}, result }) => {
               </span>
             </div>
             <div className="text-slate-400">
-              Aumento: ${formatChileanNumber(increaseAmount)}
+              Aumento: ${formatLocaleNumber(increaseAmount)}
             </div>
           </div>
         );
       }
 
       case 7: {
-        const initialValue = parseFloat(data.initialValue?.replace(/\D/g, '')) || 0;
-        const finalValue = parseFloat(data.finalValue?.replace(/\D/g, '')) || 0;
+        const initialValue = parseNumber(data.initialValue);
+        const finalValue = parseNumber(data.finalValue);
         const difference = finalValue - initialValue;
         
         return (
@@ -209,15 +266,17 @@ const FormulaDisplay = ({ activeCalculator, data = {}, result }) => {
             <div className="flex items-center">
               <span>x = </span>
               <div className="mx-2 text-center">
-                <div className="border-b border-slate-400">{`${data.finalValue} - ${data.initialValue}`}</div>
-                <div>{data.initialValue}</div>
+                <div className="border-b border-slate-400">
+                  {`${formatLocaleNumber(finalValue)} - ${formatLocaleNumber(initialValue)}`}
+                </div>
+                <div>{formatLocaleNumber(initialValue)}</div>
               </div>
-              <span>· 100 = {result}</span>
+              <span>· 100 = {result}%</span>
             </div>
             <div className="text-slate-400">
-              Aplicado: {result}
+              Aplicado: {result}%
               <br />
-              Diferencia: {difference >= 0 ? '+' : ''}{formatChileanNumber(difference)}
+              Diferencia: {difference >= 0 ? '+' : ''}{formatLocaleNumber(difference)}
             </div>
           </div>
         );
@@ -235,22 +294,22 @@ const FormulaDisplay = ({ activeCalculator, data = {}, result }) => {
 
       switch (activeCalculator) {
         case 1:
-          leftValue = result;
-          rightValue = data.amount;
+          leftValue = formatLocaleNumber(parseNumber(result));
+          rightValue = formatLocaleNumber(parseNumber(data.amount));
           break;
         case 2:
-          leftValue = data.knownAmount;
-          rightValue = result;
+          leftValue = formatLocaleNumber(parseNumber(data.knownAmount));
+          rightValue = formatLocaleNumber(parseNumber(result));
           break;
         case 3: {
           const baseValue = getBaseValue();
-          leftValue = result;
-          rightValue = formatChileanNumber(baseValue);
+          leftValue = formatLocaleNumber(parseNumber(result));
+          rightValue = formatLocaleNumber(baseValue);
           break;
         }
         case 4: {
-          leftValue = formatChileanNumber(data.amount);
-          rightValue = formatChileanNumber(data.total);
+          leftValue = formatLocaleNumber(parseNumber(data.amount));
+          rightValue = formatLocaleNumber(parseNumber(data.total));
           break;
         }
         default:

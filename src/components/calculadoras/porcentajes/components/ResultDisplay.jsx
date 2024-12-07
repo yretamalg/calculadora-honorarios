@@ -1,5 +1,5 @@
 import React from 'react';
-import { formatNumber } from '../utils/calculatorUtils';
+import { formatNumber } from '../utils/numberUtils';  // Cambiado el path de importación
 
 const ResultDisplay = ({ result }) => {
   return (
