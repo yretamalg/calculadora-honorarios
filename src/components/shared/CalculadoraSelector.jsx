@@ -23,7 +23,7 @@ const CalculadoraSelector = () => {
       icon: (className) => <Percent className={className} />
     },
     {
-      titulo: "Calculadora UF, Dólar y UTM",
+      titulo: "Conversor de Indicadores Económicos",
       descripcion: "Convierte entre UF, Dólar, Euro, UTM y Pesos Chilenos",
       href: "/indicadores",
       icon: (className) => <DollarSign className={className} />

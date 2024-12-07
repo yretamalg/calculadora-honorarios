@@ -77,7 +77,7 @@ const CalculadoraIndicadores = () => {
         <div className="max-w-4xl mx-auto">
           <div className="bg-slate-800 rounded-lg shadow-xl p-6 mb-6">
             <h1 className="text-slate-300 text-2xl font-bold text-center mb-2">
-              Calculadora de Indicadores Económicos
+              Conversor de Indicadores Económicos
             </h1>
             {lastUpdate && (
               <p className="text-slate-400 text-sm text-center mb-6">
