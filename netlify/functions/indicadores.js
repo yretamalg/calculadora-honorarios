@@ -1,117 +1,137 @@
-import fetch from 'node-fetch';
+// netlify/functions/indicadores.js
 
-export const handler = async (event, context) => {
-  // Configurar CORS
-  const headers = {
-    'Access-Control-Allow-Origin': '*',
-    'Access-Control-Allow-Headers': 'Content-Type',
-    'Access-Control-Allow-Methods': 'GET',
-    'Content-Type': 'application/json'
-  };
+const SERIES_CODES = {
+  UF: 'F073.UFF.PRE.Z.D',
+  DOLAR: 'F073.TCO.PRE.Z.D',
+  EURO: 'F072.CLP.EUR.N.O.D',
+  UTM: 'F073.UTR.PRE.Z.M'
+};
 
-  // Manejar OPTIONS para CORS
-  if (event.httpMethod === 'OPTIONS') {
-    return {
-      statusCode: 200,
-      headers
-    };
+const API_BASE_URL = 'https://si3.bcentral.cl/SieteRestWS/SieteRestWS.ashx';
+
+const formatDate = (date) => {
+  return date.toISOString().split('T')[0];
+};
+
+const getLastBusinessDay = (date = new Date()) => {
+  const previousDay = new Date(date);
+  previousDay.setDate(previousDay.getDate() - 1);
+  while (previousDay.getDay() === 0 || previousDay.getDay() === 6) {
+    previousDay.setDate(previousDay.getDate() - 1);
+  }
+  return previousDay;
+};
+
+const buildApiUrl = (code, date) => {
+  const params = new URLSearchParams({
+    user: process.env.BANCO_CENTRAL_API_USER,
+    pass: process.env.BANCO_CENTRAL_API_PASS,
+    firstdate: date,
+    lastdate: date,
+    timeseries: code,
+    function: 'GetSeries'
+  });
+  return `${API_BASE_URL}?${params}`;
+};
+
+const fetchIndicator = async (code, date) => {
+  const response = await fetch(buildApiUrl(code, formatDate(date)));
+  if (!response.ok) {
+    throw new Error(`HTTP error! status: ${response.status}`);
+  }
+  return response.json();
+};
+
+const processIndicatorData = (data) => {
+  if (!data.Series?.Obs?.[0]) {
+    return null;
   }
 
+  return {
+    valor: parseFloat(data.Series.Obs[0].value),
+    fecha: data.Series.Obs[0].indexDateString,
+    descripcion: data.Series.descripEsp
+  };
+};
+
+const getIndicatorWithRetry = async (code, initialDate, isBusinessDay = true) => {
+  let currentDate = new Date(initialDate);
+  let data = await fetchIndicator(code, currentDate);
+  let processedData = processIndicatorData(data);
+
+  // Si no hay datos y es un indicador que usa días hábiles, intentar con el último día hábil
+  if (!processedData && isBusinessDay) {
+    currentDate = getLastBusinessDay(currentDate);
+    data = await fetchIndicator(code, currentDate);
+    processedData = processIndicatorData(data);
+  }
+
+  return {
+    ...data,
+    processedData
+  };
+};
+
+exports.handler = async function(event, context) {
   try {
-    // Verificar credenciales
-    if (!process.env.BANCO_CENTRAL_API_USER || !process.env.BANCO_CENTRAL_API_PASS) {
-      throw new Error('Credenciales de API no configuradas');
-    }
+    const today = new Date();
+    const firstDayOfMonth = new Date(today.getFullYear(), today.getMonth(), 1);
 
-    const API_BASE_URL = 'https://si3.bcentral.cl/SieteRestWS/SieteRestWS.ashx';
-    
-    // Obtener fecha actual en zona horaria de Chile
-    const today = new Date().toLocaleString('en-CA', {
-      timeZone: 'America/Santiago',
-      year: 'numeric',
-      month: '2-digit',
-      day: '2-digit'
-    }).split(',')[0];
+    // Obtener todos los indicadores
+    const [ufData, dolarData, euroData, utmData] = await Promise.all([
+      getIndicatorWithRetry(SERIES_CODES.UF, today, false),
+      getIndicatorWithRetry(SERIES_CODES.DOLAR, today, true),
+      getIndicatorWithRetry(SERIES_CODES.EURO, today, true),
+      getIndicatorWithRetry(SERIES_CODES.UTM, firstDayOfMonth, false)
+    ]);
 
-    // Definir las series a consultar
-    const indicators = [
-      {
-        code: 'F073.UFF.PRE.Z.D',
-        key: 'UF',
-        required: true
+    const response = {
+      _metadata: {
+        timestamp: new Date().toISOString(),
+        date: formatDate(today),
+        isWeekend: today.getDay() === 0 || today.getDay() === 6
       },
-      {
-        code: 'F073.TCO.PRE.Z.D',
-        key: 'DOLAR',
-        required: true
+      UF: {
+        ...ufData,
+        valor: ufData.processedData?.valor,
+        fecha: ufData.processedData?.fecha
       },
-      {
-        code: 'F072.CLP.EUR.N.O.D',
-        key: 'EURO',
-        required: true
+      DOLAR: {
+        ...dolarData,
+        valor: dolarData.processedData?.valor,
+        fecha: dolarData.processedData?.fecha
       },
-      {
-        code: 'F073.UTR.PRE.Z.M',
-        key: 'UTM',
-        required: true
+      EURO: {
+        ...euroData,
+        valor: euroData.processedData?.valor,
+        fecha: euroData.processedData?.fecha
+      },
+      UTM: {
+        ...utmData,
+        valor: utmData.processedData?.valor,
+        fecha: utmData.processedData?.fecha
       }
-    ];
-
-    // Obtener datos para cada indicador
-    const results = await Promise.all(
-      indicators.map(async ({ code, key }) => {
-        const params = new URLSearchParams({
-          user: process.env.BANCO_CENTRAL_API_USER,
-          pass: process.env.BANCO_CENTRAL_API_PASS,
-          firstdate: today,
-          lastdate: today,
-          timeseries: code,
-          function: 'GetSeries'
-        });
-
-        const url = `${API_BASE_URL}?${params}`;
-        const response = await fetch(url);
-        
-        if (!response.ok) {
-          console.error(`Error fetching ${key}:`, await response.text());
-          throw new Error(`Error al obtener ${key}`);
-        }
-
-        const data = await response.json();
-        
-        if (!data?.Series?.[0]?.Obs?.[0]) {
-          throw new Error(`No hay datos disponibles para ${key}`);
-        }
-
-        return [
-          key,
-          {
-            valor: parseFloat(data.Series[0].Obs[0].value),
-            fecha: data.Series[0].Obs[0].DateTime
-          }
-        ];
-      })
-    );
-
-    const indicatorsData = Object.fromEntries(results);
+    };
 
     return {
       statusCode: 200,
       headers: {
-        ...headers,
-        'Cache-Control': 'no-cache'
+        'Content-Type': 'application/json',
+        'Cache-Control': 'public, max-age=300'
       },
-      body: JSON.stringify(indicatorsData)
+      body: JSON.stringify(response)
     };
 
   } catch (error) {
-    console.error('Function error:', error);
+    console.error('Error in indicadores function:', error);
     
     return {
-      statusCode: 500,
-      headers,
+      statusCode: 200,
+      headers: {
+        'Content-Type': 'application/json'
+      },
       body: JSON.stringify({
-        error: 'Error al obtener indicadores',
+        error: true,
         message: error.message,
         timestamp: new Date().toISOString()
       })
