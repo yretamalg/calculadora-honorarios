@@ -105,10 +105,6 @@ const ResultadosPDF = ({ resultado, formatearMoneda, formatearNumero }) => {
     <Document>
       <Page size="A4" style={styles.page}>
         <Text style={styles.title}>Conversión de {getTipoConversion()}</Text>
-        
-        <View style={styles.infoSection}>
-          <Text>Fecha: {getFechaActual()}</Text>
-        </View>
 
         {/* Primera tabla */}
         <View style={styles.tableHeader}>
@@ -160,7 +156,7 @@ const ResultadosPDF = ({ resultado, formatearMoneda, formatearNumero }) => {
             Los valores son referenciales y están basados en información del Banco Central de Chile.
           </Text>
           <Text style={styles.disclaimer}>
-            Esta conversión es solo para fines informativos.
+            Este documento es solo para fines informativos y no tiene validez Tributaria.
           </Text>
           <Text style={styles.disclaimer}>
             Generado el {format(new Date(), "dd 'de' MMMM',' yyyy 'a las' HH:mm", { locale: es })} hrs.
