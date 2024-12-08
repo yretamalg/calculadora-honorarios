@@ -10,22 +10,36 @@ const ResultadosConversion = ({ resultado }) => {
   const [copiadoConvertido, setCopiadoConvertido] = useState(false);
 
   const formatearNumero = (numero, tipo = 'CLP') => {
-    if (numero === null || numero === undefined) numero = 0;
+    if (numero === null || numero === undefined) return '0';
 
-    const opciones = {
-      maximumFractionDigits: 2,
-      minimumFractionDigits: tipo === 'CLP' ? 0 : 2
-    };
-
-    if (tipo === 'CLP') {
-      return Math.round(numero).toLocaleString('es-CL');
+    switch (tipo) {
+      case 'CLP':
+        // Pesos chilenos: solo números enteros
+        return Math.round(numero).toLocaleString('es-CL');
+      case 'DOLAR':
+      case 'EURO':
+        // Dólar y Euro: siempre con 2 decimales
+        return new Intl.NumberFormat('es-CL', {
+          minimumFractionDigits: 2,
+          maximumFractionDigits: 2
+        }).format(numero);
+      case 'UF':
+      case 'UTM':
+        // UF y UTM: decimales solo si existen
+        return new Intl.NumberFormat('es-CL', {
+          minimumFractionDigits: 0,
+          maximumFractionDigits: 2
+        }).format(numero);
+      default:
+        return new Intl.NumberFormat('es-CL', {
+          minimumFractionDigits: 2,
+          maximumFractionDigits: 2
+        }).format(numero);
     }
-
-    return new Intl.NumberFormat('es-CL', opciones).format(numero);
   };
 
   const formatearMoneda = (numero, tipo = 'CLP') => {
-    if (numero === null || numero === undefined) numero = 0;
+    if (numero === null || numero === undefined) return '0';
     const formateado = formatearNumero(numero, tipo);
 
     switch (tipo) {
@@ -43,7 +57,6 @@ const ResultadosConversion = ({ resultado }) => {
     }
   };
 
-  // Memoizar el documento PDF para evitar re-renders innecesarios
   const PDFDocument = useMemo(() => (
     <ResultadosPDF 
       resultado={resultado}
@@ -63,16 +76,16 @@ const ResultadosConversion = ({ resultado }) => {
   };
 
   const handleCopiarOriginal = () => {
-    const valor = resultado?.montoOriginal || 0;
-    const tipoFormato = resultado?.direccion === 'from_clp' ? 'CLP' : resultado?.tipoIndicador || 'CLP';
-    const texto = formatearMoneda(valor, tipoFormato);
+    const texto = resultado?.tipoIndicador === 'UF' 
+      ? formatearNumero(resultado?.montoOriginal, resultado?.tipoIndicador)
+      : formatearMoneda(resultado?.montoOriginal, resultado?.direccion === 'from_clp' ? 'CLP' : resultado?.tipoIndicador);
     copiarAlPortapapeles(texto, setCopiadoOriginal);
   };
 
   const handleCopiarConvertido = () => {
-    const valor = resultado?.montoConvertido || 0;
-    const tipoFormato = resultado?.direccion === 'to_clp' ? 'CLP' : resultado?.tipoIndicador || 'CLP';
-    const texto = formatearMoneda(valor, tipoFormato);
+    const texto = resultado?.tipoIndicador === 'UF'
+      ? formatearNumero(resultado?.montoConvertido, resultado?.tipoIndicador)
+      : formatearMoneda(resultado?.montoConvertido, resultado?.direccion === 'to_clp' ? 'CLP' : resultado?.tipoIndicador);
     copiarAlPortapapeles(texto, setCopiadoConvertido);
   };
 
@@ -93,13 +106,25 @@ const ResultadosConversion = ({ resultado }) => {
   };
 
   const formatearValorSegunDireccion = (valor, esPrimero) => {
-    if (!resultado) return formatearMoneda(0, 'CLP');
+    if (!resultado) {
+      return formatearMoneda(0, 'CLP');
+    }
 
-    const tipoFormato = esPrimero
-      ? (resultado.direccion === 'from_clp' ? 'CLP' : resultado.tipoIndicador)
-      : (resultado.direccion === 'to_clp' ? 'CLP' : resultado.tipoIndicador);
+    // Si es UF o UTM, mostrar sin símbolo de moneda
+    if (['UF', 'UTM'].includes(resultado.tipoIndicador)) {
+      return formatearNumero(valor, resultado.tipoIndicador);
+    }
 
-    return formatearMoneda(valor, tipoFormato);
+    // Para los demás casos, determinar el formato según la dirección
+    if (resultado.direccion === 'to_clp') {
+      return esPrimero
+        ? formatearMoneda(valor, resultado.tipoIndicador)
+        : formatearMoneda(valor, 'CLP');
+    } else {
+      return esPrimero
+        ? formatearMoneda(valor, 'CLP')
+        : formatearMoneda(valor, resultado.tipoIndicador);
+    }
   };
 
   return (
@@ -109,7 +134,7 @@ const ResultadosConversion = ({ resultado }) => {
         {resultado && (
           <PDFDownloadLink
             document={PDFDocument}
-            fileName={`conversion-${resultado?.tipoIndicador?.toLowerCase() || 'default'}-${format(new Date(), 'yyyyMMdd-HHmm')}.pdf`}
+            fileName={`conversion-${resultado.tipoIndicador?.toLowerCase() || 'default'}-${format(new Date(), 'yyyyMMdd-HHmm')}.pdf`}
             className="flex items-center gap-2 px-3 py-1.5 text-sm bg-orange-600 text-white rounded-md hover:bg-orange-500 transition-colors"
           >
             {({ loading }) => (
@@ -168,7 +193,9 @@ const ResultadosConversion = ({ resultado }) => {
             </span>
             <span className="text-slate-300">
               {resultado
-                ? formatearMoneda(resultado.valorIndicador, resultado.tipoIndicador)
+                ? ['UF', 'UTM'].includes(resultado.tipoIndicador)
+                  ? formatearNumero(resultado.valorIndicador, resultado.tipoIndicador)
+                  : formatearMoneda(resultado.valorIndicador, resultado.tipoIndicador)
                 : formatearMoneda(0, 'CLP')}
             </span>
           </div>
