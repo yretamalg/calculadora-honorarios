@@ -1,10 +1,8 @@
-// src/components/calculadoras/indicadores/components/ResultadosPDF.jsx
 import React from 'react';
 import { Document, Page, Text, View, StyleSheet } from '@react-pdf/renderer';
 import { format } from 'date-fns';
 import { es } from 'date-fns/locale';
 
-// Estilos para el PDF
 const styles = StyleSheet.create({
   page: {
     padding: 40,
@@ -16,9 +14,6 @@ const styles = StyleSheet.create({
     fontSize: 24,
     marginBottom: 20,
     textAlign: 'center',
-  },
-  infoSection: {
-    marginBottom: 20,
   },
   tableHeader: {
     backgroundColor: '#FF5722',
@@ -105,22 +100,18 @@ const ResultadosPDF = ({ resultado, formatearMoneda, formatearNumero }) => {
     <Document>
       <Page size="A4" style={styles.page}>
         <Text style={styles.title}>Conversión de {getTipoConversion()}</Text>
-        
-        <View style={styles.infoSection}>
-          <Text>Fecha: {getFechaActual()}</Text>
-        </View>
 
         {/* Primera tabla */}
         <View style={styles.tableHeader}>
           <Text style={[styles.tableCell, styles.tableHeaderText]}>
-            Indicadores
+            {resultado.direccion === 'to_clp' ? 
+              `Valor en ${resultado.tipoIndicador}` : 
+              'Valor en Pesos'}
           </Text>
           <Text style={[styles.tableCellAmount, styles.tableHeaderText]}>Monto</Text>
         </View>
         <View style={styles.tableRow}>
-          <Text style={styles.tableCell}>Valor {resultado.direccion === 'to_clp' ? 
-              `Valor en ${resultado.tipoIndicador}` : 
-              'Valor en Pesos'}</Text>
+          <Text style={styles.tableCell}>Valor Original</Text>
           <Text style={styles.tableCellAmount}>
             {getValorFormateado(
               resultado.montoOriginal,
@@ -160,7 +151,7 @@ const ResultadosPDF = ({ resultado, formatearMoneda, formatearNumero }) => {
             Los valores son referenciales y están basados en información del Banco Central de Chile.
           </Text>
           <Text style={styles.disclaimer}>
-            Esta conversión es solo para fines informativos.
+            Este documento es solo para fines informativos y no tiene validez legal ni tributaria.
           </Text>
           <Text style={styles.disclaimer}>
             Generado el {format(new Date(), "dd 'de' MMMM',' yyyy 'a las' HH:mm", { locale: es })} hrs.
