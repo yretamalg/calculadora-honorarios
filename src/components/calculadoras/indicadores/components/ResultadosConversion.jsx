@@ -9,10 +9,10 @@ const ResultadosConversion = ({ resultado }) => {
   const [copiadoOriginal, setCopiadoOriginal] = useState(false);
   const [copiadoConvertido, setCopiadoConvertido] = useState(false);
 
-  // Removemos el if (!resultado) return null
+  // Eliminamos el if (!resultado) return null
 
   const formatearNumero = (numero, tipo = 'CLP') => {
-    if (numero === null || numero === undefined) return '0';
+    if (numero === null || numero === undefined) numero = 0;
 
     switch (tipo) {
       case 'CLP':
@@ -28,8 +28,10 @@ const ResultadosConversion = ({ resultado }) => {
       case 'UF':
       case 'UTM':
         // UF y UTM: decimales solo si existen
+        const partes = numero.toString().split('.');
+        const decimales = partes[1]?.length || 0;
         return new Intl.NumberFormat('es-CL', {
-          minimumFractionDigits: 0,
+          minimumFractionDigits: Math.min(decimales, 2),
           maximumFractionDigits: 2
         }).format(numero);
       default:
@@ -38,7 +40,6 @@ const ResultadosConversion = ({ resultado }) => {
   };
 
   const formatearMoneda = (numero, tipo = 'CLP') => {
-    if (numero === null || numero === undefined) return '0';
     const formateado = formatearNumero(numero, tipo);
 
     switch (tipo) {
@@ -56,7 +57,6 @@ const ResultadosConversion = ({ resultado }) => {
     }
   };
 
-  // Memoizar el documento PDF para evitar re-renders innecesarios
   const PDFDocument = useMemo(() => (
     <ResultadosPDF 
       resultado={resultado}
@@ -77,16 +77,16 @@ const ResultadosConversion = ({ resultado }) => {
 
   const handleCopiarOriginal = () => {
     if (!resultado) return;
-    const texto = resultado.tipoIndicador === 'UF' 
-      ? formatearNumero(resultado.montoOriginal)
+    const texto = ['UF', 'UTM'].includes(resultado.tipoIndicador)
+      ? formatearNumero(resultado.montoOriginal, resultado.tipoIndicador)
       : formatearMoneda(resultado.montoOriginal, resultado.direccion === 'from_clp' ? 'CLP' : resultado.tipoIndicador);
     copiarAlPortapapeles(texto, setCopiadoOriginal);
   };
 
   const handleCopiarConvertido = () => {
     if (!resultado) return;
-    const texto = resultado.tipoIndicador === 'UF'
-      ? formatearNumero(resultado.montoConvertido)
+    const texto = ['UF', 'UTM'].includes(resultado.tipoIndicador)
+      ? formatearNumero(resultado.montoConvertido, resultado.tipoIndicador)
       : formatearMoneda(resultado.montoConvertido, resultado.direccion === 'to_clp' ? 'CLP' : resultado.tipoIndicador);
     copiarAlPortapapeles(texto, setCopiadoConvertido);
   };
@@ -112,21 +112,19 @@ const ResultadosConversion = ({ resultado }) => {
       return formatearMoneda(0, 'CLP');
     }
 
+    const esPesoChileno = (direccion, esPrimero) => 
+      (direccion === 'to_clp' && !esPrimero) || (direccion === 'from_clp' && esPrimero);
+
     // Si es UF o UTM, mostrar sin símbolo de moneda
     if (['UF', 'UTM'].includes(resultado.tipoIndicador)) {
-      return formatearNumero(valor, resultado.tipoIndicador);
+      return formatearNumero(valor || 0, resultado.tipoIndicador);
     }
 
-    // Para los demás casos, determinar el formato según la dirección
-    if (resultado.direccion === 'to_clp') {
-      return esPrimero
-        ? formatearMoneda(valor, resultado.tipoIndicador)
-        : formatearMoneda(valor, 'CLP');
-    } else {
-      return esPrimero
-        ? formatearMoneda(valor, 'CLP')
-        : formatearMoneda(valor, resultado.tipoIndicador);
-    }
+    // Para los demás casos
+    const tipo = esPesoChileno(resultado.direccion, esPrimero) 
+      ? 'CLP' 
+      : resultado.tipoIndicador;
+    return formatearMoneda(valor || 0, tipo);
   };
 
   return (
@@ -154,7 +152,7 @@ const ResultadosConversion = ({ resultado }) => {
           <span className="text-slate-400">{getLabelOrigen()}</span>
           <div className="flex items-center gap-3">
             <span className="text-xl font-semibold text-white">
-              {formatearValorSegunDireccion(resultado?.montoOriginal || 0, true)}
+              {formatearValorSegunDireccion(resultado?.montoOriginal, true)}
             </span>
             <button
               onClick={handleCopiarOriginal}
@@ -173,7 +171,7 @@ const ResultadosConversion = ({ resultado }) => {
           <span className="text-slate-400">{getLabelDestino()}</span>
           <div className="flex items-center gap-3">
             <span className="text-2xl font-bold text-orange-500">
-              {formatearValorSegunDireccion(resultado?.montoConvertido || 0, false)}
+              {formatearValorSegunDireccion(resultado?.montoConvertido, false)}
             </span>
             <button
               onClick={handleCopiarConvertido}
