@@ -106,7 +106,8 @@ const ConversionForm = ({
         >
           {`Ingrese monto en ${from}:`}
         </label>
-        <input
+        {/* Input de monto con eventos verificados */}
+<input
   type="text"
   id="monto"
   value={valor}
