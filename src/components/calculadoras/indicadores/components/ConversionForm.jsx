@@ -69,16 +69,14 @@ const ConversionForm = ({
     const simbolo = getSimboloMoneda(tipoIndicador, direccion);
     const espacioSimbolo = simbolo ? ' ' : ''; // Espacio solo si hay símbolo
 
-    if (direccion === 'to_clp') {
-      // Permitir máximo 2 decimales
-      if (parteDecimal) {
-        parteDecimal = parteDecimal.slice(0, 2);
-        return `${simbolo}${espacioSimbolo}${parteEntera},${parteDecimal}`;
-      }
-      // Si el último carácter era una coma, preservarla
-      if (valor.endsWith(',')) {
-        return `${simbolo}${espacioSimbolo}${parteEntera},`;
-      }
+    // Permitir decimales para todos los tipos cuando es to_clp o cuando es desde peso a otro indicador
+    if (parteDecimal) {
+      parteDecimal = parteDecimal.slice(0, 2);
+      return `${simbolo}${espacioSimbolo}${parteEntera},${parteDecimal}`;
+    }
+    // Si el último carácter era una coma, preservarla
+    if (valor.endsWith(',')) {
+      return `${simbolo}${espacioSimbolo}${parteEntera},`;
     }
     
     return `${simbolo}${espacioSimbolo}${parteEntera}`;
@@ -93,8 +91,9 @@ const ConversionForm = ({
     // Permitir números
     if (/\d/.test(key)) return;
 
-    // Permitir coma solo si aún no existe y estamos en modo to_clp
-    if (direccion === 'to_clp' && key === ',' && !value.includes(',')) return;
+    // Permitir coma para decimales en todos los casos, excepto cuando convertimos desde pesos a UF o UTM
+    const permitirComa = !(direccion === 'from_clp' && (tipoIndicador === 'UF' || tipoIndicador === 'UTM'));
+    if (key === ',' && !value.includes(',') && permitirComa) return;
 
     // Bloquear cualquier otra tecla
     e.preventDefault();
