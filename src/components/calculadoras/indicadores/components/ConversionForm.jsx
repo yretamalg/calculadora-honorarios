@@ -10,7 +10,6 @@ const ConversionForm = ({
   disabled,
   onCalcular 
 }) => {
-  // Mapeo de nombres de indicadores
   const getNombreIndicador = (tipo) => ({
     'UF': 'UF',
     'DOLAR': 'Dólares',
@@ -69,6 +68,12 @@ const ConversionForm = ({
     return montoFormateado;
   };
 
+  const handleChange = (e) => {
+    const valorActual = e.target.value;
+    const valorFormateado = formatearMonto(valorActual);
+    onChange(valorFormateado);
+  };
+
   const handleKeyDown = (e) => {
     // Permitir siempre: teclas de control
     if (['Backspace', 'Delete', 'ArrowLeft', 'ArrowRight', 'Tab'].includes(e.key)) {
@@ -93,7 +98,7 @@ const ConversionForm = ({
   };
 
   const { from, to } = getConversionLabel();
-  
+
   return (
     <form 
       onSubmit={(e) => {
