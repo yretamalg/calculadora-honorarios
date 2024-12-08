@@ -9,6 +9,8 @@ const ResultadosConversion = ({ resultado }) => {
   const [copiadoOriginal, setCopiadoOriginal] = useState(false);
   const [copiadoConvertido, setCopiadoConvertido] = useState(false);
 
+  // Removemos el if (!resultado) return null
+
   const formatearNumero = (numero, tipo = 'CLP') => {
     if (numero === null || numero === undefined) return '0';
 
@@ -31,10 +33,7 @@ const ResultadosConversion = ({ resultado }) => {
           maximumFractionDigits: 2
         }).format(numero);
       default:
-        return new Intl.NumberFormat('es-CL', {
-          minimumFractionDigits: 2,
-          maximumFractionDigits: 2
-        }).format(numero);
+        return numero.toLocaleString('es-CL');
     }
   };
 
@@ -57,6 +56,7 @@ const ResultadosConversion = ({ resultado }) => {
     }
   };
 
+  // Memoizar el documento PDF para evitar re-renders innecesarios
   const PDFDocument = useMemo(() => (
     <ResultadosPDF 
       resultado={resultado}
@@ -76,16 +76,18 @@ const ResultadosConversion = ({ resultado }) => {
   };
 
   const handleCopiarOriginal = () => {
-    const texto = resultado?.tipoIndicador === 'UF' 
-      ? formatearNumero(resultado?.montoOriginal, resultado?.tipoIndicador)
-      : formatearMoneda(resultado?.montoOriginal, resultado?.direccion === 'from_clp' ? 'CLP' : resultado?.tipoIndicador);
+    if (!resultado) return;
+    const texto = resultado.tipoIndicador === 'UF' 
+      ? formatearNumero(resultado.montoOriginal)
+      : formatearMoneda(resultado.montoOriginal, resultado.direccion === 'from_clp' ? 'CLP' : resultado.tipoIndicador);
     copiarAlPortapapeles(texto, setCopiadoOriginal);
   };
 
   const handleCopiarConvertido = () => {
-    const texto = resultado?.tipoIndicador === 'UF'
-      ? formatearNumero(resultado?.montoConvertido, resultado?.tipoIndicador)
-      : formatearMoneda(resultado?.montoConvertido, resultado?.direccion === 'to_clp' ? 'CLP' : resultado?.tipoIndicador);
+    if (!resultado) return;
+    const texto = resultado.tipoIndicador === 'UF'
+      ? formatearNumero(resultado.montoConvertido)
+      : formatearMoneda(resultado.montoConvertido, resultado.direccion === 'to_clp' ? 'CLP' : resultado.tipoIndicador);
     copiarAlPortapapeles(texto, setCopiadoConvertido);
   };
 
