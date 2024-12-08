@@ -107,7 +107,7 @@ const ResultadosConversion = ({ resultado }) => {
           <div className="flex items-center gap-3">
             <span className="text-xl font-semibold text-white">
               {resultado.tipoIndicador === 'UF' 
-                ? formatearMoneda(resultado.montoOriginal)
+                ? formatearNumero(resultado.montoOriginal)
                 : formatearMoneda(resultado.montoOriginal, resultado.tipoIndicador)}
             </span>
             <button
@@ -127,9 +127,11 @@ const ResultadosConversion = ({ resultado }) => {
           <span className="text-slate-400">{getLabelDestino()}</span>
           <div className="flex items-center gap-3">
             <span className="text-2xl font-bold text-orange-500">
-              {resultado.tipoIndicador === 'UF'
-                ? formatearNumero(resultado.montoConvertido)
-                : formatearMoneda(resultado.montoConvertido, resultado.direccion === 'to_clp' ? 'CLP' : resultado.tipoIndicador)}
+              {resultado.direccion === 'to_clp'
+                ? `$ ${Math.round(resultado.montoConvertido).toLocaleString('es-CL')}`
+                : resultado.tipoIndicador === 'UF'
+                  ? formatearNumero(resultado.montoConvertido)
+                  : formatearMoneda(resultado.montoConvertido, resultado.tipoIndicador)}
             </span>
             <button
               onClick={handleCopiarConvertido}
@@ -150,7 +152,9 @@ const ResultadosConversion = ({ resultado }) => {
               Valor {resultado.tipoIndicador} ({format(new Date(), "dd 'de' MMMM", { locale: es })}):
             </span>
             <span className="text-slate-300">
-              {formatearMoneda(resultado.valorIndicador, resultado.tipoIndicador)}
+              {resultado.tipoIndicador === 'UF'
+                ? formatearNumero(resultado.valorIndicador)
+                : formatearMoneda(resultado.valorIndicador, resultado.tipoIndicador)}
             </span>
           </div>
         </div>

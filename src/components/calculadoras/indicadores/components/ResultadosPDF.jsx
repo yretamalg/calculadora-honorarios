@@ -85,11 +85,22 @@ const ResultadosPDF = ({ resultado, formatearMoneda, formatearNumero }) => {
     }
   };
 
-  const getValorFormateado = (valor, tipo) => {
+  const formatearValorSegunTipo = (valor, tipo) => {
     try {
-      return resultado.tipoIndicador === 'UF'
-        ? formatearNumero(valor)
-        : formatearMoneda(valor, tipo);
+      if (tipo === 'CLP') {
+        return `$ ${Math.round(valor).toLocaleString('es-CL')}`;
+      }
+      
+      switch (tipo) {
+        case 'DOLAR':
+          return `US$ ${formatearNumero(valor)}`;
+        case 'EURO':
+          return `€ ${formatearNumero(valor)}`;
+        case 'UF':
+          return formatearNumero(valor);
+        default:
+          return formatearNumero(valor);
+      }
     } catch (error) {
       console.error('Error formatting value:', error);
       return '0';
@@ -101,7 +112,6 @@ const ResultadosPDF = ({ resultado, formatearMoneda, formatearNumero }) => {
       <Page size="A4" style={styles.page}>
         <Text style={styles.title}>Conversión de {getTipoConversion()}</Text>
 
-        {/* Primera tabla */}
         <View style={styles.tableHeader}>
           <Text style={[styles.tableCell, styles.tableHeaderText]}>
             Indicadores
@@ -109,11 +119,13 @@ const ResultadosPDF = ({ resultado, formatearMoneda, formatearNumero }) => {
           <Text style={[styles.tableCellAmount, styles.tableHeaderText]}>Monto</Text>
         </View>
         <View style={styles.tableRow}>
-          <Text style={styles.tableCell}>{resultado.direccion === 'to_clp' ? 
+          <Text style={styles.tableCell}>
+            {resultado.direccion === 'to_clp' ? 
               `Valor en ${resultado.tipoIndicador}` : 
-              'Valor en Pesos'}</Text>
+              'Valor en Pesos'}
+          </Text>
           <Text style={styles.tableCellAmount}>
-            {getValorFormateado(
+            {formatearValorSegunTipo(
               resultado.montoOriginal,
               resultado.direccion === 'to_clp' ? resultado.tipoIndicador : 'CLP'
             )}
@@ -126,26 +138,24 @@ const ResultadosPDF = ({ resultado, formatearMoneda, formatearNumero }) => {
               `Valor en ${resultado.tipoIndicador}`}
           </Text>
           <Text style={styles.tableCellAmount}>
-            {getValorFormateado(
+            {formatearValorSegunTipo(
               resultado.montoConvertido,
               resultado.direccion === 'to_clp' ? 'CLP' : resultado.tipoIndicador
             )}
           </Text>
         </View>
 
-        {/* Valor del indicador */}
         <View style={{ marginTop: 20 }}>
           <View style={styles.tableRow}>
             <Text style={styles.tableCell}>
               Valor {resultado.tipoIndicador} ({getFechaActual()})
             </Text>
             <Text style={styles.tableCellAmount}>
-              {formatearMoneda(resultado.valorIndicador, resultado.tipoIndicador)}
+              {formatearValorSegunTipo(resultado.valorIndicador, resultado.tipoIndicador)}
             </Text>
           </View>
         </View>
 
-        {/* Footer con disclaimers */}
         <View style={styles.footer}>
           <Text style={styles.disclaimer}>
             Los valores son referenciales y están basados en información del Banco Central de Chile.
