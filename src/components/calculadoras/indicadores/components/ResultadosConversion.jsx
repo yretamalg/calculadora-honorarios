@@ -1,6 +1,87 @@
-import React from 'react';
+import React, { useState } from 'react';
+import { Copy, Check, Download } from 'lucide-react';
+import { PDFDownloadLink, Document, Page, Text, View, StyleSheet } from '@react-pdf/renderer';
+import { format } from 'date-fns';
+import { es } from 'date-fns/locale';
+
+// Estilos para el PDF
+const styles = StyleSheet.create({
+  page: {
+    padding: 30,
+    backgroundColor: '#FFFFFF'
+  },
+  title: {
+    fontSize: 20,
+    marginBottom: 20,
+    textAlign: 'center',
+    color: '#1F2937'
+  },
+  section: {
+    marginBottom: 10
+  },
+  label: {
+    fontSize: 12,
+    color: '#6B7280',
+    marginBottom: 5
+  },
+  value: {
+    fontSize: 16,
+    color: '#1F2937'
+  },
+  footer: {
+    marginTop: 20,
+    fontSize: 10,
+    color: '#6B7280',
+    textAlign: 'center'
+  }
+});
+
+// Componente PDF
+const ResultadosPDF = ({ resultado, formatearMoneda, formatearNumero }) => (
+  <Document>
+    <Page size="A4" style={styles.page}>
+      <Text style={styles.title}>Resultado de Conversión</Text>
+      
+      <View style={styles.section}>
+        <Text style={styles.label}>Valor Ingresado:</Text>
+        <Text style={styles.value}>
+          {resultado.tipoIndicador === 'UF' 
+            ? formatearMoneda(resultado.montoOriginal)
+            : formatearMoneda(resultado.montoOriginal, resultado.tipoIndicador)}
+        </Text>
+      </View>
+      
+      <View style={styles.section}>
+        <Text style={styles.label}>
+          Valor en {resultado.direccion === 'to_clp' ? 'Pesos (CLP)' : resultado.tipoIndicador}:
+        </Text>
+        <Text style={styles.value}>
+          {resultado.tipoIndicador === 'UF'
+            ? formatearNumero(resultado.montoConvertido)
+            : formatearMoneda(resultado.montoConvertido)}
+        </Text>
+      </View>
+      
+      <View style={styles.section}>
+        <Text style={styles.label}>
+          Valor {resultado.tipoIndicador} ({format(new Date(), "dd 'de' MMMM',' yyyy", { locale: es })}):
+        </Text>
+        <Text style={styles.value}>
+          {formatearMoneda(resultado.valorIndicador)}
+        </Text>
+      </View>
+
+      <Text style={styles.footer}>
+        Generado el {format(new Date(), "dd 'de' MMMM',' yyyy 'a las' HH:mm", { locale: es })}
+      </Text>
+    </Page>
+  </Document>
+);
 
 const ResultadosConversion = ({ resultado }) => {
+  const [copiadoOriginal, setCopiadoOriginal] = useState(false);
+  const [copiadoConvertido, setCopiadoConvertido] = useState(false);
+
   if (!resultado) return null;
 
   const formatearNumero = (numero) => {
@@ -18,31 +99,100 @@ const ResultadosConversion = ({ resultado }) => {
     return formateado;
   };
 
+  const copiarAlPortapapeles = async (texto, setCopied) => {
+    try {
+      await navigator.clipboard.writeText(texto);
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2000);
+    } catch (err) {
+      console.error('Error al copiar:', err);
+    }
+  };
+
+  const handleCopiarOriginal = () => {
+    const texto = resultado.tipoIndicador === 'UF' 
+      ? formatearMoneda(resultado.montoOriginal)
+      : formatearMoneda(resultado.montoOriginal, resultado.tipoIndicador);
+    copiarAlPortapapeles(texto, setCopiadoOriginal);
+  };
+
+  const handleCopiarConvertido = () => {
+    const texto = resultado.tipoIndicador === 'UF'
+      ? formatearNumero(resultado.montoConvertido)
+      : formatearMoneda(resultado.montoConvertido);
+    copiarAlPortapapeles(texto, setCopiadoConvertido);
+  };
+
   return (
     <div className="bg-slate-700 rounded-lg p-6">
-      <h2 className="text-lg font-medium text-slate-300 mb-4">Resultado:</h2>
+      <div className="flex justify-between items-center mb-4">
+        <h2 className="text-lg font-medium text-slate-300">Resultado</h2>
+        <PDFDownloadLink
+          document={
+            <ResultadosPDF 
+              resultado={resultado}
+              formatearMoneda={formatearMoneda}
+              formatearNumero={formatearNumero}
+            />
+          }
+          fileName={`conversion-${resultado.tipoIndicador.toLowerCase()}-${format(new Date(), 'yyyyMMdd-HHmm')}.pdf`}
+          className="flex items-center gap-2 px-3 py-1.5 text-sm bg-orange-600 text-white rounded-md hover:bg-orange-500 transition-colors"
+        >
+          <Download className="w-4 h-4" />
+          <span>Exportar PDF</span>
+        </PDFDownloadLink>
+      </div>
+
       <div className="space-y-4">
         <div className="flex justify-between items-center">
-          <span className="text-slate-400">Valor Original:</span>
-          <span className="text-xl font-semibold text-white">
-            {resultado.tipoIndicador === 'UF' 
-              ? formatearMoneda(resultado.montoOriginal)
-              : formatearMoneda(resultado.montoOriginal, resultado.tipoIndicador)}
-          </span>
+          <span className="text-slate-400">Valor Ingresado:</span>
+          <div className="flex items-center gap-3">
+            <span className="text-xl font-semibold text-white">
+              {resultado.tipoIndicador === 'UF' 
+                ? formatearMoneda(resultado.montoOriginal)
+                : formatearMoneda(resultado.montoOriginal, resultado.tipoIndicador)}
+            </span>
+            <button
+              onClick={handleCopiarOriginal}
+              className="p-1.5 hover:bg-slate-600 rounded-md transition-colors"
+            >
+              {copiadoOriginal ? (
+                <Check className="w-4 h-4 text-green-500" />
+              ) : (
+                <Copy className="w-4 h-4 text-slate-400" />
+              )}
+            </button>
+          </div>
         </div>
         
         <div className="flex justify-between items-center">
-          <span className="text-slate-400">Valor Convertido:</span>
-          <span className="text-2xl font-bold text-orange-500">
-            {resultado.tipoIndicador === 'UF'
-              ? formatearNumero(resultado.montoConvertido)
-              : formatearMoneda(resultado.montoConvertido)}
+          <span className="text-slate-400">
+            Valor en {resultado.direccion === 'to_clp' ? 'Pesos (CLP)' : resultado.tipoIndicador}:
           </span>
+          <div className="flex items-center gap-3">
+            <span className="text-2xl font-bold text-orange-500">
+              {resultado.tipoIndicador === 'UF'
+                ? formatearNumero(resultado.montoConvertido)
+                : formatearMoneda(resultado.montoConvertido)}
+            </span>
+            <button
+              onClick={handleCopiarConvertido}
+              className="p-1.5 hover:bg-slate-600 rounded-md transition-colors"
+            >
+              {copiadoConvertido ? (
+                <Check className="w-4 h-4 text-green-500" />
+              ) : (
+                <Copy className="w-4 h-4 text-slate-400" />
+              )}
+            </button>
+          </div>
         </div>
 
         <div className="pt-4 border-t border-slate-600">
           <div className="flex justify-between items-center text-sm">
-            <span className="text-slate-400">Valor {resultado.tipoIndicador}:</span>
+            <span className="text-slate-400">
+              Valor {resultado.tipoIndicador} ({format(new Date(), "dd 'de' MMMM", { locale: es })}):
+            </span>
             <span className="text-slate-300">
               {formatearMoneda(resultado.valorIndicador)}
             </span>
