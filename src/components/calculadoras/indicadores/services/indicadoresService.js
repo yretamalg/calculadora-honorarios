@@ -1,4 +1,4 @@
-// src/components/calculadoras/indicadores/services/indicadoresService.js
+// src/services/indicadoresService.js
 
 import { SERIES_CODES } from '../constants/indicadores';
 import { getDateRange, getChileDateTime, isBusinessDay } from '../utils/dateUtils';
@@ -14,72 +14,96 @@ class IndicadoresService {
 
   async getIndicadores() {
     try {
-      // Obtener metadata con información de fechas de Chile
       const metadata = this.getMetadata();
-
-      // Obtener rango de fechas según hora de Chile
       const { firstdate, lastdate } = getDateRange();
 
-      // Hacer las peticiones en paralelo para cada indicador
       const promises = Object.entries(SERIES_CODES).map(([key, seriesCode]) => 
         this.fetchSeries(seriesCode, firstdate, lastdate)
           .then(data => [key, this.processSeriesData(data)])
+          .catch(error => {
+            console.error(`Error fetching ${key}:`, error);
+            return [key, { valor: null, fecha: null }];
+          })
       );
 
       const results = await Promise.all(promises);
       
-      // Retornar los resultados con la metadata
       return {
         ...Object.fromEntries(results),
         _metadata: metadata
       };
     } catch (error) {
       console.error('Error fetching indicators:', error);
-      throw error;
+      // Retornar un objeto con valores por defecto en caso de error
+      return {
+        UF: { valor: null, fecha: null },
+        DOLAR: { valor: null, fecha: null },
+        EURO: { valor: null, fecha: null },
+        UTM: { valor: null, fecha: null },
+        _metadata: this.getMetadata()
+      };
     }
   }
 
   async fetchSeries(seriesCode, firstdate, lastdate) {
-    const params = new URLSearchParams({
-      user: this.credentials.user,
-      pass: this.credentials.pass,
-      firstdate,
-      lastdate,
-      timeseries: seriesCode,
-      function: 'GetSeries'
-    });
+    try {
+      const params = new URLSearchParams({
+        user: this.credentials.user,
+        pass: this.credentials.pass,
+        firstdate,
+        lastdate,
+        timeseries: seriesCode,
+        function: 'GetSeries'
+      });
 
-    const response = await fetch(`${this.baseUrl}?${params}`);
-    if (!response.ok) {
-      throw new Error(`Error fetching series ${seriesCode}`);
+      const response = await fetch(`${this.baseUrl}?${params}`);
+      if (!response.ok) {
+        throw new Error(`Error fetching series ${seriesCode}`);
+      }
+
+      return response.json();
+    } catch (error) {
+      console.error(`Error in fetchSeries for ${seriesCode}:`, error);
+      throw error;
     }
-
-    return response.json();
   }
 
   processSeriesData(data) {
-    if (!data?.Series?.[0]?.Obs?.[0]) {
-      throw new Error('Invalid series data format');
-    }
+    try {
+      if (!data?.Series?.[0]?.Obs?.[0]) {
+        throw new Error('Invalid series data format');
+      }
 
-    const observation = data.Series[0].Obs[0];
-    return {
-      valor: parseFloat(observation.value),
-      fecha: observation.DateTime
-    };
+      const observation = data.Series[0].Obs[0];
+      return {
+        valor: parseFloat(observation.value) || null,
+        fecha: observation.DateTime || null
+      };
+    } catch (error) {
+      console.error('Error processing series data:', error);
+      return { valor: null, fecha: null };
+    }
   }
 
   getMetadata() {
-    const chileDate = new Date(getChileDateTime());
-    const currentDate = chileDate.toISOString().split('T')[0];
-    const isCurrentBusinessDay = isBusinessDay(chileDate);
-
-    return {
-      currentDate,
-      lastUpdate: chileDate.toLocaleString('es-CL', { timeZone: 'America/Santiago' }),
-      isBusinessDay: isCurrentBusinessDay,
-      chileTime: chileDate.toLocaleTimeString('es-CL', { timeZone: 'America/Santiago' })
-    };
+    try {
+      const chileDate = new Date(getChileDateTime());
+      return {
+        currentDate: chileDate.toISOString().split('T')[0],
+        lastUpdate: chileDate.toLocaleString('es-CL', { timeZone: 'America/Santiago' }),
+        isBusinessDay: isBusinessDay(chileDate),
+        chileTime: chileDate.toLocaleTimeString('es-CL', { timeZone: 'America/Santiago' })
+      };
+    } catch (error) {
+      console.error('Error getting metadata:', error);
+      const now = new Date();
+      return {
+        currentDate: now.toISOString().split('T')[0],
+        lastUpdate: now.toISOString(),
+        isBusinessDay: false,
+        chileTime: now.toLocaleTimeString()
+      };
+    }
   }
 }
 
