@@ -45,19 +45,22 @@ const ConversionForm = ({
     // Aplicar separador de miles
     parteEntera = parteEntera.replace(/\B(?=(\d{3})+(?!\d))/g, '.');
 
+    // Determinar el símbolo de moneda según el tipo y dirección
+    const simbolo = tipoIndicador === 'EURO' && direccion === 'to_clp' ? '€' : '$';
+
     if (direccion === 'to_clp') {
       // Permitir máximo 2 decimales
       if (parteDecimal) {
         parteDecimal = parteDecimal.slice(0, 2);
-        return `$ ${parteEntera},${parteDecimal}`;
+        return `${simbolo} ${parteEntera},${parteDecimal}`;
       }
       // Si el último carácter era una coma, preservarla
       if (valor.endsWith(',')) {
-        return `$ ${parteEntera},`;
+        return `${simbolo} ${parteEntera},`;
       }
     }
     
-    return `$ ${parteEntera}`;
+    return `${simbolo} ${parteEntera}`;
   };
 
   const handleKeyDown = (e) => {
@@ -89,6 +92,9 @@ const ConversionForm = ({
   };
 
   const { from, to } = getConversionLabel();
+
+  // Determinar el placeholder según el tipo y dirección
+  const placeholderSymbol = tipoIndicador === 'EURO' && direccion === 'to_clp' ? '€' : '$';
 
   return (
     <form 
@@ -130,7 +136,7 @@ const ConversionForm = ({
           onPaste={handlePaste}
           onDrop={(e) => e.preventDefault()}
           disabled={disabled}
-          placeholder="$ 0"
+          placeholder={`${placeholderSymbol} 0`}
           inputMode="text"
           autoComplete="off"
           className="block w-full text-2xl h-14 border border-gray-300 rounded-md 
