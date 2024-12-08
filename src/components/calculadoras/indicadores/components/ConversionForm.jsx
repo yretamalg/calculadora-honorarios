@@ -24,6 +24,26 @@ const ConversionForm = ({
     return { from, to };
   };
 
+  const getSimboloMoneda = (tipo, direccionConversion) => {
+    if (direccionConversion === 'to_clp') {
+      // Conversión hacia pesos
+      switch (tipo) {
+        case 'DOLAR':
+          return 'US$';
+        case 'EURO':
+          return '€';
+        case 'UF':
+        case 'UTM':
+          return ''; // Sin símbolo para UF y UTM
+        default:
+          return '$';
+      }
+    } else {
+      // Conversión desde pesos
+      return '$'; // Siempre mostrar $ cuando el origen es pesos
+    }
+  };
+
   const formatearMonto = (valor) => {
     if (!valor) return '';
 
@@ -45,22 +65,23 @@ const ConversionForm = ({
     // Aplicar separador de miles
     parteEntera = parteEntera.replace(/\B(?=(\d{3})+(?!\d))/g, '.');
 
-    // Determinar el símbolo de moneda según el tipo y dirección
-    const simbolo = tipoIndicador === 'EURO' && direccion === 'to_clp' ? '€' : '$';
+    // Obtener el símbolo de moneda apropiado
+    const simbolo = getSimboloMoneda(tipoIndicador, direccion);
+    const espacioSimbolo = simbolo ? ' ' : ''; // Espacio solo si hay símbolo
 
     if (direccion === 'to_clp') {
       // Permitir máximo 2 decimales
       if (parteDecimal) {
         parteDecimal = parteDecimal.slice(0, 2);
-        return `${simbolo} ${parteEntera},${parteDecimal}`;
+        return `${simbolo}${espacioSimbolo}${parteEntera},${parteDecimal}`;
       }
       // Si el último carácter era una coma, preservarla
       if (valor.endsWith(',')) {
-        return `${simbolo} ${parteEntera},`;
+        return `${simbolo}${espacioSimbolo}${parteEntera},`;
       }
     }
     
-    return `${simbolo} ${parteEntera}`;
+    return `${simbolo}${espacioSimbolo}${parteEntera}`;
   };
 
   const handleKeyDown = (e) => {
@@ -94,7 +115,8 @@ const ConversionForm = ({
   const { from, to } = getConversionLabel();
 
   // Determinar el placeholder según el tipo y dirección
-  const placeholderSymbol = tipoIndicador === 'EURO' && direccion === 'to_clp' ? '€' : '$';
+  const placeholderSimbolo = getSimboloMoneda(tipoIndicador, direccion);
+  const placeholder = placeholderSimbolo ? `${placeholderSimbolo} 0` : '0';
 
   return (
     <form 
@@ -136,7 +158,7 @@ const ConversionForm = ({
           onPaste={handlePaste}
           onDrop={(e) => e.preventDefault()}
           disabled={disabled}
-          placeholder={`${placeholderSymbol} 0`}
+          placeholder={placeholder}
           inputMode="text"
           autoComplete="off"
           className="block w-full text-2xl h-14 border border-gray-300 rounded-md 
