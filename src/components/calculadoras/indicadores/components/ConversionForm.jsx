@@ -26,62 +26,35 @@ const ConversionForm = ({
 
   const formatearMonto = (valor) => {
     if (!valor) return '';
-
-    // Remover el símbolo de peso y espacios
-    let numero = valor.replace(/[$\s]/g, '');
-
-    // Si estamos convirtiendo DESDE pesos (from_clp), forzar sin decimales
-    if (direccion === 'from_clp') {
-      numero = numero.split(',')[0]; // Eliminar cualquier decimal
-    }
-
-    // Remover todos los puntos (separadores de miles)
-    numero = numero.replace(/\./g, '');
-
+    // Eliminar caracteres no numéricos excepto coma
+    let numero = valor.replace(/[^0-9,]/g, '');
     // Separar parte entera y decimal
     let [parteEntera, parteDecimal] = numero.split(',');
-
-    // Si no hay parte entera, usar 0
-    parteEntera = parteEntera || '0';
-
-    // Limpiar ceros al inicio de la parte entera
-    parteEntera = parteEntera.replace(/^0+/, '') || '0';
-
+    // Limpiar ceros iniciales de la parte entera
+    parteEntera = parteEntera?.replace(/^0+/, '') || '0';
     // Aplicar separador de miles a la parte entera
     parteEntera = parteEntera.replace(/\B(?=(\d{3})+(?!\d))/g, '.');
-
-    // Construir el monto formateado según la dirección
     if (direccion === 'to_clp') {
-      // Convertir a pesos (PERMITE decimales)
+      // Permitir máximo 2 decimales
       if (parteDecimal) {
-        parteDecimal = parteDecimal.slice(0, 2); // Máximo 2 decimales
+        parteDecimal = parteDecimal.slice(0, 2);
         return `$ ${parteEntera},${parteDecimal}`;
       }
       return `$ ${parteEntera}`;
     } else {
-      // Convertir desde pesos (NO PERMITE decimales)
+      // No permitir decimales en 'from_clp'
       return `$ ${parteEntera}`;
     }
   };
 
   const handleKeyDown = (e) => {
-    // Permitir siempre: teclas de navegación y control
-    if (['Backspace', 'Delete', 'ArrowLeft', 'ArrowRight', 'Tab'].includes(e.key)) {
-      return;
-    }
-
-    // Permitir siempre: números
-    if (/\d/.test(e.key)) {
-      return;
-    }
-
-    // Permitir coma SOLO cuando:
-    // 1. Se está convirtiendo DE indicador A pesos (to_clp)
-    // 2. No hay otra coma en el valor actual
-    if (direccion === 'to_clp' && e.key === ',' && !e.target.value.includes(',')) {
-      return;
-    }
-
+    const { key, target: { value } } = e;
+    // Permitir teclas de control y navegación
+    if (['Backspace', 'Delete', 'ArrowLeft', 'ArrowRight', 'Tab'].includes(key)) return;
+    // Permitir solo números
+    if (/\d/.test(key)) return;
+    // Permitir coma solo una vez al convertir a pesos
+    if (direccion === 'to_clp' && key === ',' && !value.includes(',')) return;
     // Bloquear cualquier otra tecla
     e.preventDefault();
   };
