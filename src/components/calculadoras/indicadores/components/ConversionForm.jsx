@@ -27,58 +27,64 @@ const ConversionForm = ({
   const formatearMonto = (valor) => {
     if (!valor) return '';
 
-    // Remover todo excepto números, punto y coma
-    let numero = valor.replace(/[^\d.,]/g, '');
-    
-    // Convertir puntos a nada (removemos puntos de miles temporalmente)
-    numero = numero.replace(/\./g, '');
-    
-    // Si hay más de una coma, dejar solo la primera
-    if ((numero.match(/,/g) || []).length > 1) {
-      const partes = numero.split(',');
-      numero = partes[0] + ',' + partes[1];
+    // Remover el símbolo de peso y espacios
+    let numero = valor.replace(/[$\s]/g, '');
+
+    // Si estamos convirtiendo desde pesos (from_clp), no permitir decimales
+    if (direccion === 'from_clp') {
+      // Remover cualquier coma y sus decimales
+      numero = numero.split(',')[0];
     }
+
+    // Remover todos los puntos (separadores de miles)
+    numero = numero.replace(/\./g, '');
 
     // Separar parte entera y decimal
     let [parteEntera, parteDecimal] = numero.split(',');
-    
-    // Limpiar parte entera y aplicar formato de miles
+
+    // Si no hay parte entera, usar 0
+    parteEntera = parteEntera || '0';
+
+    // Limpiar ceros al inicio de la parte entera
     parteEntera = parteEntera.replace(/^0+/, '') || '0';
+
+    // Aplicar separador de miles a la parte entera
     parteEntera = parteEntera.replace(/\B(?=(\d{3})+(?!\d))/g, '.');
 
-    // Manejar decimales según la dirección
+    // Manejar la parte decimal según la dirección
+    let montoFormateado;
     if (direccion === 'to_clp') {
-      // Permitir decimales solo cuando se convierte a pesos
+      // En conversión a pesos, permitir hasta 2 decimales
       if (parteDecimal) {
-        parteDecimal = parteDecimal.slice(0, 2); // Máximo 2 decimales
-        return `$ ${parteEntera},${parteDecimal}`;
+        parteDecimal = parteDecimal.slice(0, 2); // Limitar a 2 decimales
+        montoFormateado = `$ ${parteEntera},${parteDecimal}`;
+      } else {
+        montoFormateado = `$ ${parteEntera}`;
       }
     } else {
-      // No permitir decimales cuando se convierte desde pesos
-      parteDecimal = '';
+      // En conversión desde pesos, no permitir decimales
+      montoFormateado = `$ ${parteEntera}`;
     }
-    
-    return `$ ${parteEntera}${parteDecimal ? `,${parteDecimal}` : ''}`;
-  };
 
-  const handleChange = (e) => {
-    const formateado = formatearMonto(e.target.value);
-    onChange(formateado);
+    return montoFormateado;
   };
 
   const handleKeyDown = (e) => {
-    // Permitir teclas de control
+    // Permitir siempre: teclas de control
     if (['Backspace', 'Delete', 'ArrowLeft', 'ArrowRight', 'Tab'].includes(e.key)) {
       return;
     }
 
-    // Permitir números
+    // Permitir siempre: números
     if (/\d/.test(e.key)) {
       return;
     }
 
-    // Permitir coma para decimales solo cuando se convierte a pesos (to_clp)
-    if (e.key === ',' && direccion === 'to_clp' && !e.target.value.includes(',')) {
+    // Permitir coma solo si:
+    // 1. Estamos convirtiendo a pesos (to_clp)
+    // 2. No hay otra coma en el valor
+    // 3. La tecla presionada es una coma
+    if (direccion === 'to_clp' && e.key === ',' && !e.target.value.includes(',')) {
       return;
     }
 
