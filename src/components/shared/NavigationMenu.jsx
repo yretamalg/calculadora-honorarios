@@ -17,11 +17,11 @@ const NavigationMenu = () => {
 
           {/* Botones de navegación con iconos a la derecha */}
           <div className="flex gap-2">
-          <span class="text-xs align-middle pt-[15px]">Elige tu Herramienta</span>
+          <span class="text-xs text-slate-400 align-middle pt-[15px]">Elige tu Herramienta</span>
             <a 
               href="/honorarios" 
               className="p-2 text-slate-300 hover:text-white hover:bg-slate-700 transition-colors rounded-md border border-slate-600"
-              title="Calculadora de Retención de Honorarios"
+              title="Retención de Honorarios"
             >
               <div className="group relative">
                 <Receipt size={24} />
@@ -62,7 +62,7 @@ const NavigationMenu = () => {
             <a 
               href="/indicadores" 
               className="p-2 text-slate-300 hover:text-white hover:bg-slate-700 transition-colors rounded-md border border-slate-600"
-              title="Calculadora de Porcentajes"
+              title="Conversor de Indicadores"
             >
               <div className="group relative">
                 <DollarSign size={24} />
