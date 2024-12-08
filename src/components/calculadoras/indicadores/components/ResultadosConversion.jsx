@@ -1,7 +1,9 @@
 import React, { useState } from 'react';
-import { Copy, Check } from 'lucide-react';
+import { Copy, Check, Download } from 'lucide-react';
+import { PDFDownloadLink } from '@react-pdf/renderer';
 import { format } from 'date-fns';
 import { es } from 'date-fns/locale';
+import ResultadosPDF from './ResultadosPDF';
 
 const ResultadosConversion = ({ resultado }) => {
   const [copiadoOriginal, setCopiadoOriginal] = useState(false);
@@ -18,10 +20,16 @@ const ResultadosConversion = ({ resultado }) => {
 
   const formatearMoneda = (numero, tipo = 'CLP') => {
     const formateado = formatearNumero(Math.abs(numero));
-    if (tipo === 'CLP') {
-      return `$ ${formateado}`;
+    switch (tipo) {
+      case 'CLP':
+        return `$ ${formateado}`;
+      case 'DOLAR':
+        return `US$ ${formateado}`;
+      case 'EURO':
+        return `€ ${formateado}`;
+      default:
+        return formateado;
     }
-    return formateado;
   };
 
   const copiarAlPortapapeles = async (texto, setCopied) => {
@@ -62,9 +70,39 @@ const ResultadosConversion = ({ resultado }) => {
     return `Valor en ${resultado.tipoIndicador}:`;
   };
 
+  const getSimboloMoneda = (tipo) => {
+    switch (tipo) {
+      case 'DOLAR':
+        return 'US$';
+      case 'EURO':
+        return '€';
+      case 'CLP':
+        return '$';
+      default:
+        return '';
+    }
+  };
+
   return (
     <div className="bg-slate-700 rounded-lg p-6">
-      <h2 className="text-lg font-medium text-slate-300 mb-4">Resultado</h2>
+      <div className="flex justify-between items-center mb-4">
+        <h2 className="text-lg font-medium text-slate-300">Resultado</h2>
+        <PDFDownloadLink
+          document={
+            <ResultadosPDF 
+              resultado={resultado}
+              formatearMoneda={formatearMoneda}
+              formatearNumero={formatearNumero}
+            />
+          }
+          fileName={`conversion-${resultado.tipoIndicador.toLowerCase()}-${format(new Date(), 'yyyyMMdd-HHmm')}.pdf`}
+          className="flex items-center gap-2 px-3 py-1.5 text-sm bg-orange-600 text-white rounded-md hover:bg-orange-500 transition-colors"
+        >
+          <Download className="w-4 h-4" />
+          <span>Exportar PDF</span>
+        </PDFDownloadLink>
+      </div>
+
       <div className="space-y-4">
         <div className="flex justify-between items-center">
           <span className="text-slate-400">{getLabelOrigen()}</span>
@@ -93,7 +131,7 @@ const ResultadosConversion = ({ resultado }) => {
             <span className="text-2xl font-bold text-orange-500">
               {resultado.tipoIndicador === 'UF'
                 ? formatearNumero(resultado.montoConvertido)
-                : formatearMoneda(resultado.montoConvertido)}
+                : formatearMoneda(resultado.montoConvertido, resultado.direccion === 'to_clp' ? 'CLP' : resultado.tipoIndicador)}
             </span>
             <button
               onClick={handleCopiarConvertido}
@@ -114,7 +152,7 @@ const ResultadosConversion = ({ resultado }) => {
               Valor {resultado.tipoIndicador} ({format(new Date(), "dd 'de' MMMM", { locale: es })}):
             </span>
             <span className="text-slate-300">
-              {formatearMoneda(resultado.valorIndicador)}
+              {formatearMoneda(resultado.valorIndicador, resultado.tipoIndicador)}
             </span>
           </div>
         </div>

@@ -1,25 +1,38 @@
-// src/components/calculadoras/indicadores/utils/dateUtils.js
+// src/utils/dateUtils.js
+
+const CHILE_TZ = 'America/Santiago';
+
+export const getChileDateTime = () => {
+  return new Date().toLocaleString('es-CL', { timeZone: CHILE_TZ });
+};
+
+export const getChileDate = () => {
+  return new Date().toLocaleDateString('es-CL', { timeZone: CHILE_TZ });
+};
 
 export const isBusinessDay = (date) => {
-  const day = date.getDay();
+  // Convertir la fecha a zona horaria de Chile
+  const chileDate = new Date(date.toLocaleString('en-US', { timeZone: CHILE_TZ }));
+  const day = chileDate.getDay();
   return day !== 0 && day !== 6; // 0 = Domingo, 6 = Sábado
 };
 
 export const getLastBusinessDay = () => {
-  let date = new Date();
-  date.setHours(0, 0, 0, 0);
+  // Obtener fecha actual en Chile
+  const chileDate = new Date(getChileDateTime());
+  chileDate.setHours(0, 0, 0, 0);
   
-  while (!isBusinessDay(date)) {
-    date.setDate(date.getDate() - 1);
+  while (!isBusinessDay(chileDate)) {
+    chileDate.setDate(chileDate.getDate() - 1);
   }
   
-  return date.toISOString().split('T')[0];
+  return chileDate.toISOString().split('T')[0];
 };
 
 export const getCurrentDate = () => {
-  const date = new Date();
-  date.setHours(0, 0, 0, 0);
-  return date.toISOString().split('T')[0];
+  const chileDate = new Date(getChileDateTime());
+  chileDate.setHours(0, 0, 0, 0);
+  return chileDate.toISOString().split('T')[0];
 };
 
 export const getDateRange = (indicadorType = 'default') => {
@@ -36,9 +49,9 @@ export const getDateRange = (indicadorType = 'default') => {
       
     case 'UTM':
       // UTM usa el primer día del mes
-      const firstDayOfMonth = new Date();
-      firstDayOfMonth.setDate(1);
-      const firstDayStr = firstDayOfMonth.toISOString().split('T')[0];
+      const chileDate = new Date(getChileDateTime());
+      chileDate.setDate(1);
+      const firstDayStr = chileDate.toISOString().split('T')[0];
       return {
         firstdate: firstDayStr,
         lastdate: firstDayStr
@@ -57,6 +70,7 @@ export const formatDate = (date) => {
   if (!date) return '';
   
   return new Date(date).toLocaleDateString('es-CL', {
+    timeZone: CHILE_TZ,
     year: 'numeric',
     month: 'long',
     day: 'numeric'
@@ -67,15 +81,16 @@ export const getUpdateMessage = (fecha, tipo) => {
   if (!fecha) return 'Fecha no disponible';
   
   const fechaIndicador = new Date(fecha);
-  const today = new Date();
+  const chileDate = new Date(getChileDateTime());
   
   // Establecer horas en 0 para comparar solo fechas
   fechaIndicador.setHours(0, 0, 0, 0);
-  today.setHours(0, 0, 0, 0);
+  chileDate.setHours(0, 0, 0, 0);
   
   // Para UTM
   if (tipo === 'UTM') {
     return `Valor para ${fechaIndicador.toLocaleDateString('es-CL', { 
+      timeZone: CHILE_TZ,
       month: 'long', 
       year: 'numeric' 
     })}`;
@@ -83,18 +98,18 @@ export const getUpdateMessage = (fecha, tipo) => {
   
   // Para UF
   if (tipo === 'UF') {
-    if (fechaIndicador.getTime() === today.getTime()) {
+    if (fechaIndicador.getTime() === chileDate.getTime()) {
       return 'Valor de hoy';
     }
     return `Valor para ${formatDate(fecha)}`;
   }
   
   // Para dólar y euro
-  if (!isBusinessDay(today)) {
+  if (!isBusinessDay(chileDate)) {
     return `Último valor disponible (${formatDate(fecha)})`;
   }
   
-  if (fechaIndicador.getTime() === today.getTime()) {
+  if (fechaIndicador.getTime() === chileDate.getTime()) {
     return 'Valor de hoy';
   }
   

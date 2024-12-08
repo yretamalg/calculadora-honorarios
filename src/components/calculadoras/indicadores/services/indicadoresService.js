@@ -1,7 +1,7 @@
 // src/components/calculadoras/indicadores/services/indicadoresService.js
 
 import { SERIES_CODES } from '../constants/indicadores';
-import { getDateRange } from '../utils/dateUtils';
+import { getDateRange, getChileDateTime, isBusinessDay } from '../utils/dateUtils';
 
 class IndicadoresService {
   constructor() {
@@ -14,7 +14,10 @@ class IndicadoresService {
 
   async getIndicadores() {
     try {
-      // Obtener rango de fechas (hoy o último día hábil)
+      // Obtener metadata con información de fechas de Chile
+      const metadata = this.getMetadata();
+
+      // Obtener rango de fechas según hora de Chile
       const { firstdate, lastdate } = getDateRange();
 
       // Hacer las peticiones en paralelo para cada indicador
@@ -24,7 +27,12 @@ class IndicadoresService {
       );
 
       const results = await Promise.all(promises);
-      return Object.fromEntries(results);
+      
+      // Retornar los resultados con la metadata
+      return {
+        ...Object.fromEntries(results),
+        _metadata: metadata
+      };
     } catch (error) {
       console.error('Error fetching indicators:', error);
       throw error;
@@ -58,6 +66,19 @@ class IndicadoresService {
     return {
       valor: parseFloat(observation.value),
       fecha: observation.DateTime
+    };
+  }
+
+  getMetadata() {
+    const chileDate = new Date(getChileDateTime());
+    const currentDate = chileDate.toISOString().split('T')[0];
+    const isCurrentBusinessDay = isBusinessDay(chileDate);
+
+    return {
+      currentDate,
+      lastUpdate: chileDate.toLocaleString('es-CL', { timeZone: 'America/Santiago' }),
+      isBusinessDay: isCurrentBusinessDay,
+      chileTime: chileDate.toLocaleTimeString('es-CL', { timeZone: 'America/Santiago' })
     };
   }
 }
