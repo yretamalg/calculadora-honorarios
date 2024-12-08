@@ -10,7 +10,6 @@ const ConversionForm = ({
   disabled,
   onCalcular 
 }) => {
-  // Mapeo de nombres de indicadores
   const getNombreIndicador = (tipo) => ({
     'UF': 'UF',
     'DOLAR': 'Dólares',
@@ -26,23 +25,41 @@ const ConversionForm = ({
 
   const formatearMonto = (valor) => {
     if (!valor) return '';
-    // Eliminar caracteres no numéricos excepto coma
-    let numero = valor.replace(/[^0-9,]/g, '');
+
+    // Remover el símbolo de peso y espacios
+    let numero = valor.replace(/[$\s]/g, '');
+    
+    // Remover todos los puntos (separadores de miles)
+    numero = numero.replace(/\./g, '');
+
+    // Si hay más de una coma, mantener solo la primera
+    if ((numero.match(/,/g) || []).length > 1) {
+      const partes = numero.split(',');
+      numero = partes[0] + ',' + partes[1];
+    }
+
     // Separar parte entera y decimal
     let [parteEntera, parteDecimal] = numero.split(',');
-    // Limpiar ceros iniciales de la parte entera
-    parteEntera = parteEntera?.replace(/^0+/, '') || '0';
-    // Aplicar separador de miles a la parte entera
+
+    // Asegurarse que parteEntera existe
+    parteEntera = parteEntera || '0';
+    
+    // Limpiar ceros iniciales
+    parteEntera = parteEntera.replace(/^0+/, '') || '0';
+    
+    // Aplicar separador de miles
     parteEntera = parteEntera.replace(/\B(?=(\d{3})+(?!\d))/g, '.');
+
+    // Manejar decimales según dirección
     if (direccion === 'to_clp') {
-      // Permitir máximo 2 decimales
+      // Permitir decimales
       if (parteDecimal) {
         parteDecimal = parteDecimal.slice(0, 2);
         return `$ ${parteEntera},${parteDecimal}`;
       }
       return `$ ${parteEntera}`;
     } else {
-      // No permitir decimales en 'from_clp'
+      // No permitir decimales en from_clp
       return `$ ${parteEntera}`;
     }
   };
