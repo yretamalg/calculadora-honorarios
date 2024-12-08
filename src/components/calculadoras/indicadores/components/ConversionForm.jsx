@@ -27,16 +27,16 @@ const ConversionForm = ({
   const formatearMonto = (valor) => {
     if (!valor) return '';
 
-    // Remover caracteres no numéricos excepto coma
+    // Remover caracteres inválidos
     let numero = valor.replace(/[^0-9,]/g, '');
 
     // Separar parte entera y decimal
     let [parteEntera, parteDecimal] = numero.split(',');
 
-    // Limpiar ceros iniciales de la parte entera
+    // Limpiar ceros iniciales
     parteEntera = parteEntera?.replace(/^0+/, '') || '0';
 
-    // Aplicar separador de miles a la parte entera
+    // Aplicar separador de miles
     parteEntera = parteEntera.replace(/\B(?=(\d{3})+(?!\d))/g, '.');
 
     if (direccion === 'to_clp') {
@@ -47,7 +47,7 @@ const ConversionForm = ({
       }
       return `$ ${parteEntera}`;
     } else {
-      // No permitir decimales en 'from_clp'
+      // Solo enteros
       return `$ ${parteEntera}`;
     }
   };
@@ -61,7 +61,7 @@ const ConversionForm = ({
     // Permitir números
     if (/\d/.test(key)) return;
 
-    // Permitir coma solo al convertir a pesos y si aún no existe en el valor
+    // Permitir coma solo si aún no existe
     if (direccion === 'to_clp' && key === ',' && !value.includes(',')) return;
 
     // Bloquear cualquier otra tecla
