@@ -10,6 +10,7 @@ const ConversionForm = ({
   disabled,
   onCalcular 
 }) => {
+  // Mapeo de nombres de indicadores
   const getNombreIndicador = (tipo) => ({
     'UF': 'UF',
     'DOLAR': 'Dólares',
@@ -26,52 +27,43 @@ const ConversionForm = ({
   const formatearMonto = (valor) => {
     if (!valor) return '';
 
-    // Remover el símbolo de peso y espacios
-    let numero = valor.replace(/[$\s]/g, '');
-    
-    // Remover todos los puntos (separadores de miles)
-    numero = numero.replace(/\./g, '');
-
-    // Si hay más de una coma, mantener solo la primera
-    if ((numero.match(/,/g) || []).length > 1) {
-      const partes = numero.split(',');
-      numero = partes[0] + ',' + partes[1];
-    }
+    // Remover caracteres no numéricos excepto coma
+    let numero = valor.replace(/[^0-9,]/g, '');
 
     // Separar parte entera y decimal
     let [parteEntera, parteDecimal] = numero.split(',');
 
-    // Asegurarse que parteEntera existe
-    parteEntera = parteEntera || '0';
-    
-    // Limpiar ceros iniciales
-    parteEntera = parteEntera.replace(/^0+/, '') || '0';
-    
-    // Aplicar separador de miles
+    // Limpiar ceros iniciales de la parte entera
+    parteEntera = parteEntera?.replace(/^0+/, '') || '0';
+
+    // Aplicar separador de miles a la parte entera
     parteEntera = parteEntera.replace(/\B(?=(\d{3})+(?!\d))/g, '.');
 
-    // Manejar decimales según dirección
     if (direccion === 'to_clp') {
-      // Permitir decimales
+      // Permitir máximo 2 decimales
       if (parteDecimal) {
         parteDecimal = parteDecimal.slice(0, 2);
         return `$ ${parteEntera},${parteDecimal}`;
       }
       return `$ ${parteEntera}`;
     } else {
-      // No permitir decimales en from_clp
+      // No permitir decimales en 'from_clp'
       return `$ ${parteEntera}`;
     }
   };
 
   const handleKeyDown = (e) => {
     const { key, target: { value } } = e;
+
     // Permitir teclas de control y navegación
     if (['Backspace', 'Delete', 'ArrowLeft', 'ArrowRight', 'Tab'].includes(key)) return;
-    // Permitir solo números
+
+    // Permitir números
     if (/\d/.test(key)) return;
-    // Permitir coma solo una vez al convertir a pesos
+
+    // Permitir coma solo al convertir a pesos y si aún no existe en el valor
     if (direccion === 'to_clp' && key === ',' && !value.includes(',')) return;
+
     // Bloquear cualquier otra tecla
     e.preventDefault();
   };
