@@ -1,10 +1,7 @@
-// src/components/calculadora/ResultadosConversion.jsx
 import React, { useState } from 'react';
-import { Copy, Check, Download } from 'lucide-react';
-import { PDFDownloadLink } from '@react-pdf/renderer';
+import { Copy, Check } from 'lucide-react';
 import { format } from 'date-fns';
 import { es } from 'date-fns/locale';
-import ResultadosPDF from './ResultadosPDF';
 
 const ResultadosConversion = ({ resultado }) => {
   const [copiadoOriginal, setCopiadoOriginal] = useState(false);
@@ -51,29 +48,26 @@ const ResultadosConversion = ({ resultado }) => {
     copiarAlPortapapeles(texto, setCopiadoConvertido);
   };
 
+  const getLabelOrigen = () => {
+    if (resultado.direccion === 'to_clp') {
+      return `Valor en ${resultado.tipoIndicador}:`;
+    }
+    return 'Valor en Pesos (CLP):';
+  };
+
+  const getLabelDestino = () => {
+    if (resultado.direccion === 'to_clp') {
+      return 'Valor en Pesos (CLP):';
+    }
+    return `Valor en ${resultado.tipoIndicador}:`;
+  };
+
   return (
     <div className="bg-slate-700 rounded-lg p-6">
-      <div className="flex justify-between items-center mb-4">
-        <h2 className="text-lg font-medium text-slate-300">Resultado</h2>
-        <PDFDownloadLink
-          document={
-            <ResultadosPDF 
-              resultado={resultado}
-              formatearMoneda={formatearMoneda}
-              formatearNumero={formatearNumero}
-            />
-          }
-          fileName={`conversion-${resultado.tipoIndicador.toLowerCase()}-${format(new Date(), 'yyyyMMdd-HHmm')}.pdf`}
-          className="flex items-center gap-2 px-3 py-1.5 text-sm bg-orange-600 text-white rounded-md hover:bg-orange-500 transition-colors"
-        >
-          <Download className="w-4 h-4" />
-          <span>Exportar PDF</span>
-        </PDFDownloadLink>
-      </div>
-
+      <h2 className="text-lg font-medium text-slate-300 mb-4">Resultado</h2>
       <div className="space-y-4">
         <div className="flex justify-between items-center">
-          <span className="text-slate-400">Valor Ingresado:</span>
+          <span className="text-slate-400">{getLabelOrigen()}</span>
           <div className="flex items-center gap-3">
             <span className="text-xl font-semibold text-white">
               {resultado.tipoIndicador === 'UF' 
@@ -94,9 +88,7 @@ const ResultadosConversion = ({ resultado }) => {
         </div>
         
         <div className="flex justify-between items-center">
-          <span className="text-slate-400">
-            Valor en {resultado.direccion === 'to_clp' ? 'Pesos (CLP)' : resultado.tipoIndicador}:
-          </span>
+          <span className="text-slate-400">{getLabelDestino()}</span>
           <div className="flex items-center gap-3">
             <span className="text-2xl font-bold text-orange-500">
               {resultado.tipoIndicador === 'UF'
