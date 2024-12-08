@@ -107,19 +107,31 @@ const ConversionForm = ({
           {`Ingrese monto en ${from}:`}
         </label>
         <input
-          type="text"
-          id="monto"
-          value={valor}
-          onChange={handleChange}
-          onKeyDown={handleKeyDown}
-          disabled={disabled}
-          placeholder="$ 0"
-          className="block w-full text-2xl h-14 border border-gray-300 rounded-md 
-                   shadow-sm py-2 px-3 bg-slate-700 text-white text-right 
-                   focus:outline-none focus:ring-2 focus:ring-orange-500 
-                   focus:border-orange-500 disabled:opacity-50 
-                   disabled:cursor-not-allowed"
-        />
+  type="text"
+  id="monto"
+  value={valor}
+  onChange={handleChange}
+  onKeyDown={handleKeyDown}
+  // Prevenimos el pegado de contenido para mantener el control del formato
+  onPaste={(e) => {
+    e.preventDefault();
+    const texto = e.clipboardData.getData('text');
+    const valorFormateado = formatearMonto(texto);
+    onChange(valorFormateado);
+  }}
+  // Prevenimos el drop de contenido
+  onDrop={(e) => e.preventDefault()}
+  disabled={disabled}
+  placeholder="$ 0"
+  // Evitamos que el navegador aplique su propio formateo numérico
+  inputMode="text"
+  autoComplete="off"
+  className="block w-full text-2xl h-14 border border-gray-300 rounded-md 
+           shadow-sm py-2 px-3 bg-slate-700 text-white text-right 
+           focus:outline-none focus:ring-2 focus:ring-orange-500 
+           focus:border-orange-500 disabled:opacity-50 
+           disabled:cursor-not-allowed"
+/>
       </div>
 
       {/* Botón calcular */}
