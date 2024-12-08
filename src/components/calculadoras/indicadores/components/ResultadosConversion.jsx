@@ -5,6 +5,7 @@ import { format } from 'date-fns';
 import { es } from 'date-fns/locale';
 import ResultadosPDF from './ResultadosPDF';
 import { formatCurrency } from '../../../../utils/formatters';
+import { formatearMonto, parsearMonto, formatearIndicador } from '../../../utils/formatters';
 
 const ResultadosConversion = ({ resultado }) => {
   const [copiadoOriginal, setCopiadoOriginal] = useState(false);
