@@ -104,14 +104,14 @@ const ResultadosPDF = ({ resultado, formatearMoneda, formatearNumero }) => {
         {/* Primera tabla */}
         <View style={styles.tableHeader}>
           <Text style={[styles.tableCell, styles.tableHeaderText]}>
-            {resultado.direccion === 'to_clp' ? 
-              `Valor en ${resultado.tipoIndicador}` : 
-              'Valor en Pesos'}
+            Indicadores
           </Text>
           <Text style={[styles.tableCellAmount, styles.tableHeaderText]}>Monto</Text>
         </View>
         <View style={styles.tableRow}>
-          <Text style={styles.tableCell}>Valor Original</Text>
+          <Text style={styles.tableCell}>{resultado.direccion === 'to_clp' ? 
+              `Valor en ${resultado.tipoIndicador}` : 
+              'Valor en Pesos'}</Text>
           <Text style={styles.tableCellAmount}>
             {getValorFormateado(
               resultado.montoOriginal,
