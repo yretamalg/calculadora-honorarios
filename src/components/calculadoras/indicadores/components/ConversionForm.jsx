@@ -10,6 +10,7 @@ const ConversionForm = ({
   disabled,
   onCalcular 
 }) => {
+  // Mapeo de nombres de indicadores
   const getNombreIndicador = (tipo) => ({
     'UF': 'UF',
     'DOLAR': 'Dólares',
@@ -29,10 +30,9 @@ const ConversionForm = ({
     // Remover el símbolo de peso y espacios
     let numero = valor.replace(/[$\s]/g, '');
 
-    // Si estamos convirtiendo desde pesos (from_clp), no permitir decimales
+    // Si estamos convirtiendo DESDE pesos (from_clp), forzar sin decimales
     if (direccion === 'from_clp') {
-      // Remover cualquier coma y sus decimales
-      numero = numero.split(',')[0];
+      numero = numero.split(',')[0]; // Eliminar cualquier decimal
     }
 
     // Remover todos los puntos (separadores de miles)
@@ -50,32 +50,22 @@ const ConversionForm = ({
     // Aplicar separador de miles a la parte entera
     parteEntera = parteEntera.replace(/\B(?=(\d{3})+(?!\d))/g, '.');
 
-    // Manejar la parte decimal según la dirección
-    let montoFormateado;
+    // Construir el monto formateado según la dirección
     if (direccion === 'to_clp') {
-      // En conversión a pesos, permitir hasta 2 decimales
+      // Convertir a pesos (PERMITE decimales)
       if (parteDecimal) {
-        parteDecimal = parteDecimal.slice(0, 2); // Limitar a 2 decimales
-        montoFormateado = `$ ${parteEntera},${parteDecimal}`;
-      } else {
-        montoFormateado = `$ ${parteEntera}`;
+        parteDecimal = parteDecimal.slice(0, 2); // Máximo 2 decimales
+        return `$ ${parteEntera},${parteDecimal}`;
       }
+      return `$ ${parteEntera}`;
     } else {
-      // En conversión desde pesos, no permitir decimales
-      montoFormateado = `$ ${parteEntera}`;
+      // Convertir desde pesos (NO PERMITE decimales)
+      return `$ ${parteEntera}`;
     }
-
-    return montoFormateado;
-  };
-
-  const handleChange = (e) => {
-    const valorActual = e.target.value;
-    const valorFormateado = formatearMonto(valorActual);
-    onChange(valorFormateado);
   };
 
   const handleKeyDown = (e) => {
-    // Permitir siempre: teclas de control
+    // Permitir siempre: teclas de navegación y control
     if (['Backspace', 'Delete', 'ArrowLeft', 'ArrowRight', 'Tab'].includes(e.key)) {
       return;
     }
@@ -85,16 +75,20 @@ const ConversionForm = ({
       return;
     }
 
-    // Permitir coma solo si:
-    // 1. Estamos convirtiendo a pesos (to_clp)
-    // 2. No hay otra coma en el valor
-    // 3. La tecla presionada es una coma
+    // Permitir coma SOLO cuando:
+    // 1. Se está convirtiendo DE indicador A pesos (to_clp)
+    // 2. No hay otra coma en el valor actual
     if (direccion === 'to_clp' && e.key === ',' && !e.target.value.includes(',')) {
       return;
     }
 
     // Bloquear cualquier otra tecla
     e.preventDefault();
+  };
+
+  const handleChange = (e) => {
+    const valorFormateado = formatearMonto(e.target.value);
+    onChange(valorFormateado);
   };
 
   const { from, to } = getConversionLabel();
