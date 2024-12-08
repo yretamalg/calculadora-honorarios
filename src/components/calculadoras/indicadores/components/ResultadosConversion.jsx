@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useMemo } from 'react';
 import { Copy, Check, Download } from 'lucide-react';
 import { PDFDownloadLink } from '@react-pdf/renderer';
 import { format } from 'date-fns';
@@ -12,6 +12,7 @@ const ResultadosConversion = ({ resultado }) => {
   if (!resultado) return null;
 
   const formatearNumero = (numero) => {
+    if (numero === null || numero === undefined) return '0';
     return new Intl.NumberFormat('es-CL', {
       maximumFractionDigits: 2,
       minimumFractionDigits: 2
@@ -19,6 +20,7 @@ const ResultadosConversion = ({ resultado }) => {
   };
 
   const formatearMoneda = (numero, tipo = 'CLP') => {
+    if (numero === null || numero === undefined) return '0';
     const formateado = formatearNumero(Math.abs(numero));
     switch (tipo) {
       case 'CLP':
@@ -31,6 +33,15 @@ const ResultadosConversion = ({ resultado }) => {
         return formateado;
     }
   };
+
+  // Memoizar el documento PDF para evitar re-renders innecesarios
+  const PDFDocument = useMemo(() => (
+    <ResultadosPDF 
+      resultado={resultado}
+      formatearMoneda={formatearMoneda}
+      formatearNumero={formatearNumero}
+    />
+  ), [resultado]);
 
   const copiarAlPortapapeles = async (texto, setCopied) => {
     try {
@@ -52,7 +63,7 @@ const ResultadosConversion = ({ resultado }) => {
   const handleCopiarConvertido = () => {
     const texto = resultado.tipoIndicador === 'UF'
       ? formatearNumero(resultado.montoConvertido)
-      : formatearMoneda(resultado.montoConvertido);
+      : formatearMoneda(resultado.montoConvertido, resultado.direccion === 'to_clp' ? 'CLP' : resultado.tipoIndicador);
     copiarAlPortapapeles(texto, setCopiadoConvertido);
   };
 
@@ -70,37 +81,24 @@ const ResultadosConversion = ({ resultado }) => {
     return `Valor en ${resultado.tipoIndicador}:`;
   };
 
-  const getSimboloMoneda = (tipo) => {
-    switch (tipo) {
-      case 'DOLAR':
-        return 'US$';
-      case 'EURO':
-        return '€';
-      case 'CLP':
-        return '$';
-      default:
-        return '';
-    }
-  };
-
   return (
     <div className="bg-slate-700 rounded-lg p-6">
       <div className="flex justify-between items-center mb-4">
         <h2 className="text-lg font-medium text-slate-300">Resultado</h2>
-        <PDFDownloadLink
-          document={
-            <ResultadosPDF 
-              resultado={resultado}
-              formatearMoneda={formatearMoneda}
-              formatearNumero={formatearNumero}
-            />
-          }
-          fileName={`conversion-${resultado.tipoIndicador.toLowerCase()}-${format(new Date(), 'yyyyMMdd-HHmm')}.pdf`}
-          className="flex items-center gap-2 px-3 py-1.5 text-sm bg-orange-600 text-white rounded-md hover:bg-orange-500 transition-colors"
-        >
-          <Download className="w-4 h-4" />
-          <span>Exportar PDF</span>
-        </PDFDownloadLink>
+        {resultado && (
+          <PDFDownloadLink
+            document={PDFDocument}
+            fileName={`conversion-${resultado.tipoIndicador.toLowerCase()}-${format(new Date(), 'yyyyMMdd-HHmm')}.pdf`}
+            className="flex items-center gap-2 px-3 py-1.5 text-sm bg-orange-600 text-white rounded-md hover:bg-orange-500 transition-colors"
+          >
+            {({ loading }) => (
+              <>
+                <Download className="w-4 h-4" />
+                <span>{loading ? 'Preparando...' : 'Exportar PDF'}</span>
+              </>
+            )}
+          </PDFDownloadLink>
+        )}
       </div>
 
       <div className="space-y-4">
