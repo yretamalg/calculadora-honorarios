@@ -27,8 +27,14 @@ const ConversionForm = ({
   const formatearMonto = (valor) => {
     if (!valor) return '';
 
-    // Remover caracteres inválidos
+    // Remover caracteres inválidos, pero preservar la última coma
     let numero = valor.replace(/[^0-9,]/g, '');
+    
+    // Asegurarse de mantener solo una coma
+    let partes = numero.split(',');
+    if (partes.length > 2) {
+      numero = partes[0] + ',' + partes[1];
+    }
 
     // Separar parte entera y decimal
     let [parteEntera, parteDecimal] = numero.split(',');
@@ -45,11 +51,13 @@ const ConversionForm = ({
         parteDecimal = parteDecimal.slice(0, 2);
         return `$ ${parteEntera},${parteDecimal}`;
       }
-      return `$ ${parteEntera}`;
-    } else {
-      // Solo enteros
-      return `$ ${parteEntera}`;
+      // Si el último carácter era una coma, preservarla
+      if (valor.endsWith(',')) {
+        return `$ ${parteEntera},`;
+      }
     }
+    
+    return `$ ${parteEntera}`;
   };
 
   const handleKeyDown = (e) => {
@@ -61,7 +69,7 @@ const ConversionForm = ({
     // Permitir números
     if (/\d/.test(key)) return;
 
-    // Permitir coma solo si aún no existe
+    // Permitir coma solo si aún no existe y estamos en modo to_clp
     if (direccion === 'to_clp' && key === ',' && !value.includes(',')) return;
 
     // Bloquear cualquier otra tecla
@@ -70,6 +78,13 @@ const ConversionForm = ({
 
   const handleChange = (e) => {
     const valorFormateado = formatearMonto(e.target.value);
+    onChange(valorFormateado);
+  };
+
+  const handlePaste = (e) => {
+    e.preventDefault();
+    const texto = e.clipboardData.getData('text');
+    const valorFormateado = formatearMonto(texto);
     onChange(valorFormateado);
   };
 
@@ -106,33 +121,24 @@ const ConversionForm = ({
         >
           {`Ingrese monto en ${from}:`}
         </label>
-        {/* Input de monto con eventos verificados */}
-<input
-  type="text"
-  id="monto"
-  value={valor}
-  onChange={handleChange}
-  onKeyDown={handleKeyDown}
-  // Prevenimos el pegado de contenido para mantener el control del formato
-  onPaste={(e) => {
-    e.preventDefault();
-    const texto = e.clipboardData.getData('text');
-    const valorFormateado = formatearMonto(texto);
-    onChange(valorFormateado);
-  }}
-  // Prevenimos el drop de contenido
-  onDrop={(e) => e.preventDefault()}
-  disabled={disabled}
-  placeholder="$ 0"
-  // Evitamos que el navegador aplique su propio formateo numérico
-  inputMode="text"
-  autoComplete="off"
-  className="block w-full text-2xl h-14 border border-gray-300 rounded-md 
-           shadow-sm py-2 px-3 bg-slate-700 text-white text-right 
-           focus:outline-none focus:ring-2 focus:ring-orange-500 
-           focus:border-orange-500 disabled:opacity-50 
-           disabled:cursor-not-allowed"
-/>
+        <input
+          type="text"
+          id="monto"
+          value={valor}
+          onChange={handleChange}
+          onKeyDown={handleKeyDown}
+          onPaste={handlePaste}
+          onDrop={(e) => e.preventDefault()}
+          disabled={disabled}
+          placeholder="$ 0"
+          inputMode="text"
+          autoComplete="off"
+          className="block w-full text-2xl h-14 border border-gray-300 rounded-md 
+                   shadow-sm py-2 px-3 bg-slate-700 text-white text-right 
+                   focus:outline-none focus:ring-2 focus:ring-orange-500 
+                   focus:border-orange-500 disabled:opacity-50 
+                   disabled:cursor-not-allowed"
+        />
       </div>
 
       {/* Botón calcular */}
