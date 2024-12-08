@@ -18,7 +18,6 @@ const ConversionForm = ({
     'UTM': 'UTM'
   }[tipo] || tipo);
 
-  // Función unificada para obtener la etiqueta de conversión
   const getConversionLabel = () => {
     const from = direccion === 'to_clp' ? getNombreIndicador(tipoIndicador) : 'Pesos';
     const to = direccion === 'to_clp' ? 'Pesos' : getNombreIndicador(tipoIndicador);
@@ -28,28 +27,38 @@ const ConversionForm = ({
   const formatearMonto = (valor) => {
     if (!valor) return '';
 
+    // Remover todo excepto números, punto y coma
     let numero = valor.replace(/[^\d.,]/g, '');
     
-    if ((numero.match(/\./g) || []).length > 1) {
-      numero = numero.replace(/\./g, '');
+    // Convertir puntos a nada (removemos puntos de miles temporalmente)
+    numero = numero.replace(/\./g, '');
+    
+    // Si hay más de una coma, dejar solo la primera
+    if ((numero.match(/,/g) || []).length > 1) {
+      const partes = numero.split(',');
+      numero = partes[0] + ',' + partes[1];
     }
 
+    // Separar parte entera y decimal
     let [parteEntera, parteDecimal] = numero.split(',');
     
-    parteEntera = parteEntera.replace(/\./g, '');
+    // Limpiar parte entera y aplicar formato de miles
     parteEntera = parteEntera.replace(/^0+/, '') || '0';
     parteEntera = parteEntera.replace(/\B(?=(\d{3})+(?!\d))/g, '.');
-    
+
+    // Manejar decimales según la dirección
     if (direccion === 'to_clp') {
+      // Permitir decimales solo cuando se convierte a pesos
       if (parteDecimal) {
-        parteDecimal = parteDecimal.slice(0, 2);
+        parteDecimal = parteDecimal.slice(0, 2); // Máximo 2 decimales
         return `$ ${parteEntera},${parteDecimal}`;
       }
     } else {
+      // No permitir decimales cuando se convierte desde pesos
       parteDecimal = '';
     }
     
-    return parteDecimal ? `$ ${parteEntera},${parteDecimal}` : `$ ${parteEntera}`;
+    return `$ ${parteEntera}${parteDecimal ? `,${parteDecimal}` : ''}`;
   };
 
   const handleChange = (e) => {
@@ -58,18 +67,22 @@ const ConversionForm = ({
   };
 
   const handleKeyDown = (e) => {
+    // Permitir teclas de control
     if (['Backspace', 'Delete', 'ArrowLeft', 'ArrowRight', 'Tab'].includes(e.key)) {
       return;
     }
 
+    // Permitir números
     if (/\d/.test(e.key)) {
       return;
     }
 
+    // Permitir coma para decimales solo cuando se convierte a pesos (to_clp)
     if (e.key === ',' && direccion === 'to_clp' && !e.target.value.includes(',')) {
       return;
     }
 
+    // Bloquear cualquier otra tecla
     e.preventDefault();
   };
 
@@ -83,7 +96,7 @@ const ConversionForm = ({
       }}
       className="bg-slate-800 rounded-lg p-6 space-y-6"
     >
-      {/* Botón unificado de dirección */}
+      {/* Botón de dirección */}
       <button
         type="button"
         onClick={onDireccionChange}
