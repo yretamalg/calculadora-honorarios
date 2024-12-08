@@ -22,6 +22,7 @@ const ResultadosConversion = ({ resultado }) => {
   const formatearMoneda = (numero, tipo = 'CLP') => {
     if (numero === null || numero === undefined) return '0';
     const formateado = formatearNumero(Math.abs(numero));
+
     switch (tipo) {
       case 'CLP':
         return `$ ${formateado}`;
@@ -34,6 +35,7 @@ const ResultadosConversion = ({ resultado }) => {
     }
   };
 
+  // Memoizar el documento PDF para evitar re-renders innecesarios
   const PDFDocument = useMemo(() => (
     <ResultadosPDF 
       resultado={resultado}
@@ -53,20 +55,16 @@ const ResultadosConversion = ({ resultado }) => {
   };
 
   const handleCopiarOriginal = () => {
-    const texto = resultado.direccion === 'to_clp'
-      ? (resultado.tipoIndicador === 'UF'
-        ? formatearNumero(resultado.montoOriginal)
-        : formatearMoneda(resultado.montoOriginal, resultado.tipoIndicador))
-      : formatearMoneda(resultado.montoOriginal, 'CLP');
+    const texto = resultado.tipoIndicador === 'UF' 
+      ? formatearNumero(resultado.montoOriginal)
+      : formatearMoneda(resultado.montoOriginal, resultado.direccion === 'from_clp' ? 'CLP' : resultado.tipoIndicador);
     copiarAlPortapapeles(texto, setCopiadoOriginal);
   };
 
   const handleCopiarConvertido = () => {
-    const texto = resultado.direccion === 'to_clp'
-      ? formatearMoneda(resultado.montoConvertido, 'CLP')
-      : (resultado.tipoIndicador === 'UF'
-        ? formatearNumero(resultado.montoConvertido)
-        : formatearMoneda(resultado.montoConvertido, resultado.tipoIndicador));
+    const texto = resultado.tipoIndicador === 'UF'
+      ? formatearNumero(resultado.montoConvertido)
+      : formatearMoneda(resultado.montoConvertido, resultado.direccion === 'to_clp' ? 'CLP' : resultado.tipoIndicador);
     copiarAlPortapapeles(texto, setCopiadoConvertido);
   };
 
@@ -82,6 +80,24 @@ const ResultadosConversion = ({ resultado }) => {
       return 'Valor en Pesos (CLP):';
     }
     return `Valor en ${resultado.tipoIndicador}:`;
+  };
+
+  const formatearValorSegunDireccion = (valor, esPrimero) => {
+    // Si es UF, siempre mostrar sin símbolo de moneda
+    if (resultado.tipoIndicador === 'UF') {
+      return formatearNumero(valor);
+    }
+
+    // Para los demás casos, determinar el formato según la dirección
+    if (resultado.direccion === 'to_clp') {
+      return esPrimero
+        ? formatearMoneda(valor, resultado.tipoIndicador)
+        : formatearMoneda(valor, 'CLP');
+    } else {
+      return esPrimero
+        ? formatearMoneda(valor, 'CLP')
+        : formatearMoneda(valor, resultado.tipoIndicador);
+    }
   };
 
   return (
@@ -109,11 +125,7 @@ const ResultadosConversion = ({ resultado }) => {
           <span className="text-slate-400">{getLabelOrigen()}</span>
           <div className="flex items-center gap-3">
             <span className="text-xl font-semibold text-white">
-              {resultado.direccion === 'to_clp'
-                ? (resultado.tipoIndicador === 'UF'
-                  ? formatearNumero(resultado.montoOriginal)
-                  : formatearMoneda(resultado.montoOriginal, resultado.tipoIndicador))
-                : formatearMoneda(resultado.montoOriginal, 'CLP')}
+              {formatearValorSegunDireccion(resultado.montoOriginal, true)}
             </span>
             <button
               onClick={handleCopiarOriginal}
@@ -132,11 +144,7 @@ const ResultadosConversion = ({ resultado }) => {
           <span className="text-slate-400">{getLabelDestino()}</span>
           <div className="flex items-center gap-3">
             <span className="text-2xl font-bold text-orange-500">
-              {resultado.direccion === 'to_clp'
-                ? formatearMoneda(resultado.montoConvertido, 'CLP')
-                : (resultado.tipoIndicador === 'UF'
-                  ? formatearNumero(resultado.montoConvertido)
-                  : formatearMoneda(resultado.montoConvertido, resultado.tipoIndicador))}
+              {formatearValorSegunDireccion(resultado.montoConvertido, false)}
             </span>
             <button
               onClick={handleCopiarConvertido}
