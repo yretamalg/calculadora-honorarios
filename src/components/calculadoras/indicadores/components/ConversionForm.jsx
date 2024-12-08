@@ -1,5 +1,5 @@
 import React from 'react';
-import { ArrowUpDown } from 'lucide-react';
+import { ArrowRightLeft } from 'lucide-react';
 
 const ConversionForm = ({ 
   valor, 
@@ -18,36 +18,34 @@ const ConversionForm = ({
     'UTM': 'UTM'
   }[tipo] || tipo);
 
+  // Función unificada para obtener la etiqueta de conversión
+  const getConversionLabel = () => {
+    const from = direccion === 'to_clp' ? getNombreIndicador(tipoIndicador) : 'Pesos';
+    const to = direccion === 'to_clp' ? 'Pesos' : getNombreIndicador(tipoIndicador);
+    return { from, to };
+  };
+
   const formatearMonto = (valor) => {
     if (!valor) return '';
 
-    // Remover todo excepto números, punto y coma
     let numero = valor.replace(/[^\d.,]/g, '');
     
-    // Convertir comas a puntos si hay más de un punto
     if ((numero.match(/\./g) || []).length > 1) {
       numero = numero.replace(/\./g, '');
     }
 
-    // Separar parte entera y decimal
     let [parteEntera, parteDecimal] = numero.split(',');
     
-    // Limpiar parte entera
     parteEntera = parteEntera.replace(/\./g, '');
     parteEntera = parteEntera.replace(/^0+/, '') || '0';
-    
-    // Aplicar separadores de miles
     parteEntera = parteEntera.replace(/\B(?=(\d{3})+(?!\d))/g, '.');
     
-    // Manejar decimales según dirección de conversión
     if (direccion === 'to_clp') {
-      // Permitir decimales cuando se convierte a pesos
       if (parteDecimal) {
         parteDecimal = parteDecimal.slice(0, 2);
         return `$ ${parteEntera},${parteDecimal}`;
       }
     } else {
-      // No permitir decimales cuando se convierte desde pesos
       parteDecimal = '';
     }
     
@@ -60,32 +58,23 @@ const ConversionForm = ({
   };
 
   const handleKeyDown = (e) => {
-    // Permitir teclas de control
     if (['Backspace', 'Delete', 'ArrowLeft', 'ArrowRight', 'Tab'].includes(e.key)) {
       return;
     }
 
-    // Permitir números
     if (/\d/.test(e.key)) {
       return;
     }
 
-    // Permitir coma para decimales solo en la dirección correcta
     if (e.key === ',' && direccion === 'to_clp' && !e.target.value.includes(',')) {
       return;
     }
 
-    // Bloquear cualquier otra tecla
     e.preventDefault();
   };
 
-  const getEtiquetaConversion = () => {
-    if (direccion === 'to_clp') {
-      return `Ingrese monto en ${getNombreIndicador(tipoIndicador)}:`;
-    }
-    return 'Ingrese monto en Pesos (CLP):';
-  };
-
+  const { from, to } = getConversionLabel();
+  
   return (
     <form 
       onSubmit={(e) => {
@@ -94,28 +83,29 @@ const ConversionForm = ({
       }}
       className="bg-slate-800 rounded-lg p-6 space-y-6"
     >
-      <div className="space-y-4">
-        {/* Botón de dirección */}
-        <button
-          type="button"
-          onClick={onDireccionChange}
-          className="w-full flex items-center justify-center p-4 
-                   bg-slate-700 rounded-lg hover:bg-slate-600 
-                   transition-colors text-slate-300"
-        >
-          <ArrowUpDown className="w-6 h-6" />
-        </button>
-      </div>
+      {/* Botón unificado de dirección */}
+      <button
+        type="button"
+        onClick={onDireccionChange}
+        disabled={disabled}
+        className="w-full py-4 px-6 flex items-center justify-center gap-4 
+                 bg-slate-700 rounded-lg hover:bg-slate-600 
+                 transition-colors text-slate-300 disabled:opacity-50 
+                 disabled:cursor-not-allowed"
+      >
+        <span className="font-medium">{from}</span>
+        <ArrowRightLeft className="w-6 h-6" />
+        <span className="font-medium">{to}</span>
+      </button>
 
-        {/* Label de conversión */}
+      {/* Input de monto */}
+      <div>
         <label 
           htmlFor="monto" 
-          className="block text-sm font-medium text-slate-300"
+          className="block text-sm font-medium text-slate-300 mb-2"
         >
-          {getEtiquetaConversion()}
+          {`Ingrese monto en ${from}:`}
         </label>
-
-        {/* Input de monto */}
         <input
           type="text"
           id="monto"
@@ -130,6 +120,7 @@ const ConversionForm = ({
                    focus:border-orange-500 disabled:opacity-50 
                    disabled:cursor-not-allowed"
         />
+      </div>
 
       {/* Botón calcular */}
       <button

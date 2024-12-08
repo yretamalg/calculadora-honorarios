@@ -101,24 +101,17 @@ const CalculadoraIndicadores = () => {
                   disabled={loading}
                 />
                 
-                <button
-                  onClick={toggleDireccion}
-                  className="w-full p-3 text-sm font-medium rounded-lg
-                           bg-slate-700 text-slate-300 hover:bg-slate-600
-                           transition-colors"
-                >
-                  {getConversionLabel()}
-                  <span className="ml-2 text-slate-400">↔</span>
-                </button>
+
 
                 <ConversionForm
-                  valor={monto}
-                  onChange={setMonto}
-                  tipoIndicador={tipoIndicador}
-                  direccion={direccion}
-                  disabled={loading || !indicadores}
-                  onCalcular={calcular}
-                />
+                    valor={monto}
+                    onChange={setMonto}
+                    tipoIndicador={tipoIndicador}
+                    direccion={direccion}
+                    onDireccionChange={toggleDireccion}
+                    disabled={loading || !indicadores}
+                    onCalcular={calcular}
+                  />
 
                 {resultado && (
                   <ResultadosConversion
