@@ -17,26 +17,24 @@ class IndicadoresService {
       const metadata = this.getMetadata();
       const { firstdate, lastdate } = getDateRange();
 
-      console.log(`Consultando indicadores desde ${firstdate} hasta ${lastdate}`);
-
-      const promises = Object.entries(SERIES_CODES).map(([key, seriesCode]) =>
+      const promises = Object.entries(SERIES_CODES).map(([key, seriesCode]) => 
         this.fetchSeries(seriesCode, firstdate, lastdate)
           .then(data => [key, this.processSeriesData(data)])
           .catch(error => {
-            console.error(`Error fetching ${key}:`, error);
+            console.error(Error fetching ${key}:, error);
             return [key, { valor: null, fecha: null }];
           })
       );
 
       const results = await Promise.all(promises);
-
+      
       return {
         ...Object.fromEntries(results),
         _metadata: metadata
       };
     } catch (error) {
       console.error('Error fetching indicators:', error);
-
+      // Retornar un objeto con valores por defecto en caso de error
       return {
         UF: { valor: null, fecha: null },
         DOLAR: { valor: null, fecha: null },
@@ -58,16 +56,14 @@ class IndicadoresService {
         function: 'GetSeries'
       });
 
-      const response = await fetch(`${this.baseUrl}?${params}`);
+      const response = await fetch(${this.baseUrl}?${params});
       if (!response.ok) {
-        throw new Error(`Error fetching series ${seriesCode}`);
+        throw new Error(Error fetching series ${seriesCode});
       }
 
-      const data = await response.json();
-      console.log(`Datos recibidos para ${seriesCode}:`, data);
-      return data;
+      return response.json();
     } catch (error) {
-      console.error(`Error in fetchSeries for ${seriesCode}:`, error);
+      console.error(Error in fetchSeries for ${seriesCode}:, error);
       throw error;
     }
   }
@@ -81,7 +77,7 @@ class IndicadoresService {
       const observation = data.Series[0].Obs[0];
       return {
         valor: parseFloat(observation.value) || null,
-        fecha: observation.indexDateString || null
+        fecha: observation.DateTime || null
       };
     } catch (error) {
       console.error('Error processing series data:', error);
