@@ -5,7 +5,6 @@ import TipoIndicadorSelector from './components/TipoIndicadorSelector';
 import ConversionForm from './components/ConversionForm';
 import ResultadosConversion from './components/ResultadosConversion';
 import IndicadoresDisplay from './components/IndicadoresDisplay';
-import BotonesControl from '@/shared/ui/BotonesControl';
 import { useIndicadores } from './hooks/useIndicadores';
 import { parsearMonto } from '@/core/formatters/formatters';
 import { formatDate } from './utils/dateUtils';
@@ -91,26 +90,13 @@ const CalculadoraIndicadores = () => {
                   tipoIndicador={tipoIndicador}
                   direccion={direccion}
                   onDireccionChange={toggleDireccion}
+                  onCalcular={calcular}
                   disabled={loading || !indicadores}
                 />
 
-                <BotonesControl
-                  onCalcular={calcular}
-                  tipo="indicadores"
-                  disabled={loading || !indicadores || !monto}
-                />
-
-{resultado && (
-  <>
-    <ResultadosConversion resultado={resultado} />
-    <div className="mt-4">
-      <BotonExportar 
-        resultado={resultado} 
-        tipo="indicadores"
-      />
-    </div>
-  </>
-)}
+                {resultado && (
+                  <ResultadosConversion resultado={resultado} />
+                )}
               </div>
             </div>
           </div>

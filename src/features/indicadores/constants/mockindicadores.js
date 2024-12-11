@@ -29,19 +29,19 @@ export const SERIES_CODES = {
   // Datos de ejemplo actualizados
   export const MOCK_DATA = {
     UF: {
-      valor: 38367.21,
+      valor: 11111.00,
       fecha: new Date().toISOString()
     },
     DOLAR: {
-      valor: 972.43,
+      valor: 111.00,
       fecha: new Date().toISOString()
     },
     EURO: {
-      valor: 1022.10,
+      valor: 1111.00,
       fecha: new Date().toISOString()
     },
     UTM: {
-      valor: 64513,
+      valor: 11111,
       fecha: new Date().toISOString()
     }
   };
