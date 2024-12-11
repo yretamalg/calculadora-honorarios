@@ -1,8 +1,12 @@
 import React from 'react';
-import { formatearIndicador } from '@/core/formatters/formatters';
-import { INDICATOR_FORMAT } from '../constants/indicadores';
+import { getChileDateTime } from './utils/dateUtils';
+import { obtenerUFValida, mostrarUFSiguiente } from './utils/ufUtils';
 
 const IndicadoresDisplay = ({ indicadores, loading, error }) => {
+  const fechaHoraChile = new Date(getChileDateTime());
+  const ufValida = obtenerUFValida(indicadores, fechaHoraChile);
+  const mostrarSiguiente = mostrarUFSiguiente(fechaHoraChile.getHours());
+
   const formatearNumero = (numero) => {
     if (!numero && numero !== 0) return '-';
     return new Intl.NumberFormat('es-CL', {
@@ -50,8 +54,8 @@ const IndicadoresDisplay = ({ indicadores, loading, error }) => {
   const INDICADORES = [
     { 
       id: 'UF', 
-      nombre: 'UF', 
-      valor: indicadores.UF?.valor,
+      nombre: `UF${mostrarSiguiente ? ' (mañana)' : ''}`,
+      valor: ufValida?.valor || indicadores.UF?.valor,
       tipo: 'UF'
     },
     { 
