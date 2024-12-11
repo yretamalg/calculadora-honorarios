@@ -45,60 +45,74 @@ const ConversionForm = ({
     }
   };
 
-  const formatearMonto = (valor) => {
-    if (!valor) return '';
+  // Agregar esta nueva función después de getSimboloMoneda
+const permitirDecimales = () => {
+  if (tipoIndicador === 'DOLAR' || tipoIndicador === 'EURO') return true;
+  if (tipoIndicador === 'UF' || tipoIndicador === 'UTM') {
+    return direccion === 'to_clp'; // Solo permitir decimales cuando convertimos a pesos
+  }
+  return false;
+};
 
-    // Remover caracteres inválidos, pero preservar la última coma
-    let numero = valor.replace(/[^0-9,]/g, '');
-    
-    // Asegurarse de mantener solo una coma
-    let partes = numero.split(',');
-    if (partes.length > 2) {
-      numero = partes[0] + ',' + partes[1];
-    }
+// Modificar el formatearMonto para usar la nueva función
+const formatearMonto = (valor) => {
+  if (!valor) return '';
 
-    // Separar parte entera y decimal
-    let [parteEntera, parteDecimal] = numero.split(',');
+  // Remover caracteres inválidos, preservando comas
+  let numero = valor.replace(/[^0-9,]/g, '');
+  
+  // Asegurarse de mantener solo una coma
+  let partes = numero.split(',');
+  if (partes.length > 2) {
+    numero = partes[0] + ',' + partes[1];
+  }
 
-    // Limpiar ceros iniciales
-    parteEntera = parteEntera?.replace(/^0+/, '') || '0';
+  // Separar parte entera y decimal
+  let [parteEntera, parteDecimal] = numero.split(',');
 
-    // Aplicar separador de miles
-    parteEntera = parteEntera.replace(/\B(?=(\d{3})+(?!\d))/g, '.');
+  // Limpiar ceros iniciales
+  parteEntera = parteEntera?.replace(/^0+/, '') || '0';
 
-    // Obtener el símbolo de moneda apropiado
-    const simbolo = getSimboloMoneda(tipoIndicador, direccion);
-    const espacioSimbolo = simbolo ? ' ' : ''; // Espacio solo si hay símbolo
+  // Aplicar separador de miles
+  parteEntera = parteEntera.replace(/\B(?=(\d{3})+(?!\d))/g, '.');
 
-    // Permitir decimales para todos los tipos cuando es to_clp o cuando es desde peso a otro indicador
-    if (parteDecimal) {
-      parteDecimal = parteDecimal.slice(0, 2);
-      return `${simbolo}${espacioSimbolo}${parteEntera},${parteDecimal}`;
-    }
-    // Si el último carácter era una coma, preservarla
-    if (valor.endsWith(',')) {
-      return `${simbolo}${espacioSimbolo}${parteEntera},`;
-    }
-    
-    return `${simbolo}${espacioSimbolo}${parteEntera}`;
-  };
+  // Obtener el símbolo de moneda apropiado
+  const simbolo = getSimboloMoneda(tipoIndicador, direccion);
+  const espacioSimbolo = simbolo ? ' ' : '';
 
-  const handleKeyDown = (e) => {
-    const { key, target: { value } } = e;
+  const debenPermitirseDecimales = permitirDecimales();
 
-    // Permitir teclas de control y navegación
-    if (['Backspace', 'Delete', 'ArrowLeft', 'ArrowRight', 'Tab'].includes(key)) return;
+  if (parteDecimal && debenPermitirseDecimales) {
+    parteDecimal = parteDecimal.slice(0, 2);
+    return `${simbolo}${espacioSimbolo}${parteEntera},${parteDecimal}`;
+  }
 
-    // Permitir números
-    if (/\d/.test(key)) return;
+  if (valor.endsWith(',') && debenPermitirseDecimales) {
+    return `${simbolo}${espacioSimbolo}${parteEntera},`;
+  }
+  
+  return `${simbolo}${espacioSimbolo}${parteEntera}`;
+};
 
-    // Permitir coma para decimales en todos los casos, excepto cuando convertimos desde pesos a UF o UTM
-    const permitirComa = !(direccion === 'from_clp' && (tipoIndicador === 'UF' || tipoIndicador === 'UTM'));
-    if (key === ',' && !value.includes(',') && permitirComa) return;
+// Modificar el handleKeyDown para usar la nueva función
+const handleKeyDown = (e) => {
+  const { key, target: { value } } = e;
 
-    // Bloquear cualquier otra tecla
-    e.preventDefault();
-  };
+  // Permitir teclas de control y navegación
+  if (['Backspace', 'Delete', 'ArrowLeft', 'ArrowRight', 'Tab'].includes(key)) return;
+
+  // Permitir números
+  if (/\d/.test(key)) return;
+
+  // Verificar si se permiten decimales
+  const debenPermitirseDecimales = permitirDecimales();
+
+  // Permitir coma para decimales cuando corresponda
+  if (key === ',' && !value.includes(',') && debenPermitirseDecimales) return;
+
+  // Bloquear cualquier otra tecla
+  e.preventDefault();
+};
 
   const handleChange = (e) => {
     const valorFormateado = formatearMonto(e.target.value);
@@ -132,9 +146,9 @@ const ConversionForm = ({
         onClick={onDireccionChange}
         disabled={disabled}
         className="w-full py-4 px-6 flex items-center justify-center gap-4 
-                 bg-slate-700 rounded-lg hover:bg-slate-600 
-                 transition-colors text-slate-300 disabled:opacity-50 
-                 disabled:cursor-not-allowed"
+                  bg-slate-700 rounded-lg hover:bg-slate-600 
+                  transition-colors text-slate-300 disabled:opacity-50 
+                  disabled:cursor-not-allowed"
       >
         <span className="font-medium">{from}</span>
         <ArrowRightLeft className="w-6 h-6" />
@@ -161,12 +175,11 @@ const ConversionForm = ({
           placeholder={placeholder}
           inputMode="text"
           autoComplete="off"
-          writingsuggestions="off" // Reemplazamos textprediction por writingsuggestions
           className="block w-full text-2xl h-14 border border-gray-300 rounded-md 
-                  shadow-sm py-2 px-3 bg-slate-700 text-white text-right 
-                  focus:outline-none focus:ring-2 focus:ring-orange-500 
-                  focus:border-orange-500 disabled:opacity-50 
-                  disabled:cursor-not-allowed"
+                    shadow-sm py-2 px-3 bg-slate-700 text-white text-right 
+                    focus:outline-none focus:ring-2 focus:ring-orange-500 
+                    focus:border-orange-500 disabled:opacity-50 
+                    disabled:cursor-not-allowed"
         />
       </div>
 
@@ -175,9 +188,9 @@ const ConversionForm = ({
         type="submit"
         disabled={disabled || !valor}
         className="w-full px-4 py-2 text-white bg-orange-700 rounded-md 
-                 hover:bg-orange-600 focus:outline-none focus:ring-2 
-                 focus:ring-orange-500 focus:ring-offset-2 
-                 disabled:opacity-50 disabled:cursor-not-allowed"
+                  hover:bg-orange-600 focus:outline-none focus:ring-2 
+                  focus:ring-orange-500 focus:ring-offset-2 
+                  disabled:opacity-50 disabled:cursor-not-allowed"
       >
         Calcular
       </button>

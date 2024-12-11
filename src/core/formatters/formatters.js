@@ -58,8 +58,20 @@ export const formatearMonto = (numero) => {
  */
 export const parsearMonto = (texto) => {
   if (!texto) return 0;
-  const numeroLimpio = texto.replace(/[$.\s]/g, '');
-  return parseInt(numeroLimpio) || 0;
+  
+  // Remover todo excepto números, comas y puntos, y símbolos de moneda
+  const textoLimpio = texto.replace(/[^0-9,.]/g, '');
+  
+  // Remover los puntos (separadores de miles)
+  const sinPuntos = textoLimpio.replace(/\./g, '');
+  
+  // Reemplazar la coma decimal por punto para el parseFloat
+  const numeroNormalizado = sinPuntos.replace(',', '.');
+  
+  // Convertir a número usando parseFloat en lugar de parseInt
+  const numero = parseFloat(numeroNormalizado);
+  
+  return isNaN(numero) ? 0 : numero;
 };
 
 /**
