@@ -9,7 +9,8 @@ const ConversionForm = ({
   direccion,
   onDireccionChange,
   disabled,
-  onCalcular 
+  onCalcular,
+  onLimpiar
 }) => {
   // Mapeo de nombres de indicadores
   const getNombreIndicador = (tipo) => ({
@@ -25,95 +26,75 @@ const ConversionForm = ({
     return { from, to };
   };
 
+  // Obtener las etiquetas de conversión
+  const { from, to } = getConversionLabel();
+
   const getSimboloMoneda = (tipo, direccionConversion) => {
     if (direccionConversion === 'to_clp') {
-      // Conversión hacia pesos
       switch (tipo) {
         case 'DOLAR':
           return 'US$';
         case 'EURO':
           return '€';
         case 'UF':
-          return 'UF';  // Cambiado para mostrar UF
+          return 'UF';
         case 'UTM':
-          return 'UTM'; // Cambiado para mostrar UTM
+          return 'UTM';
         default:
           return '$';
       }
     } else {
-      // Conversión desde pesos
-      return '$'; // Siempre mostrar $ cuando el origen es pesos
+      return '$';
     }
   };
 
-  // Agregar esta nueva función después de getSimboloMoneda
-const permitirDecimales = () => {
-  if (tipoIndicador === 'DOLAR' || tipoIndicador === 'EURO') return true;
-  if (tipoIndicador === 'UF' || tipoIndicador === 'UTM') {
-    return direccion === 'to_clp'; // Solo permitir decimales cuando convertimos a pesos
-  }
-  return false;
-};
+  const permitirDecimales = () => {
+    if (tipoIndicador === 'DOLAR' || tipoIndicador === 'EURO') return true;
+    if (tipoIndicador === 'UF' || tipoIndicador === 'UTM') {
+      return direccion === 'to_clp';
+    }
+    return false;
+  };
 
-// Modificar el formatearMonto para usar la nueva función
-const formatearMonto = (valor) => {
-  if (!valor) return '';
+  const formatearMonto = (valor) => {
+    if (!valor) return '';
 
-  // Remover caracteres inválidos, preservando comas
-  let numero = valor.replace(/[^0-9,]/g, '');
-  
-  // Asegurarse de mantener solo una coma
-  let partes = numero.split(',');
-  if (partes.length > 2) {
-    numero = partes[0] + ',' + partes[1];
-  }
+    let numero = valor.replace(/[^0-9,]/g, '');
+    let partes = numero.split(',');
+    if (partes.length > 2) {
+      numero = partes[0] + ',' + partes[1];
+    }
 
-  // Separar parte entera y decimal
-  let [parteEntera, parteDecimal] = numero.split(',');
+    let [parteEntera, parteDecimal] = numero.split(',');
+    parteEntera = parteEntera?.replace(/^0+/, '') || '0';
+    parteEntera = parteEntera.replace(/\B(?=(\d{3})+(?!\d))/g, '.');
 
-  // Limpiar ceros iniciales
-  parteEntera = parteEntera?.replace(/^0+/, '') || '0';
+    const simbolo = getSimboloMoneda(tipoIndicador, direccion);
+    const espacioSimbolo = simbolo ? ' ' : '';
+    const debenPermitirseDecimales = permitirDecimales();
 
-  // Aplicar separador de miles
-  parteEntera = parteEntera.replace(/\B(?=(\d{3})+(?!\d))/g, '.');
+    if (parteDecimal && debenPermitirseDecimales) {
+      parteDecimal = parteDecimal.slice(0, 2);
+      return `${simbolo}${espacioSimbolo}${parteEntera},${parteDecimal}`;
+    }
 
-  // Obtener el símbolo de moneda apropiado
-  const simbolo = getSimboloMoneda(tipoIndicador, direccion);
-  const espacioSimbolo = simbolo ? ' ' : '';
+    if (valor.endsWith(',') && debenPermitirseDecimales) {
+      return `${simbolo}${espacioSimbolo}${parteEntera},`;
+    }
+    
+    return `${simbolo}${espacioSimbolo}${parteEntera}`;
+  };
 
-  const debenPermitirseDecimales = permitirDecimales();
-
-  if (parteDecimal && debenPermitirseDecimales) {
-    parteDecimal = parteDecimal.slice(0, 2);
-    return `${simbolo}${espacioSimbolo}${parteEntera},${parteDecimal}`;
-  }
-
-  if (valor.endsWith(',') && debenPermitirseDecimales) {
-    return `${simbolo}${espacioSimbolo}${parteEntera},`;
-  }
-  
-  return `${simbolo}${espacioSimbolo}${parteEntera}`;
-};
-
-// Modificar el handleKeyDown para usar la nueva función
-const handleKeyDown = (e) => {
-  const { key, target: { value } } = e;
-
-  // Permitir teclas de control y navegación
-  if (['Backspace', 'Delete', 'ArrowLeft', 'ArrowRight', 'Tab'].includes(key)) return;
-
-  // Permitir números
-  if (/\d/.test(key)) return;
-
-  // Verificar si se permiten decimales
-  const debenPermitirseDecimales = permitirDecimales();
-
-  // Permitir coma para decimales cuando corresponda
-  if (key === ',' && !value.includes(',') && debenPermitirseDecimales) return;
-
-  // Bloquear cualquier otra tecla
-  e.preventDefault();
-};
+  const handleKeyDown = (e) => {
+    const { key, target: { value } } = e;
+    if (['Backspace', 'Delete', 'ArrowLeft', 'ArrowRight', 'Tab'].includes(key)) return;
+    if (/\d/.test(key)) return;
+    
+    const debenPermitirseDecimales = permitirDecimales();
+    if (key === ',' && !value.includes(',') && debenPermitirseDecimales) return;
+    
+    e.preventDefault();
+  };
 
   const handleChange = (e) => {
     const valorFormateado = formatearMonto(e.target.value);
@@ -127,13 +108,8 @@ const handleKeyDown = (e) => {
     onChange(valorFormateado);
   };
 
-  const { from, to } = getConversionLabel();
-
-  // Determinar el placeholder según el tipo y dirección
   const placeholderSimbolo = getSimboloMoneda(tipoIndicador, direccion);
-  const placeholder = placeholderSimbolo === '$' || placeholderSimbolo === 'US$' || placeholderSimbolo === '€' 
-    ? `${placeholderSimbolo} 0` 
-    : `${placeholderSimbolo} 0`;
+  const placeholder = `${placeholderSimbolo} 0`;
 
   return (
     <form 
@@ -143,22 +119,20 @@ const handleKeyDown = (e) => {
       }}
       className="bg-slate-800 rounded-lg p-6 space-y-6"
     >
-      {/* Botón de dirección */}
       <button
         type="button"
         onClick={onDireccionChange}
         disabled={disabled}
         className="w-full py-4 px-6 flex items-center justify-center gap-4 
-                  bg-slate-700 rounded-lg hover:bg-slate-600 
-                  transition-colors text-slate-300 disabled:opacity-50 
-                  disabled:cursor-not-allowed"
+                 bg-slate-700 rounded-lg hover:bg-slate-600 
+                 transition-colors text-slate-300 disabled:opacity-50 
+                 disabled:cursor-not-allowed"
       >
         <span className="font-medium">{from}</span>
         <ArrowRightLeft className="w-6 h-6" />
         <span className="font-medium">{to}</span>
       </button>
 
-      {/* Input de monto */}
       <div>
         <label 
           htmlFor="monto" 
@@ -179,24 +153,38 @@ const handleKeyDown = (e) => {
           inputMode="text"
           autoComplete="off"
           className="block w-full text-2xl h-14 border border-gray-300 rounded-md 
-                    shadow-sm py-2 px-3 bg-slate-700 text-white text-right 
-                    focus:outline-none focus:ring-2 focus:ring-orange-500 
-                    focus:border-orange-500 disabled:opacity-50 
-                    disabled:cursor-not-allowed"
+                  shadow-sm py-2 px-3 bg-slate-700 text-white text-right 
+                  focus:outline-none focus:ring-2 focus:ring-orange-500 
+                  focus:border-orange-500 disabled:opacity-50 
+                  disabled:cursor-not-allowed"
         />
       </div>
 
-      {/* Botón calcular */}
-      <button
-        type="submit"
-        disabled={disabled || !valor}
-        className="w-full px-4 py-2 text-white bg-orange-700 rounded-md 
-                  hover:bg-orange-600 focus:outline-none focus:ring-2 
-                  focus:ring-orange-500 focus:ring-offset-2 
-                  disabled:opacity-50 disabled:cursor-not-allowed"
-      >
-        Calcular
-      </button>
+      <div className="grid grid-cols-2 gap-4">
+        <button
+          type="submit"
+          disabled={disabled || !valor}
+          className="w-full px-4 py-2 text-white bg-orange-700 rounded-md 
+                   hover:bg-orange-600 focus:outline-none focus:ring-2 
+                   focus:ring-orange-500 focus:ring-offset-2 
+                   disabled:opacity-50 disabled:cursor-not-allowed"
+        >
+          Calcular
+        </button>
+
+        <button
+          type="button"
+          onClick={() => onLimpiar?.()}
+          disabled={disabled || !valor}
+          className="w-full px-4 py-2 text-slate-300 bg-slate-700 rounded-md 
+                   hover:bg-slate-600 focus:outline-none focus:ring-2 
+                   focus:ring-slate-500 focus:ring-offset-2 
+                   disabled:opacity-50 disabled:cursor-not-allowed
+                   border border-slate-600"
+        >
+          Limpiar
+        </button>
+      </div>
     </form>
   );
 };

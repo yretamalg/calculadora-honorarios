@@ -91,6 +91,7 @@ const CalculadoraIndicadores = () => {
                   direccion={direccion}
                   onDireccionChange={toggleDireccion}
                   onCalcular={calcular}
+                  onLimpiar={limpiar}
                   disabled={loading || !indicadores}
                 />
 
