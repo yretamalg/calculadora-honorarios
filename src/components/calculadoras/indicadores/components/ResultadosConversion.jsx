@@ -69,15 +69,15 @@ const ResultadosConversion = ({ resultado }) => {
   const getLabelOrigen = () => {
     if (!resultado) return 'Valor Original:';
     return resultado.direccion === 'to_clp' 
-      ? `Valor en ${resultado.tipoIndicador}:` 
-      : 'Valor en Pesos:';
+      ? `Monto Ingresado en ${resultado.tipoIndicador}:` 
+      : 'Monto Ingresado en Peso:';
   };
 
   const getLabelDestino = () => {
     if (!resultado) return 'Valor Convertido:';
     return resultado.direccion === 'to_clp'
-      ? 'Valor en Pesos:'
-      : `Valor en ${resultado.tipoIndicador}:`;
+      ? 'Monto Covertido en Peso:'
+      : `Monto Covertido en ${resultado.tipoIndicador}:`;
   };
 
   return (
