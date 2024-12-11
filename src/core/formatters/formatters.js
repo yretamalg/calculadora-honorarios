@@ -14,6 +14,11 @@ const DECIMAL_FORMATTER = new Intl.NumberFormat(CHILE_LOCALE, {
   maximumFractionDigits: 2
 });
 
+const DECIMAL_FORMATTER_NO_DECIMALS = new Intl.NumberFormat(CHILE_LOCALE, {
+  minimumFractionDigits: 0,
+  maximumFractionDigits: 0
+});
+
 const PERCENT_FORMATTER = new Intl.NumberFormat(CHILE_LOCALE, {
   style: 'percent',
   minimumFractionDigits: 2,
@@ -67,28 +72,21 @@ export const formatearIndicador = (valor, tipo) => {
   if (!valor && valor !== 0) return tipo === 'CLP' ? '$ 0' : '0,00';
 
   try {
+    const numero = Math.abs(valor);
     switch (tipo) {
       case 'CLP':
-        return formatearMonto(valor);
+        return `$ ${DECIMAL_FORMATTER_NO_DECIMALS.format(numero)}`;
       case 'USD':
-        return new Intl.NumberFormat(CHILE_LOCALE, {
-          style: 'currency',
-          currency: 'USD',
-          minimumFractionDigits: 2,
-          maximumFractionDigits: 2
-        }).format(valor).replace('USD', 'US$');
+        return `US$ ${DECIMAL_FORMATTER.format(numero)}`;
+      case 'EURO':
       case 'EUR':
-        return new Intl.NumberFormat(CHILE_LOCALE, {
-          style: 'currency',
-          currency: 'EUR',
-          minimumFractionDigits: 2,
-          maximumFractionDigits: 2
-        }).format(valor);
+        return `€ ${DECIMAL_FORMATTER.format(numero)}`;
       case 'UF':
+        return `UF ${DECIMAL_FORMATTER.format(numero)}`;
       case 'UTM':
-        return DECIMAL_FORMATTER.format(valor);
+        return `UTM ${DECIMAL_FORMATTER_NO_DECIMALS.format(numero)}`;
       default:
-        return formatearMonto(valor);
+        return `$ ${DECIMAL_FORMATTER_NO_DECIMALS.format(numero)}`;
     }
   } catch (error) {
     console.error('Error al formatear indicador:', error);
@@ -159,10 +157,19 @@ export const calcularValorDesdePorcentaje = (porcentaje, total) => {
 
 // Objeto con formateadores de moneda predefinidos
 export const formatCurrency = {
-  CLP: (value) => formatearMonto(value),
-  USD: (value) => formatearIndicador(value, 'USD'),
-  EUR: (value) => formatearIndicador(value, 'EUR'),
-  INDICATOR: (value) => DECIMAL_FORMATTER.format(value)
+  CLP: (value) => `$ ${DECIMAL_FORMATTER_NO_DECIMALS.format(value)}`,
+  USD: (value) => `US$ ${DECIMAL_FORMATTER.format(value)}`,
+  EUR: (value) => `€ ${DECIMAL_FORMATTER.format(value)}`,
+  UF: (value) => `UF ${DECIMAL_FORMATTER.format(value)}`,
+  UTM: (value) => `UTM ${DECIMAL_FORMATTER_NO_DECIMALS.format(value)}`,
+  INDICATOR: (value, tipo) => {
+    if (tipo === 'UTM') {
+      return `UTM ${DECIMAL_FORMATTER_NO_DECIMALS.format(value)}`;
+    } else if (tipo === 'UF') {
+      return `UF ${DECIMAL_FORMATTER.format(value)}`;
+    }
+    return DECIMAL_FORMATTER.format(value);
+  }
 };
 
 // Exportación por defecto con todos los formateadores
