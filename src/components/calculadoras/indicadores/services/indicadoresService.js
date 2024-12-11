@@ -21,7 +21,7 @@ class IndicadoresService {
         this.fetchSeries(seriesCode, firstdate, lastdate)
           .then(data => [key, this.processSeriesData(data)])
           .catch(error => {
-            console.error(Error fetching ${key}:, error);
+            console.error(`Error fetching ${key}:`, error);
             return [key, { valor: null, fecha: null }];
           })
       );
@@ -56,14 +56,14 @@ class IndicadoresService {
         function: 'GetSeries'
       });
 
-      const response = await fetch(${this.baseUrl}?${params});
+      const response = await fetch(`${this.baseUrl}?${params}`);
       if (!response.ok) {
-        throw new Error(Error fetching series ${seriesCode});
+        throw new Error(`Error fetching series ${seriesCode}`);
       }
 
       return response.json();
     } catch (error) {
-      console.error(Error in fetchSeries for ${seriesCode}:, error);
+      console.error(`Error in fetchSeries for ${seriesCode}:`, error);
       throw error;
     }
   }
