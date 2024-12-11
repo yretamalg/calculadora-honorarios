@@ -1,6 +1,6 @@
 // src/shared/components/BotonExportar.jsx
 import React from 'react';
-import { generarPDFIndicadores } from '@/core/pdf/generators/indicadoresPDF.js';
+import generarPDFIndicadores from '@/core/pdf/generators/indicadoresPDF';
 
 const BotonExportar = ({ resultado, tipo }) => {
   const handleExport = async () => {
