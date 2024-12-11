@@ -1,24 +1,29 @@
 import React, { useState } from 'react';
-import FormularioItems from './FormularioItems';
-import ResultadosIVA from './ResultadosIVA';
-import NavigationMenu from '../../shared/NavigationMenu';
-import ShareButtons from '../../shared/ShareButtons';
-import { calcularIVA } from '../../../utils/calculators';
-import { parsearMonto } from '../../../utils/formatters';
+import FormularioItems from './components/FormularioItems';
+import ResultadosIVA from './components/ResultadosIVA';
+import NavigationMenu from '../../../layouts/components/NavigationMenu';
+import ShareButtons from '../../../layouts/components/ShareButtons';
+import { calcularIVA } from './utils/ivaCalculator';
+import { parsearMonto } from '../../../core/formatters/formatters';
 
 const CalculadoraIVA = () => {
   const [items, setItems] = useState([
-    { id: 1, descripcion: '', cantidad: 1, valorUnitario: '' }
+    { id: 1, descripcion: '', cantidad: 1, valorUnitario: '' },
+    { id: 2, descripcion: '', cantidad: 1, valorUnitario: '' },
+    { id: 3, descripcion: '', cantidad: 1, valorUnitario: '' }
   ]);
+  
   const [resultados, setResultados] = useState({
     subtotal: 0,
     iva: 0,
     total: 0
   });
 
-  const calcular = (items) => {
-    const subtotal = items.reduce((sum, item) => {
-      return sum + (parsearMonto(item.valorUnitario) * item.cantidad);
+  const calcular = (itemsActuales) => {
+    const subtotal = itemsActuales.reduce((sum, item) => {
+      const monto = parsearMonto(item.valorUnitario);
+      const cantidad = parseInt(item.cantidad) || 0;
+      return sum + (monto * cantidad);
     }, 0);
     
     const { iva, total } = calcularIVA(subtotal);
@@ -26,12 +31,16 @@ const CalculadoraIVA = () => {
   };
 
   const limpiar = () => {
-    setItems([{ id: 1, descripcion: '', cantidad: 1, valorUnitario: '' }]);
+    setItems([
+      { id: 1, descripcion: '', cantidad: 1, valorUnitario: '' },
+      { id: 2, descripcion: '', cantidad: 1, valorUnitario: '' },
+      { id: 3, descripcion: '', cantidad: 1, valorUnitario: '' }
+    ]);
     setResultados({ subtotal: 0, iva: 0, total: 0 });
   };
 
   return (
-    <div className="flex flex-col min-h-screen">
+    <div className="flex flex-col min-h-screen bg-slate-950">
       <NavigationMenu />
       <div className="flex-grow container mx-auto px-4">
         <div className="max-w-4xl mx-auto">

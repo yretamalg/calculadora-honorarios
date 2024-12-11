@@ -1,5 +1,6 @@
 import React from 'react';
 import { ArrowRightLeft } from 'lucide-react';
+import AutoSizingInput from '@/shared/ui/AutoSizingInput';
 
 const ConversionForm = ({ 
   valor, 

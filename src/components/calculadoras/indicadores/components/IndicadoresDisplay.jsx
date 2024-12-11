@@ -1,4 +1,6 @@
 import React from 'react';
+import { formatearIndicador } from '@/core/formatters/formatters';
+import { INDICATOR_FORMAT } from '../constants/indicadores';
 
 const IndicadoresDisplay = ({ indicadores, loading, error }) => {
   const formatearNumero = (numero) => {

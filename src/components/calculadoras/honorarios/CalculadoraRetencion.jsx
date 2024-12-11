@@ -1,11 +1,10 @@
 import { useState } from 'react';
-import FormularioIngreso from './FormularioIngreso';
-import BotonesControl from './BotonesControl';
-import ResultadosCalculo from './ResultadosCalculo';
-import NavigationMenu from '../../shared/NavigationMenu';
-import ShareButtons from '../../shared/ShareButtons';
-import { TASAS_RETENCION } from '../../../constants/config';
-import { parsearMonto } from '../../../utils/formatters';
+import FormularioIngreso from './components/FormularioIngreso';
+import BotonesControl from '../../../shared/ui/BotonesControl';
+import ResultadosCalculo from './components/ResultadosCalculo';
+import NavigationMenu from '../../../layouts/components/NavigationMenu';
+import ShareButtons from '../../../layouts/components/ShareButtons';
+import { TASAS_RETENCION, calcularMontos } from '../../../config/config';
 
 const CalculadoraRetencion = () => {
   const [monto, setMonto] = useState('');
@@ -23,31 +22,19 @@ const CalculadoraRetencion = () => {
     }
   });
 
+  const parsearMonto = (texto) => {
+    if (!texto) return 0;
+    // Remover el signo peso, los puntos y los espacios
+    const numeroLimpio = texto.replace(/[$\s.]/g, '');
+    return parseInt(numeroLimpio) || 0;
+  };
+
   const calcular = () => {
     const montoNumerico = parsearMonto(monto);
     if (!montoNumerico) return;
 
-    const tasa = TASAS_RETENCION.find(t => t.valor.toString() === tasaRetencion);
-    if (!tasa) return;
-    
-    const montoBrutoDesdeLiquido = Math.round(montoNumerico / tasa.factor);
-    const retencionDesdeLiquido = montoBrutoDesdeLiquido - montoNumerico;
-    
-    const retencionDesdeBruto = Math.round(montoNumerico * (tasa.valor / 100));
-    const liquidoDesdeBruto = montoNumerico - retencionDesdeBruto;
-    
-    setResultados({
-      desdeValoresLiquidos: {
-        bruto: montoBrutoDesdeLiquido,
-        retencion: retencionDesdeLiquido,
-        liquido: montoNumerico
-      },
-      desdeValoresBrutos: {
-        bruto: montoNumerico,
-        retencion: retencionDesdeBruto,
-        liquido: liquidoDesdeBruto
-      }
-    });
+    const resultadosCalculados = calcularMontos(montoNumerico, tasaRetencion);
+    setResultados(resultadosCalculados);
   };
 
   const limpiar = () => {

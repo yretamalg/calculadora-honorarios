@@ -1,11 +1,9 @@
 import React, { useState } from 'react';
 import { Copy, Check, Download } from 'lucide-react';
-import { PDFDownloadLink } from '@react-pdf/renderer';
 import { format } from 'date-fns';
 import { es } from 'date-fns/locale';
-import ResultadosPDF from './ResultadosPDF';
-import { formatCurrency } from '../../../../utils/formatters';
-import { formatearMonto, parsearMonto, formatearIndicador } from '../../../utils/formatters';
+import { formatCurrency } from '@/core/formatters/formatters';
+import { formatearMonto, parsearMonto } from '@/core/formatters/formatters';
 
 const ResultadosConversion = ({ resultado }) => {
   const [copiadoOriginal, setCopiadoOriginal] = useState(false);

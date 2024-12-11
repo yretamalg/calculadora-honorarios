@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import FormulaDisplay from './FormulaDisplay';
 import BaseCalculatorForm from './BaseCalculatorForm';
 import { formatChileanNumber, parseChileanNumber } from '../utils/calculatorUtils';
+import AutoSizingInput from '@/shared/ui/AutoSizingInput';
 
 const Calculator7Form = ({ formData, setFormData }) => {
   const [result, setResult] = useState(null);

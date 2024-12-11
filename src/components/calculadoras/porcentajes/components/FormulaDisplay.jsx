@@ -146,27 +146,21 @@ const FormulaDisplay = ({ activeCalculator, data = {}, result }) => {
       }
 
       case 3: {
-        const baseValue = getBaseValue();
+        const knownVal = parseNumber(data.knownValue);
+        const knownPerc = parseNumber(data.knownPercentage);
         const targetPerc = parseNumber(data.targetPercentage);
         const parsedResult = parseNumber(result);
         
         return (
-          <div className="flex flex-col items-center space-y-4">
-            <p className="text-sm text-slate-400">
-              Si {formatLocaleNumber(parseNumber(data.knownPercentage))}% es{' '}
-              {formatLocaleNumber(parseNumber(data.knownValue))}, el valor base es{' '}
-              {formatLocaleNumber(baseValue)}
-            </p>
-            <div className="flex items-center">
-              <span>x = </span>
-              <div className="mx-2 text-center">
-                <div className="border-b border-slate-400">
-                  {`${formatLocaleNumber(baseValue)} · ${formatLocaleNumber(targetPerc)}`}
-                </div>
-                <div>100</div>
+          <div className="flex items-center justify-center">
+            <span>x = </span>
+            <div className="mx-2 text-center">
+              <div className="border-b border-slate-400">
+                {`${formatLocaleNumber(knownVal)} · ${formatLocaleNumber(targetPerc)}`}
               </div>
-              <span>= {formatLocaleNumber(parsedResult)}</span>
+              <div>{formatLocaleNumber(knownPerc)}</div>
             </div>
+            <span>= {formatLocaleNumber(parsedResult)}</span>
           </div>
         );
       }
@@ -195,7 +189,8 @@ const FormulaDisplay = ({ activeCalculator, data = {}, result }) => {
         const price = parseNumber(data.initialPrice);
         const discountAmount = Math.round((price * discount) / 100);
         const finalPrice = price - discountAmount;
-
+        const fillPercentage = ((price - discountAmount) / price) * 100;
+      
         return (
           <div className="flex flex-col items-center space-y-4">
             <div className="flex items-center">
@@ -218,6 +213,47 @@ const FormulaDisplay = ({ activeCalculator, data = {}, result }) => {
             </div>
             <div className="text-slate-400">
               Descuento: ${formatLocaleNumber(discountAmount)}
+            </div>
+      
+            {/* Nueva sección de barra de progreso */}
+            <div className="bg-slate-800 rounded-lg p-4 mt-4 w-full">
+              <div className="text-center text-slate-300 mb-2">Representación del precio final</div>
+              <div className="relative pt-6 pb-2">
+                <div className="absolute top-0 left-0 w-full">
+                  <span 
+                    className="absolute text-xs text-slate-300"
+                    style={{ 
+                      left: `${fillPercentage}%`,
+                      transform: 'translateX(-50%)'
+                    }}
+                  >
+                    ${formatLocaleNumber(finalPrice)}
+                  </span>
+                </div>
+      
+                <div className="h-6 bg-slate-900 rounded-full overflow-hidden relative">
+                  <div
+                    className="h-full bg-orange-600 transition-all duration-500 ease-out relative"
+                    style={{ width: `${fillPercentage}%` }}
+                  >
+                    <span 
+                      className="absolute text-xs text-white"
+                      style={{ 
+                        right: 0,
+                        top: '50%',
+                        transform: 'translate(50%, -50%)'
+                      }}
+                    >
+                      {(100 - discount).toFixed(1)}%
+                    </span>
+                  </div>
+                </div>
+      
+                <div className="absolute top-0 left-0 w-full flex justify-between text-xs text-slate-400">
+                  <span>$0</span>
+                  <span>${formatLocaleNumber(price)}</span>
+                </div>
+              </div>
             </div>
           </div>
         );
