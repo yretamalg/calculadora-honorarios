@@ -1,46 +1,33 @@
-import fs from 'fs/promises';
-import path from 'path';
-import type { Changelog, ChangelogEntry } from '../types/changelog';
-
-const CHANGELOG_PATH = path.join(process.cwd(), 'src/features/changelog/data/changelog.json');
-
-/**
- * Obtiene todas las entradas del changelog
- */
-export async function getChangelog(): Promise<Changelog> {
+// src/features/changelog/api/changelog.js
+export async function getChangelog() {
   try {
-    const data = await fs.readFile(CHANGELOG_PATH, 'utf-8');
-    return JSON.parse(data) as Changelog;
+    const data = await fs.readFile(CHANGELOG_FILE, 'utf-8');
+    return JSON.parse(data);
   } catch (error) {
     console.error('Error reading changelog:', error);
     return { entries: [] };
   }
 }
 
-/**
- * Guarda una nueva entrada en el changelog
- */
-export async function saveChangelog(entry: ChangelogEntry): Promise<void> {
+export async function saveChangelog(entry) {
   try {
     const changelog = await getChangelog();
-    changelog.entries.unshift(entry);
-    await fs.writeFile(CHANGELOG_PATH, JSON.stringify(changelog, null, 2));
+    changelog.entries.unshift({
+      ...entry,
+      id: Date.now(),
+      date: new Date().toISOString()
+    });
+    await fs.writeFile(CHANGELOG_FILE, JSON.stringify(changelog, null, 2));
   } catch (error) {
     console.error('Error saving changelog:', error);
-    throw new Error('Failed to save changelog');
+    throw error;
   }
 }
 
-/**
- * Valida una entrada del changelog
- */
-export function validateEntry(entry: ChangelogEntry): boolean {
-  return !!(
-    entry.version &&
-    entry.date &&
-    entry.changes &&
-    Array.isArray(entry.changes.new) &&
-    Array.isArray(entry.changes.improved) &&
-    Array.isArray(entry.changes.fixed)
-  );
+export function validateEntry(entry) {
+  if (!entry) return false;
+  if (!entry.title || typeof entry.title !== 'string') return false;
+  if (!entry.description || typeof entry.description !== 'string') return false;
+  if (!entry.category || typeof entry.category !== 'string') return false;
+  return true;
 }
