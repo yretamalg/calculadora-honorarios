@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import FormulaDisplay from './FormulaDisplay';
 import BaseCalculatorForm from './BaseCalculatorForm';
 import { formatChileanNumber, parseChileanNumber } from '../utils/calculatorUtils';
-import AutoSizingInput from '@/shared/ui/AutoSizingInput';
+import BotonExportarPorcentajes from './BotonExportarPorcentajes';
 
 const Calculator7Form = ({ formData, setFormData }) => {
   const [result, setResult] = useState(null);
@@ -42,6 +42,12 @@ const Calculator7Form = ({ formData, setFormData }) => {
     return formattedResult;
   };
 
+  const getVariacionAbsoluta = () => {
+    const initialNum = parseChileanNumber(formData.calculator7.initialValue);
+    const finalNum = parseChileanNumber(formData.calculator7.finalValue);
+    return finalNum - initialNum;
+  };
+
   return (
     <BaseCalculatorForm
       title="Calcular el porcentaje de variación"
@@ -74,12 +80,27 @@ const Calculator7Form = ({ formData, setFormData }) => {
               </span>
             )}
           </div>
+
           {showResults && result && (
-            <FormulaDisplay
-              activeCalculator={7}
-              data={formData.calculator7}
-              result={result}
-            />
+            <>
+              <FormulaDisplay
+                activeCalculator={7}
+                data={formData.calculator7}
+                result={result}
+              />
+              <div className="mt-6 flex justify-center">
+                <BotonExportarPorcentajes 
+                  datos={{
+                    titulo: "Calcular porcentaje de variación",
+                    valorInicial: parseChileanNumber(formData.calculator7.initialValue),
+                    valorFinal: parseChileanNumber(formData.calculator7.finalValue),
+                    variacionAbsoluta: getVariacionAbsoluta(),
+                    resultado: parseChileanNumber(result),
+                    tipo: 7
+                  }}
+                />
+              </div>
+            </>
           )}
         </>
       )}

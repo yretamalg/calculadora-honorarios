@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import FormulaDisplay from './FormulaDisplay';
 import BaseCalculatorForm from './BaseCalculatorForm';
 import { formatChileanNumber, parseChileanNumber } from '../utils/calculatorUtils';
-import AutoSizingInput from '@/shared/ui/AutoSizingInput';
+import BotonExportarPorcentajes from './BotonExportarPorcentajes';
 
 const Calculator1Form = ({ formData, setFormData }) => {
   const [result, setResult] = useState(null);
@@ -72,13 +72,28 @@ const Calculator1Form = ({ formData, setFormData }) => {
               </span>
             )}
           </div>
+
           {showResults && result && (
-            <FormulaDisplay
-              activeCalculator={1}
-              data={formData.calculator1}
-              result={result}
-              calculatorType="calculator1"
-            />
+            <>
+              <FormulaDisplay
+                activeCalculator={1}
+                data={formData.calculator1}
+                result={result}
+                calculatorType="calculator1"
+              />
+              
+              <div className="mt-6 flex justify-center">
+              <BotonExportarPorcentajes 
+                  datos={{
+                    titulo: "Calcular Porcentaje",
+                    porcentaje: parseChileanNumber(formData.calculator1.percentage),
+                    cantidad: parseChileanNumber(formData.calculator1.amount),
+                    resultado: parseChileanNumber(result),
+                    tipo: 1  // Este es importante! Faltaba especificar el tipo
+                  }}
+                />
+              </div>
+            </>
           )}
         </>
       )}

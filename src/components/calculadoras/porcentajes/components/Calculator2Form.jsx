@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import FormulaDisplay from './FormulaDisplay';
 import BaseCalculatorForm from './BaseCalculatorForm';
 import { formatChileanNumber, parseChileanNumber } from '../utils/calculatorUtils';
-import AutoSizingInput from '@/shared/ui/AutoSizingInput';
+import BotonExportarPorcentajes from './BotonExportarPorcentajes';
 
 const Calculator2Form = ({ formData, setFormData }) => {
   const [result, setResult] = useState(null);
@@ -47,7 +47,7 @@ const Calculator2Form = ({ formData, setFormData }) => {
       onClear={handleClear}
     >
       {(showResults) => (
-        <>
+        <div>
           <div className="flex flex-wrap md:flex-nowrap items-center gap-3 text-slate-300">
             <span>Si el</span>
             <input
@@ -72,15 +72,38 @@ const Calculator2Form = ({ formData, setFormData }) => {
               </span>
             )}
           </div>
+
           {showResults && result && (
-            <FormulaDisplay
-              activeCalculator={2}
-              data={formData.calculator2}
-              result={result}
-              calculatorType="calculator2"
-            />
+            <>
+              <FormulaDisplay
+                activeCalculator={2}
+                data={formData.calculator2}
+                result={result}
+                calculatorType="calculator2"
+              />
+              <div className="mt-6 flex justify-center">
+                <BotonExportarPorcentajes 
+                  datos={{
+                    titulo: "Encontrar el total desde porcentaje conocido",
+                    porcentaje: parseChileanNumber(formData.calculator2.percentage),
+                    valorConocido: parseChileanNumber(formData.calculator2.knownAmount),
+                    resultado: parseChileanNumber(result),
+                    tipo: 2,
+                    // Incluir datos adicionales para la fórmula
+                    formula: {
+                      operacion: 'encontrarTotal',
+                      valores: {
+                        porcentaje: formData.calculator2.percentage,
+                        valorConocido: formData.calculator2.knownAmount,
+                        total: result
+                      }
+                    }
+                  }}
+                />
+              </div>
+            </>
           )}
-        </>
+        </div>
       )}
     </BaseCalculatorForm>
   );

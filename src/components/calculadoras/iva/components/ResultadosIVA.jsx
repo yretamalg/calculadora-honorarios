@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { Check, Copy } from 'lucide-react';
 import { formatearMonto } from '../../../../core/formatters/formatters';
-import BotonExportar from '../../../shared/BotonExportar';
+import BotonExportarIVA from './BotonExportarIVA';
 import generarPDFIva from '../../../../core/pdf/generators/ivaPDF';
 import { agregarFooter } from '../../../../core/pdf/components/common';
 
@@ -166,7 +166,10 @@ const ResultadosIVA = ({ resultados, items }) => {
       </div>
 
       <div className="mt-6 flex justify-center">
-        <BotonExportar onClick={handleExportPDF} />
+        <BotonExportarIVA 
+          items={items} 
+          resultados={resultados}
+        />
       </div>
     </div>
   );

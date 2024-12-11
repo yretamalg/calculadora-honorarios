@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import FormulaDisplay from './FormulaDisplay';
 import BaseCalculatorForm from './BaseCalculatorForm';
 import { formatChileanNumber, parseChileanNumber } from '../utils/calculatorUtils';
-import AutoSizingInput from '@/shared/ui/AutoSizingInput';
+import BotonExportarPorcentajes from './BotonExportarPorcentajes';
 
 const Calculator4Form = ({ formData, setFormData }) => {
   const [result, setResult] = useState(null);
@@ -43,7 +43,7 @@ const Calculator4Form = ({ formData, setFormData }) => {
 
   return (
     <BaseCalculatorForm
-      title="Si el Total es [200], entonces [40] es el 20%"
+      title="Calcular qué porcentaje es un número del total"
       onCalculate={handleCalculate}
       onClear={handleClear}
     >
@@ -73,13 +73,27 @@ const Calculator4Form = ({ formData, setFormData }) => {
               </span>
             )}
           </div>
+
           {showResults && result && (
+          <>
             <FormulaDisplay
               activeCalculator={4}
               data={formData.calculator4}
               result={result}
             />
-          )}
+            <div className="mt-6 flex justify-center">
+              <BotonExportarPorcentajes 
+                datos={{
+                  titulo: "Porcentaje del Total",
+                  total: parseChileanNumber(formData.calculator4.total),
+                  cantidad: parseChileanNumber(formData.calculator4.amount),
+                  resultado: parseChileanNumber(result.replace('%', '')), // Removemos el símbolo % si existe
+                  tipo: 4
+                }}
+              />
+            </div>
+          </>
+        )}
         </>
       )}
     </BaseCalculatorForm>

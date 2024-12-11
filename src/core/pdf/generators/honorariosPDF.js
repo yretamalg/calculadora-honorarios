@@ -24,11 +24,16 @@ const generarPDFHonorarios = (resultados, tasaRetencion, añoRetencion) => {
     ],
     theme: 'grid',
     headStyles: { fillColor: [255, 87, 34] },
-    styles: { halign: 'left', fontSize: 11 },
+    styles: { 
+      halign: 'left', 
+      fontSize: 11,
+      cellPadding: 5
+    },
     columnStyles: {
-      0: { cellWidth: 100 },
-      1: { cellWidth: 80, halign: 'right' }
-    }
+      0: { cellWidth: 'auto' },
+      1: { cellWidth: 'auto', halign: 'right' }
+    },
+    margin: { left: 20, right: 20 }
   });
 
   // Valores Brutos
@@ -42,11 +47,16 @@ const generarPDFHonorarios = (resultados, tasaRetencion, añoRetencion) => {
     ],
     theme: 'grid',
     headStyles: { fillColor: [255, 87, 34] },
-    styles: { halign: 'left', fontSize: 11 },
+    styles: { 
+      halign: 'left', 
+      fontSize: 11,
+      cellPadding: 5
+    },
     columnStyles: {
-      0: { cellWidth: 100 },
-      1: { cellWidth: 80, halign: 'right' }
-    }
+      0: { cellWidth: 'auto' },
+      1: { cellWidth: 'auto', halign: 'right' }
+    },
+    margin: { left: 20, right: 20 }
   });
 
   agregarFooter(doc);

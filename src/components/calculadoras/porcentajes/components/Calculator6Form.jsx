@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import FormulaDisplay from './FormulaDisplay';
 import BaseCalculatorForm from './BaseCalculatorForm';
 import { formatChileanNumber, parseChileanNumber } from '../utils/calculatorUtils';
-import AutoSizingInput from '@/shared/ui/AutoSizingInput';
+import BotonExportarPorcentajes from './BotonExportarPorcentajes';
 
 const Calculator6Form = ({ formData, setFormData }) => {
   const [result, setResult] = useState(null);
@@ -73,12 +73,28 @@ const Calculator6Form = ({ formData, setFormData }) => {
               </span>
             )}
           </div>
+
           {showResults && result && (
-            <FormulaDisplay
-              activeCalculator={6}
-              data={formData.calculator6}
-              result={result}
-            />
+            <>
+              <FormulaDisplay
+                activeCalculator={6}
+                data={formData.calculator6}
+                result={result}
+              />
+              <div className="mt-6 flex justify-center">
+                <BotonExportarPorcentajes 
+                  datos={{
+                    titulo: "Calcular precio con aumento",
+                    precioInicial: parseChileanNumber(formData.calculator6.initialPrice),
+                    aumento: parseChileanNumber(formData.calculator6.increase),
+                    montoAumento: (parseChileanNumber(formData.calculator6.initialPrice) * 
+                                 parseChileanNumber(formData.calculator6.increase)) / 100,
+                    resultado: parseChileanNumber(result),
+                    tipo: 6
+                  }}
+                />
+              </div>
+            </>
           )}
         </>
       )}

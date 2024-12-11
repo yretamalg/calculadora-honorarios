@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import FormulaDisplay from './FormulaDisplay';
 import BaseCalculatorForm from './BaseCalculatorForm';
 import { formatChileanNumber, parseChileanNumber } from '../utils/calculatorUtils';
-import AutoSizingInput from '@/shared/ui/AutoSizingInput';
+import BotonExportarPorcentajes from './BotonExportarPorcentajes';
 
 const Calculator5Form = ({ formData, setFormData }) => {
   const [result, setResult] = useState(null);
@@ -73,12 +73,28 @@ const Calculator5Form = ({ formData, setFormData }) => {
               </span>
             )}
           </div>
+
           {showResults && result && (
-            <FormulaDisplay
-              activeCalculator={5}
-              data={formData.calculator5}
-              result={result}
-            />
+            <>
+              <FormulaDisplay
+                activeCalculator={5}
+                data={formData.calculator5}
+                result={result}
+              />
+              <div className="mt-6 flex justify-center">
+                <BotonExportarPorcentajes 
+                  datos={{
+                    titulo: "Calcular el precio con descuento",
+                    precioInicial: parseChileanNumber(formData.calculator5.initialPrice),
+                    descuento: parseChileanNumber(formData.calculator5.discount),
+                    resultado: parseChileanNumber(result),
+                    montoDescuento: (parseChileanNumber(formData.calculator5.initialPrice) * 
+                                    parseChileanNumber(formData.calculator5.discount)) / 100,
+                    tipo: 5
+                  }}
+                />
+              </div>
+            </>
           )}
         </>
       )}

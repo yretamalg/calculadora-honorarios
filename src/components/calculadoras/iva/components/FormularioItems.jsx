@@ -91,7 +91,7 @@ const FormularioItems = ({ items, setItems, onCalcular, onLimpiar }) => {
         <button
           type="button"
           onClick={onLimpiar}
-          className="px-4 py-2 text-slate-300 bg-slate-700/20 hover:bg-slate-700/30 rounded-md focus:outline-none focus:ring-2 focus:ring-slate-500 focus:ring-offset-2"
+          className="px-4 py-2 text-slate-300 bg-slate-300/20 hover:bg-slate-100/30 rounded-md focus:outline-none focus:ring-2 focus:ring-slate-500 focus:ring-offset-2"
         >
           Limpiar
         </button>

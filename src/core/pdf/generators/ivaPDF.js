@@ -12,6 +12,23 @@ const generarPDFIva = (items, resultados) => {
     titulo: 'Cálculo de IVA'
   });
 
+  try {
+    // Agregar logo en la esquina superior derecha usando scale
+    doc.addImage(
+      '/logoyr_gris.png',
+      'PNG',
+      100,
+      235,
+      undefined,
+      undefined,
+      undefined,
+      'FAST',
+      0.3
+    );
+  } catch (error) {
+    console.warn('No se pudo cargar el logo:', error);
+  }
+
   // Tabla de items
   const itemsParaTabla = items.map(item => [
     item.descripcion || 'Sin descripción',
