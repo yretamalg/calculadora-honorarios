@@ -1,6 +1,4 @@
-// src/utils/ufUtils.js
-
-const HORA_ACTUALIZACION_UF = 18; // 18:00 hrs Chile
+// src/components/calculadoras/indicadores/utils/ufUtils.js
 
 export const obtenerUFValida = (indicadores, fechaHoraChile) => {
   if (!indicadores?.UF || !fechaHoraChile) {
@@ -8,7 +6,6 @@ export const obtenerUFValida = (indicadores, fechaHoraChile) => {
   }
 
   try {
-    const horaChile = fechaHoraChile.getHours();
     const fechaUF = new Date(indicadores.UF.fecha);
     const fechaActualChile = new Date(fechaHoraChile);
     
@@ -16,19 +13,11 @@ export const obtenerUFValida = (indicadores, fechaHoraChile) => {
     fechaUF.setHours(0, 0, 0, 0);
     fechaActualChile.setHours(0, 0, 0, 0);
 
-    // Si es después de las 18:00, debemos mostrar la UF del día siguiente
-    if (horaChile >= HORA_ACTUALIZACION_UF) {
-      // Si la fecha de la UF es igual a la fecha actual, es correcta
-      if (fechaUF.getTime() > fechaActualChile.getTime()) {
-        return indicadores.UF;
-      }
-      return null; // Necesitamos la UF del día siguiente
-    }
-    
-    // Si es antes de las 18:00, debemos mostrar la UF del día actual
+    // La UF es válida si corresponde a la fecha actual
     if (fechaUF.getTime() === fechaActualChile.getTime()) {
       return indicadores.UF;
     }
+    
     return null; // La UF no corresponde al día actual
   } catch (error) {
     console.error('Error al validar UF:', error);
@@ -36,6 +25,13 @@ export const obtenerUFValida = (indicadores, fechaHoraChile) => {
   }
 };
 
-export const mostrarUFSiguiente = (horaChile) => {
-  return horaChile >= HORA_ACTUALIZACION_UF;
+export const mostrarUFSiguiente = (fechaHoraChile) => {
+  if (!fechaHoraChile) return false;
+  
+  // Obtener solo la fecha (sin hora) de la UF
+  const fechaActualChile = new Date(fechaHoraChile);
+  fechaActualChile.setHours(0, 0, 0, 0);
+  
+  // Si la fecha de la UF es mayor que la fecha actual, es la UF de mañana
+  return false; // Por defecto, no mostrar indicador de "mañana"
 };
