@@ -4,10 +4,12 @@ import { format } from 'date-fns';
 import { es } from 'date-fns/locale';
 import { formatCurrency } from '@/core/formatters/formatters';
 import { formatearMonto, parsearMonto, formatearNumero } from '@/core/formatters/formatters';
+import generarPDFIndicadores from '@/core/pdf/generators/indicadoresPDF';
 
 const ResultadosConversion = ({ resultado }) => {
   const [copiadoOriginal, setCopiadoOriginal] = useState(false);
   const [copiadoConvertido, setCopiadoConvertido] = useState(false);
+  const [exportando, setExportando] = useState(false);
 
   const formatearResultado = (valor, tipo, esDestino = false) => {
     if (!resultado) return formatCurrency.CLP(0);
@@ -53,6 +55,17 @@ const ResultadosConversion = ({ resultado }) => {
     }
   };
 
+  const exportarPDF = async () => {
+    try {
+      setExportando(true);
+      await generarPDFIndicadores(resultado);
+    } catch (error) {
+      console.error('Error al exportar PDF:', error);
+    } finally {
+      setExportando(false);
+    }
+  };
+
   const getLabelOrigen = () => {
     if (!resultado) return 'Valor Original:';
     return resultado.direccion === 'to_clp' 
@@ -71,6 +84,16 @@ const ResultadosConversion = ({ resultado }) => {
     <div className="bg-slate-700 rounded-lg p-6">
       <div className="flex justify-between items-center mb-4">
         <h2 className="text-lg font-medium text-slate-300">Resultado</h2>
+        <button
+          onClick={exportarPDF}
+          disabled={exportando}
+          className="flex items-center gap-2 px-3 py-1.5 text-sm font-medium 
+                   text-white bg-orange-700 rounded-md hover:bg-orange-600 
+                   transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+        >
+          <Download className="w-4 h-4" />
+          {exportando ? 'Exportando...' : 'Exportar PDF'}
+        </button>
       </div>
 
       <div className="space-y-4">
