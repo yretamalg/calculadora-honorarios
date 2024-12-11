@@ -19,20 +19,6 @@ export const agregarFooter = (doc) => {
     y += 6;
   });
 
-  // Logo
-  try {
-    const logoWidth = 30;
-    doc.addImage(
-      'logoyr_b.png',
-      'PNG',
-      (pageWidth - logoWidth) / 2,
-      280,
-      logoWidth,
-      logoWidth
-    );
-  } catch (error) {
-    console.error('Error al agregar logo:', error);
-  }
 };
 
 export const generarEncabezado = (doc, { titulo, subtitulo }) => {

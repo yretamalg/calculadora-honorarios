@@ -40,14 +40,12 @@ const generarPDFIndicadores = (resultado) => {
   };
 
   const formatearValor = (valor, tipo, esDestino = false) => {
-    // Si es conversión a pesos y es el valor destino
-    if (resultado.direccion === 'to_clp' && esDestino) {
-      return `$ ${valor.toLocaleString('es-CL')}`;
-    }
-
-    // Si es conversión desde pesos y es el valor origen
-    if (resultado.direccion === 'from_clp' && !esDestino) {
-      return `$ ${valor.toLocaleString('es-CL')}`;
+    // Si es pesos chilenos (ya sea origen o destino)
+    const esPesos = (resultado.direccion === 'to_clp' && esDestino) || 
+                   (resultado.direccion === 'from_clp' && !esDestino);
+    
+    if (esPesos) {
+      return `$ ${Math.round(valor).toLocaleString('es-CL')}`;
     }
 
     // Para otros casos según el tipo
@@ -68,13 +66,31 @@ const generarPDFIndicadores = (resultado) => {
   // Formatear la fecha actual
   const fechaActual = format(new Date(), "dd 'de' MMMM 'de' yyyy", { locale: es });
 
+  // Generar encabezado con título y fecha
   generarEncabezado(doc, { 
     titulo: `Conversión de ${getTipoConversion()}`
   });
 
+  try {
+    // Agregar logo en la esquina superior derecha usando scale
+    doc.addImage(
+      '/logoyr_gris.png',
+      'PNG',
+      100,
+      235,
+      undefined,
+      undefined,
+      undefined,
+      'FAST',
+      0.3
+    );
+  } catch (error) {
+    console.warn('No se pudo cargar el logo:', error);
+  }
+
   // Tabla de conversión
   doc.autoTable({
-    startY: 45,
+    startY: 80,
     head: [['Detalle', 'Valor']],
     body: [
       [getMontoIngresadoLabel(), formatearValor(resultado.montoOriginal, resultado.tipoIndicador, false)],
@@ -91,17 +107,16 @@ const generarPDFIndicadores = (resultado) => {
       0: { cellWidth: 100 },
       1: { cellWidth: 80, halign: 'right' }
     },
-    // Definir estilos específicos para la última fila
     didParseCell: function(data) {
-      if (data.row.index === 2) { // última fila
-        data.cell.styles.fontSize = 10; // tamaño de letra más pequeño
-        data.cell.styles.textColor = [128, 128, 128]; // color gris
+      if (data.row.index === 2) {
+        data.cell.styles.fontSize = 10;
+        data.cell.styles.textColor = [128, 128, 128];
       }
     }
   });
 
-  // Ajustar el logo al final
-  agregarFooter(doc, { logoWidth: 50, logoHeight: 50 });
+  // Agregar footer con disclaimer y logo
+  agregarFooter(doc);
 
   doc.save('conversion-indicadores.pdf');
 };
