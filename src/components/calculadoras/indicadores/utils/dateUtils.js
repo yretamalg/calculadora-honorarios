@@ -1,5 +1,3 @@
-// src/components/calculadoras/indicadores/utils/dateUtils.js
-
 const CHILE_TZ = 'America/Santiago';
 
 export const getChileDateTime = () => {
@@ -70,11 +68,10 @@ export const getCurrentDate = () => {
 export const getDateRange = (indicadorType = 'default') => {
   try {
     const today = getCurrentDate();
-    const lastBusinessDay = getLastBusinessDay();
-
+    
     switch (indicadorType) {
       case 'UF':
-        // UF siempre usa la fecha actual
+        // UF siempre usa el día actual, tanto para firstdate como lastdate
         return { firstdate: today, lastdate: today };
         
       case 'UTM':
@@ -86,6 +83,7 @@ export const getDateRange = (indicadorType = 'default') => {
         
       default:
         // Dólar y Euro usan el último día hábil
+        const lastBusinessDay = getLastBusinessDay();
         return { firstdate: lastBusinessDay, lastdate: lastBusinessDay };
     }
   } catch (error) {
