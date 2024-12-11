@@ -34,8 +34,9 @@ const ConversionForm = ({
         case 'EURO':
           return '€';
         case 'UF':
+          return 'UF';  // Cambiado para mostrar UF
         case 'UTM':
-          return ''; // Sin símbolo para UF y UTM
+          return 'UTM'; // Cambiado para mostrar UTM
         default:
           return '$';
       }
@@ -130,7 +131,9 @@ const handleKeyDown = (e) => {
 
   // Determinar el placeholder según el tipo y dirección
   const placeholderSimbolo = getSimboloMoneda(tipoIndicador, direccion);
-  const placeholder = placeholderSimbolo ? `${placeholderSimbolo} 0` : '0';
+  const placeholder = placeholderSimbolo === '$' || placeholderSimbolo === 'US$' || placeholderSimbolo === '€' 
+    ? `${placeholderSimbolo} 0` 
+    : `${placeholderSimbolo} 0`;
 
   return (
     <form 
