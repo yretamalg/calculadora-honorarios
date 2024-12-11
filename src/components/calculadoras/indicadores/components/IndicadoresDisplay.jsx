@@ -1,6 +1,6 @@
 import React from 'react';
-import { getChileDateTime } from './utils/dateUtils';
-import { obtenerUFValida, mostrarUFSiguiente } from './utils/ufUtils';
+import { getChileDateTime } from '../utils/dateUtils';
+import { obtenerUFValida, mostrarUFSiguiente } from '../utils/ufUtils';
 
 const IndicadoresDisplay = ({ indicadores, loading, error }) => {
   const fechaHoraChile = new Date(getChileDateTime());
