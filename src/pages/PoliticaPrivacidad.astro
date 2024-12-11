@@ -4,6 +4,7 @@ import NavigationMenu from '../layouts/components/NavigationMenu';
 import Footer from '../layouts/components/Footer';
 import ShareButtons from '../layouts/components/ShareButtons';
 import { PAGE_METADATA } from '../config/seo';
+import { APP_CONFIG } from '../config/config';
 
 const { privacyPolicy: pageMetadata } = PAGE_METADATA;
 ---
@@ -36,7 +37,7 @@ const { privacyPolicy: pageMetadata } = PAGE_METADATA;
                         </div>
 
                         <div class="bg-slate-700 p-4 rounded-lg">
-                            <h3 class="font-semibold text-white mb-2">1.2 Datos de Cálculo</h3>
+                            <h3 class="font-semibold text-white mb-2">1.2 Datos de Cálculo e Indicadores</h3>
                             <p class="text-slate-300">Los cálculos se procesan localmente en tu navegador. No almacenamos:</p>
                             <ul class="list-disc pl-6 mt-2 text-slate-300 space-y-1">
                                 <li>Montos ingresados en calculadoras</li>
@@ -44,14 +45,25 @@ const { privacyPolicy: pageMetadata } = PAGE_METADATA;
                                 <li>Información de boletas/facturas</li>
                                 <li>Datos personales o tributarios</li>
                             </ul>
+                            <p class="text-slate-300 mt-4">
+                                Para el funcionamiento del Conversor de Indicadores Económicos:
+                            </p>
+                            <ul class="list-disc pl-6 mt-2 text-slate-300 space-y-1">
+                                <li>Utilizamos la API pública del Banco Central de Chile</li>
+                                <li>Los datos se actualizan automáticamente</li>
+                                <li>No almacenamos historial de consultas</li>
+                                <li>Las conversiones se realizan localmente</li>
+                            </ul>
                         </div>
 
                         <div class="bg-slate-700 p-4 rounded-lg">
                             <h3 class="font-semibold text-white mb-2">1.3 Exportación de Datos</h3>
                             <ul class="list-disc pl-6 text-slate-300 space-y-1">
                                 <li>Permitimos exportar resultados a PDF</li>
-                                <li>Los PDFs se generan localmente</li>
+                                <li>Los PDFs se generan localmente en tu dispositivo</li>
                                 <li>No almacenamos copias de los documentos generados</li>
+                                <li>Los documentos son para referencia personal</li>
+                                <li>Incluimos marca de agua para evitar mal uso</li>
                             </ul>
                         </div>
                     </div>
@@ -67,13 +79,15 @@ const { privacyPolicy: pageMetadata } = PAGE_METADATA;
                                 <li>Google Analytics utiliza cookies para análisis</li>
                                 <li>No contienen información personal</li>
                                 <li>Pueden desactivarse desde el navegador</li>
+                                <li>Solo métricas básicas de uso</li>
                             </ul>
                         </div>
 
                         <div class="bg-slate-700 p-4 rounded-lg">
                             <h3 class="font-semibold text-white mb-2">2.2 Almacenamiento Local</h3>
                             <ul class="list-disc pl-6 text-slate-300 space-y-1">
-                                <li>Usado para preferencias de visualización</li>
+                                <li>Cache temporal de indicadores</li>
+                                <li>Preferencias de visualización</li>
                                 <li>No almacena datos sensibles</li>
                                 <li>Se limpia al cerrar el navegador</li>
                             </ul>
@@ -107,7 +121,32 @@ const { privacyPolicy: pageMetadata } = PAGE_METADATA;
 
                     <div class="mt-4 bg-slate-700 p-4 rounded-lg">
                         <p class="text-sm text-slate-300">
-                            <span class="text-orange-400 font-semibold">Importante:</span> Para preguntas sobre privacidad o para ejercer tus derechos sobre tus datos, contáctanos a través del formulario en el pie de página o escribe directamente a hola@vbox.pro
+                            <span class="text-orange-400 font-semibold">Importante:</span> Para preguntas sobre privacidad 
+                            o para ejercer tus derechos sobre tus datos, contáctanos a través del formulario en el pie de 
+                            página o escribe directamente a {APP_CONFIG.contactEmail}
+                        </p>
+                    </div>
+                </section>
+
+                <section class="bg-slate-800 rounded-lg p-6 space-y-4">
+                    <h2 class="text-xl font-semibold text-orange-500">4. Fuentes de Datos</h2>
+                    
+                    <div class="bg-slate-700 p-4 rounded-lg">
+                        <p class="text-slate-300">
+                            Los datos de indicadores económicos (UF, UTM, Dólar, Euro) son obtenidos a través de la API pública
+                            del Banco Central de Chile. Esta información se actualiza automáticamente durante días hábiles y está
+                            sujeta a las condiciones de uso establecidas por el Banco Central.
+                        </p>
+                        <p class="text-slate-300 mt-4">
+                            Puedes consultar las condiciones de uso de estos datos en:
+                            <a 
+                                href="https://www.bcentral.cl/web/banco-central/condiciones-de-uso"
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                class="text-orange-400 hover:text-orange-300 underline"
+                            >
+                                Condiciones de Uso del Banco Central →
+                            </a>
                         </p>
                     </div>
                 </section>

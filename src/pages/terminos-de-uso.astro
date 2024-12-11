@@ -55,6 +55,9 @@ const { termsOfUse: pageMetadata } = PAGE_METADATA;
                         <li>
                             <strong>Calculadora de Porcentajes</strong>: Realiza diversos cálculos porcentuales, como porcentaje de un número, encontrar el total desde un porcentaje, calcular variaciones porcentuales, y más.
                         </li>
+                        <li>
+                            <strong>Conversor de Indicadores Económicos</strong>: Convierte entre UF, Dólar, Euro, UTM y Pesos Chilenos con datos actualizados del Banco Central de Chile.
+                        </li>
                     </ul>
                 </section>
 
@@ -199,7 +202,92 @@ const { termsOfUse: pageMetadata } = PAGE_METADATA;
                 </section>
 
                 <section>
-                    <h2 class="text-xl font-semibold mb-2 text-orange-500">9. Modificaciones a los Términos</h2>
+                    <h2 class="text-xl font-semibold mb-2 text-orange-500">9. Uso de API del Banco Central</h2>
+                    <div class="bg-slate-800 p-6 rounded-lg">
+                        <p class="mb-4">
+                            Para el funcionamiento del Conversor de Indicadores Económicos, utilizamos la API pública
+                            del Banco Central de Chile. El uso de estos datos está sujeto a las condiciones establecidas por
+                            el Banco Central en sus términos de uso.
+                        </p>
+                        <p class="mb-4">
+                            <a 
+                                href="https://www.bcentral.cl/web/banco-central/condiciones-de-uso"
+                                target="_blank" 
+                                rel="noopener noreferrer"
+                                class="text-orange-400 hover:text-orange-300 underline"
+                            >
+                                Consultar condiciones de uso del Banco Central →
+                            </a>
+                        </p>
+                        <p class="text-sm bg-slate-700 p-4 rounded-lg">
+                            Nota: Esta aplicación utiliza datos públicos del Banco Central de Chile pero no tiene
+                            ninguna afiliación oficial con la institución. Los datos son obtenidos a través de su
+                            API pública y su uso se realiza respetando las condiciones establecidas para el acceso
+                            a esta información.
+                        </p>
+                    </div>
+                </section>
+
+                <section>
+                    <h2 class="text-xl font-semibold mb-2 text-orange-500">10. Preguntas Frecuentes (FAQ)</h2>
+                    <div class="bg-slate-800 p-6 rounded-lg space-y-4">
+                        <div class="bg-slate-700 p-4 rounded-lg">
+                            <h3 class="font-semibold text-white mb-2">¿Qué tan actualizados están los indicadores económicos?</h3>
+                            <p class="text-slate-300">
+                                Los indicadores se actualizan en tiempo real durante días hábiles utilizando la API oficial
+                                del Banco Central. La UF y UTM siguen el calendario oficial de actualización, mientras que
+                                el Dólar y Euro se actualizan diariamente en días hábiles.
+                            </p>
+                        </div>
+
+                        <div class="bg-slate-700 p-4 rounded-lg">
+                            <h3 class="font-semibold text-white mb-2">¿Son oficiales los cálculos de retención?</h3><p class="text-slate-300">
+                                Los cálculos se basan en las tasas oficiales publicadas por el SII para los años 2024-2028,
+                                pero son referenciales. Recomendamos verificar siempre con un profesional contable para
+                                casos específicos.
+                            </p>
+                        </div>
+
+                        <div class="bg-slate-700 p-4 rounded-lg">
+                            <h3 class="font-semibold text-white mb-2">¿Cómo se calculan los valores en UF?</h3>
+                            <p class="text-slate-300">
+                                Las conversiones utilizan el valor oficial de la UF del día, obtenido directamente desde
+                                el Banco Central. Los cálculos consideran el valor exacto incluyendo decimales para
+                                mayor precisión.
+                            </p>
+                        </div>
+
+                        <div class="bg-slate-700 p-4 rounded-lg">
+                            <h3 class="font-semibold text-white mb-2">¿Los PDFs generados son oficiales?</h3>
+                            <p class="text-slate-300">
+                                No, los PDFs generados son solo para referencia y respaldo personal. No constituyen
+                                documentos tributarios oficiales. Para documentos oficiales, utiliza siempre los
+                                sistemas del SII.
+                            </p>
+                        </div>
+
+                        <div class="bg-slate-700 p-4 rounded-lg">
+                            <h3 class="font-semibold text-white mb-2">¿Qué hago si los indicadores no se actualizan?</h3>
+                            <p class="text-slate-300">
+                                Si los indicadores no se actualizan, verifica que sea un día hábil. Los fines de
+                                semana y festivos se mantienen los últimos valores disponibles. Si el problema
+                                persiste en día hábil, puedes contactarnos.
+                            </p>
+                        </div>
+
+                        <div class="bg-slate-700 p-4 rounded-lg">
+                            <h3 class="font-semibold text-white mb-2">¿Cómo se manejan mis datos?</h3>
+                            <p class="text-slate-300">
+                                Todos los cálculos se realizan localmente en tu navegador. No almacenamos ningún
+                                dato personal ni información de los cálculos realizados. Los PDFs se generan en
+                                tu dispositivo y no se envían a ningún servidor.
+                            </p>
+                        </div>
+                    </div>
+                </section>
+
+                <section>
+                    <h2 class="text-xl font-semibold mb-2 text-orange-500">11. Modificaciones a los Términos</h2>
                     <p>
                         Nos reservamos el derecho de actualizar estos términos de uso en cualquier momento. Los cambios serán efectivos inmediatamente después de su publicación en esta página. Te recomendamos revisarlos periódicamente.
                     </p>
