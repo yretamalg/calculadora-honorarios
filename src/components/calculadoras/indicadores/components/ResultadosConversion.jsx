@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { Copy, Check, Download } from 'lucide-react';
 import { format } from 'date-fns';
 import { es } from 'date-fns/locale';
-import { formatCurrency } from '@/core/formatters/formatters';
+import { formatCurrency, DECIMAL_FORMATTER, DECIMAL_FORMATTER_NO_DECIMALS } from '@/core/formatters/formatters';
 import { formatearMonto, parsearMonto } from '@/core/formatters/formatters';
 
 const ResultadosConversion = ({ resultado }) => {
@@ -12,23 +12,22 @@ const ResultadosConversion = ({ resultado }) => {
   const formatearResultado = (valor, tipo, esDestino = false) => {
     if (!resultado) return formatCurrency.CLP(0);
 
-    // Si el resultado es UF o UTM
-    if (['UF', 'UTM'].includes(tipo)) {
-      return formatCurrency.INDICATOR(valor);
-    }
-
-    // Si es conversión a pesos
+    // Si es conversión a pesos (desde cualquier indicador a CLP)
     if (esDestino && resultado.direccion === 'to_clp') {
       return formatCurrency.CLP(valor);
     }
 
-    // Si es conversión desde pesos
+    // Si es conversión desde pesos (origen en CLP)
     if (!esDestino && resultado.direccion === 'from_clp') {
       return formatCurrency.CLP(valor);
     }
 
     // Para otros casos según el tipo
     switch (tipo) {
+      case 'UF':
+        return `UF ${DECIMAL_FORMATTER.format(valor)}`;
+      case 'UTM':
+        return `UTM ${DECIMAL_FORMATTER_NO_DECIMALS.format(valor)}`;
       case 'DOLAR':
         return formatCurrency.USD(valor);
       case 'EURO':
