@@ -1,14 +1,16 @@
 import React, { useState } from 'react';
-import NavigationMenu from '@/components/shared/NavigationMenu';
-import ShareButtons from '@/components/shared/ShareButtons';
+import NavigationMenu from '@/layouts/components/NavigationMenu';
+import ShareButtons from '@/layouts/components/ShareButtons';
 import CalculatorGrid from './components/CalculatorGrid';
-import Calculator1Form from './components/Calculator1Form';
-import Calculator2Form from './components/Calculator2Form';
-import Calculator3Form from './components/Calculator3Form';
-import Calculator4Form from './components/Calculator4Form';
-import Calculator5Form from './components/Calculator5Form';
-import Calculator6Form from './components/Calculator6Form';
-import Calculator7Form from './components/Calculator7Form';
+import {
+  Calculator1Form,
+  Calculator2Form,
+  Calculator3Form,
+  Calculator4Form,
+  Calculator5Form,
+  Calculator6Form,
+  Calculator7Form
+} from './components';
 import { calculatorDescriptions } from './config/calculatorConfig';
 
 const initialFormData = {
@@ -24,31 +26,32 @@ const initialFormData = {
 const CalculadoraPorcentajes = () => {
   const [activeCalculator, setActiveCalculator] = useState(1);
   const [formData, setFormData] = useState(initialFormData);
+  const [resultado, setResultado] = useState(null);
 
-  const renderCalculator = () => {
+  const getCurrentCalculator = () => {
     const props = {
       formData,
-      setFormData
+      setFormData,
+      resultado,
+      setResultado
     };
 
     switch (activeCalculator) {
-      case 1:
-        return <Calculator1Form {...props} />;
-      case 2:
-        return <Calculator2Form {...props} />;
-      case 3:
-        return <Calculator3Form {...props} />;
-      case 4:
-        return <Calculator4Form {...props} />;
-      case 5:
-        return <Calculator5Form {...props} />;
-      case 6:
-        return <Calculator6Form {...props} />;
-      case 7:
-        return <Calculator7Form {...props} />;
-      default:
-        return null;
+      case 1: return <Calculator1Form {...props} />;
+      case 2: return <Calculator2Form {...props} />;
+      case 3: return <Calculator3Form {...props} />;
+      case 4: return <Calculator4Form {...props} />;
+      case 5: return <Calculator5Form {...props} />;
+      case 6: return <Calculator6Form {...props} />;
+      case 7: return <Calculator7Form {...props} />;
+      default: return null;
     }
+  };
+
+  // Verifica si hay datos ingresados en el calculador activo
+  const hayDatosIngresados = () => {
+    const data = formData[`calculator${activeCalculator}`];
+    return Object.values(data).some(value => value !== '');
   };
 
   return (
@@ -72,7 +75,7 @@ const CalculadoraPorcentajes = () => {
               <h2 className="text-lg font-semibold text-slate-300 mb-4">
                 {calculatorDescriptions[activeCalculator]?.title || 'Calculadora'}
               </h2>
-              {renderCalculator()}
+              {getCurrentCalculator()}
             </div>
           </div>
           

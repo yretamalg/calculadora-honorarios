@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import FormulaDisplay from './FormulaDisplay';
 import BaseCalculatorForm from './BaseCalculatorForm';
 import { formatChileanNumber, parseChileanNumber } from '../utils/calculatorUtils';
+import AutoSizingInput from '@/shared/ui/AutoSizingInput';
 
 const Calculator3Form = ({ formData = { calculator3: {} }, setFormData }) => {
   const [result, setResult] = useState(null);
@@ -37,8 +38,8 @@ const Calculator3Form = ({ formData = { calculator3: {} }, setFormData }) => {
     
     if (!knownPerc) return '0';
     
-    const baseValue = knownVal * (100 / knownPerc);
-    const calculatedResult = baseValue * (targetPerc / 100);
+    // Cambiar a la fórmula de proporción directa
+    const calculatedResult = (knownVal * targetPerc) / knownPerc;
     
     const formattedResult = formatChileanNumber(calculatedResult);
     setResult(formattedResult);

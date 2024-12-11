@@ -1,15 +1,14 @@
 import React, { useState } from 'react';
-import NavigationMenu from '@/components/shared/NavigationMenu';
-import ShareButtons from '@/components/shared/ShareButtons';
+import NavigationMenu from '@/layouts/components/NavigationMenu';
+import ShareButtons from '@/layouts/components/ShareButtons';
 import TipoIndicadorSelector from './components/TipoIndicadorSelector';
 import ConversionForm from './components/ConversionForm';
 import ResultadosConversion from './components/ResultadosConversion';
 import IndicadoresDisplay from './components/IndicadoresDisplay';
 import { useIndicadores } from './hooks/useIndicadores';
-import { parsearMonto } from './utils/formatters';
+import { parsearMonto } from '@/core/formatters/formatters';
 import { formatDate } from './utils/dateUtils';
 import DataSourceInfo from './DataSourceInfo';
-
 
 const CalculadoraIndicadores = () => {
   const { data: indicadores, loading, error, lastUpdate } = useIndicadores();
@@ -28,10 +27,8 @@ const CalculadoraIndicadores = () => {
 
     let resultadoCalculo;
     if (direccion === 'to_clp') {
-      // Convertir a CLP (multiplicar por el valor del indicador)
       resultadoCalculo = montoNumerico * valorIndicador;
     } else {
-      // Convertir desde CLP (dividir por el valor del indicador)
       resultadoCalculo = montoNumerico / valorIndicador;
     }
 
@@ -45,23 +42,9 @@ const CalculadoraIndicadores = () => {
     });
   };
 
-  const getConversionLabel = () => {
-    const indicadorLabel = {
-      'UF': 'UF',
-      'DOLAR': 'Dólares',
-      'EURO': 'Euros',
-      'UTM': 'UTM'
-    }[tipoIndicador];
-
-    return direccion === 'to_clp'
-      ? `${indicadorLabel} a Pesos`
-      : `Pesos a ${indicadorLabel}`;
-  };
-
-  const handleTipoChange = (nuevoTipo) => {
-    setTipoIndicador(nuevoTipo);
-    setResultado(null);
+  const limpiar = () => {
     setMonto('');
+    setResultado(null);
   };
 
   const toggleDireccion = () => {
@@ -97,26 +80,22 @@ const CalculadoraIndicadores = () => {
               <div className="space-y-6">
                 <TipoIndicadorSelector
                   tipoSeleccionado={tipoIndicador}
-                  onChange={handleTipoChange}
+                  onChange={setTipoIndicador}
                   disabled={loading}
                 />
-                
-
 
                 <ConversionForm
-                    valor={monto}
-                    onChange={setMonto}
-                    tipoIndicador={tipoIndicador}
-                    direccion={direccion}
-                    onDireccionChange={toggleDireccion}
-                    disabled={loading || !indicadores}
-                    onCalcular={calcular}
-                  />
+                  valor={monto}
+                  onChange={setMonto}
+                  tipoIndicador={tipoIndicador}
+                  direccion={direccion}
+                  onDireccionChange={toggleDireccion}
+                  onCalcular={calcular}
+                  disabled={loading || !indicadores}
+                />
 
                 {resultado && (
-                  <ResultadosConversion
-                    resultado={resultado}
-                  />
+                  <ResultadosConversion resultado={resultado} />
                 )}
               </div>
             </div>

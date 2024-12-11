@@ -1,11 +1,9 @@
 import React, { useState } from 'react';
 import { Copy, Check, Download } from 'lucide-react';
-import { PDFDownloadLink } from '@react-pdf/renderer';
 import { format } from 'date-fns';
 import { es } from 'date-fns/locale';
-import ResultadosPDF from './ResultadosPDF';
-import { formatCurrency } from '../../../../utils/formatters';
-import { formatearMonto, parsearMonto, formatearIndicador } from '../../../utils/formatters';
+import { formatCurrency } from '@/core/formatters/formatters';
+import { formatearMonto, parsearMonto, formatearNumero } from '@/core/formatters/formatters';
 
 const ResultadosConversion = ({ resultado }) => {
   const [copiadoOriginal, setCopiadoOriginal] = useState(false);
@@ -14,23 +12,22 @@ const ResultadosConversion = ({ resultado }) => {
   const formatearResultado = (valor, tipo, esDestino = false) => {
     if (!resultado) return formatCurrency.CLP(0);
 
-    // Si el resultado es UF o UTM
-    if (['UF', 'UTM'].includes(tipo)) {
-      return formatCurrency.INDICATOR(valor);
-    }
-
-    // Si es conversión a pesos
+    // Si es conversión a pesos (desde cualquier indicador a CLP)
     if (esDestino && resultado.direccion === 'to_clp') {
       return formatCurrency.CLP(valor);
     }
 
-    // Si es conversión desde pesos
+    // Si es conversión desde pesos (origen en CLP)
     if (!esDestino && resultado.direccion === 'from_clp') {
       return formatCurrency.CLP(valor);
     }
 
     // Para otros casos según el tipo
     switch (tipo) {
+      case 'UF':
+        return `UF ${formatearNumero(valor, true)}`; // Con decimales
+      case 'UTM':
+        return `UTM ${formatearNumero(valor, true)}`; // Con decimales
       case 'DOLAR':
         return formatCurrency.USD(valor);
       case 'EURO':

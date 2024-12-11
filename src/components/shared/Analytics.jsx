@@ -1,5 +1,5 @@
 import { useEffect } from 'react';
-import { ANALYTICS_CONFIG } from '../../constants/analytics';
+import { ANALYTICS_CONFIG } from '../../core/analytics/analytics';
 
 const Analytics = () => {
   useEffect(() => {

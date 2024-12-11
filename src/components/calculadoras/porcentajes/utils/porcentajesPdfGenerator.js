@@ -2,7 +2,7 @@
 
 import { jsPDF } from 'jspdf';
 import 'jspdf-autotable';
-import { agregarFooter } from '../../../../utils/pdfGenerators/common';
+import { agregarFooter } from '../../honorarios/utils/pdfGenerators/common';
 
 const generarPDFPorcentaje = (porcentaje, cantidad, resultado) => {
   const doc = new jsPDF();

@@ -16,7 +16,13 @@
     "noUnusedParameters": false,
     "baseUrl": ".",
     "paths": {
-      "@/*": ["src/*"]
+      "@/*": ["src/*"],
+      "@/components/*": ["src/components/*"],
+      "@/shared/*": ["src/shared/*"],
+      "@/layouts/*": ["src/layouts/*"],
+      "@/core/*": ["src/core/*"],
+      "@/config/*": ["src/config/*"],
+      "@/utils/*": ["src/utils/*"]
     },
     "types": ["astro/client"],
     "esModuleInterop": true
