@@ -2,8 +2,8 @@ import React, { useState } from 'react';
 import { Copy, Check, Download } from 'lucide-react';
 import { format } from 'date-fns';
 import { es } from 'date-fns/locale';
-import { formatCurrency, DECIMAL_FORMATTER, DECIMAL_FORMATTER_NO_DECIMALS } from '@/core/formatters/formatters';
-import { formatearMonto, parsearMonto } from '@/core/formatters/formatters';
+import { formatCurrency } from '@/core/formatters/formatters';
+import { formatearMonto, parsearMonto, formatearNumero } from '@/core/formatters/formatters';
 
 const ResultadosConversion = ({ resultado }) => {
   const [copiadoOriginal, setCopiadoOriginal] = useState(false);
@@ -25,9 +25,9 @@ const ResultadosConversion = ({ resultado }) => {
     // Para otros casos según el tipo
     switch (tipo) {
       case 'UF':
-        return `UF ${DECIMAL_FORMATTER.format(valor)}`;
+        return `UF ${formatearNumero(valor, true)}`; // Con decimales
       case 'UTM':
-        return `UTM ${DECIMAL_FORMATTER_NO_DECIMALS.format(valor)}`;
+        return `UTM ${formatearNumero(valor, true)}`; // Con decimales
       case 'DOLAR':
         return formatCurrency.USD(valor);
       case 'EURO':
