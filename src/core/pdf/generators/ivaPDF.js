@@ -13,7 +13,7 @@ const generarPDFIva = (items, resultados) => {
   });
 
   try {
-    // Agregar logo en la esquina superior derecha usando scale
+    // Agregar logo usando scale
     doc.addImage(
       '/logoyr_gris.png',
       'PNG',

@@ -74,6 +74,23 @@ export const generarPDFPorcentaje = (datos) => {
   };
 
   try {
+    // Agregar logo usando scale
+    doc.addImage(
+      '/logoyr_gris.png',
+      'PNG',
+      100,
+      235,
+      undefined,
+      undefined,
+      undefined,
+      'FAST',
+      0.3
+    );
+  } catch (error) {
+    console.warn('No se pudo cargar el logo:', error);
+  }
+  
+  try {
     generarEncabezado(doc, { 
       titulo: obtenerTitulo(datos.tipo)
     });
