@@ -117,28 +117,32 @@ const ConversionForm = ({
         e.preventDefault();
         if (!disabled && valor) onCalcular?.();
       }}
-      className="bg-slate-800 rounded-lg p-6 space-y-6"
+      className="bg-slate-800 rounded-lg p-6 space-y-2"
     >
+    <div className="text-xs flex justify-center text-slate-300">Selecciona la dirección de Conversión</div> 
+      <div className="flex justify-center">      
       <button
         type="button"
         onClick={onDireccionChange}
         disabled={disabled}
-        className="w-full py-4 px-6 flex items-center justify-center gap-4 
-                 bg-slate-700 rounded-lg hover:bg-slate-600 
-                 transition-colors text-slate-300 disabled:opacity-50 
+        className="place-content-center w-96 py-4 px-6 flex gap-8 
+                 bg-slate-400 rounded-lg hover:bg-slate-300 
+                 transition-colors text-slate-900 disabled:opacity-50 
                  disabled:cursor-not-allowed"
       >
         <span className="font-medium">{from}</span>
         <ArrowRightLeft className="w-6 h-6" />
         <span className="font-medium">{to}</span>
       </button>
+      </div>
 
       <div>
         <label 
           htmlFor="monto" 
           className="block text-sm font-medium text-slate-300 mb-2"
+          
         >
-          {`Ingrese monto en ${from}:`}
+          <div className='text-sm font-medium'>Ingrese monto en <span className="text-sm font-medium text-orange-500 mb-2"> {from}</span></div>
         </label>
         <input
           type="text"
