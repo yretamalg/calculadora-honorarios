@@ -327,7 +327,7 @@ const FormulaDisplay = ({ activeCalculator, data = {}, result }) => {
     if ([1, 2, 3, 4].includes(activeCalculator)) {
       const percentage = calculateBarPercentage();
       let leftValue, rightValue;
-
+  
       switch (activeCalculator) {
         case 1:
           leftValue = formatLocaleNumber(parseNumber(result));
@@ -352,7 +352,7 @@ const FormulaDisplay = ({ activeCalculator, data = {}, result }) => {
           leftValue = '0';
           rightValue = '0';
       }
-
+  
       return (
         <>
           <div className="text-center text-slate-300 mb-2">Representación</div>
@@ -368,25 +368,34 @@ const FormulaDisplay = ({ activeCalculator, data = {}, result }) => {
                 {leftValue}
               </span>
             </div>
-
+  
             <div className="h-6 bg-slate-900 rounded-full overflow-hidden relative">
               <div
                 className="h-full bg-orange-600 transition-all duration-500 ease-out relative"
                 style={{ width: `${percentage}%` }}
               >
-                <span 
-                  className="absolute text-xs text-white"
-                  style={{ 
-                    right: 0,
-                    top: '50%',
-                    transform: 'translate(50%, -50%)'
-                  }}
-                >
-                  {percentage.toFixed(1)}%
-                </span>
+                {percentage >= 5 && (
+                  <span 
+                    className="absolute text-xs text-white"
+                    style={{ 
+                      left: '50%',
+                      top: '50%',
+                      transform: 'translate(-50%, -50%)'
+                    }}
+                  >
+                    {percentage.toFixed(1)}%
+                  </span>
+                )}
               </div>
+              {percentage < 5 && (
+                <div className="absolute w-full text-center mt-2">
+                  <span className="text-xs text-slate-300">
+                    {percentage.toFixed(1)}%
+                  </span>
+                </div>
+              )}
             </div>
-
+  
             <div className="absolute top-0 left-0 w-full flex justify-between text-xs text-slate-400">
               <span>0</span>
               <span>{rightValue}</span>
@@ -395,7 +404,7 @@ const FormulaDisplay = ({ activeCalculator, data = {}, result }) => {
         </>
       );
     }
-
+  
     return null;
   };
 
