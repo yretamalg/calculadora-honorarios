@@ -1,4 +1,5 @@
 import React from 'react';
+import { useAnalytics } from '@/hooks/useAnalytics';
 import { Button } from './button';
 
 const BotonesControl = ({ 
@@ -11,9 +12,15 @@ const BotonesControl = ({
   textoLimpiar = 'Limpiar',
   textoAgregar = 'Agregar Item'
 }) => {
+  const { trackCalculator } = useAnalytics();
+
   const handleSubmit = (e) => {
     e.preventDefault();
-    onCalcular();
+    trackCalculator('button_calculate_click', {
+      tipo,
+      estado: disabled ? 'disabled' : 'enabled'
+    });
+    onCalcular?.();
   };
 
   const renderBotones = () => {
@@ -23,7 +30,7 @@ const BotonesControl = ({
           <>
             <Button
               type="submit"
-              onClick={onCalcular}
+              onClick={handleSubmit}
               disabled={disabled}
               variant="default"
               className="flex-1"
@@ -32,7 +39,10 @@ const BotonesControl = ({
             </Button>
             <Button
               type="button"
-              onClick={onLimpiar}
+              onClick={() => {
+                trackCalculator('button_clear_click', { tipo });
+                onLimpiar?.();
+              }}
               variant="secondary"
               className="flex-1"
             >
@@ -40,7 +50,10 @@ const BotonesControl = ({
             </Button>
             <Button
               type="button"
-              onClick={onAgregar}
+              onClick={() => {
+                trackCalculator('button_add_click', { tipo });
+                onAgregar?.();
+              }}
               variant="default"
               className="flex-1"
             >
@@ -54,7 +67,7 @@ const BotonesControl = ({
           <>
             <Button
               type="submit"
-              onClick={onCalcular}
+              onClick={handleSubmit}
               disabled={disabled}
               variant="default"
               size="lg"
@@ -64,7 +77,10 @@ const BotonesControl = ({
             </Button>
             <Button
               type="button"
-              onClick={onLimpiar}
+              onClick={() => {
+                trackCalculator('button_clear_click', { tipo });
+                onLimpiar?.();
+              }}
               variant="secondary"
               size="lg"
               className="flex-1"
@@ -78,7 +94,7 @@ const BotonesControl = ({
         return (
           <Button
             type="submit"
-            onClick={onCalcular}
+            onClick={handleSubmit}
             disabled={disabled}
             variant="default"
             className="w-full"
@@ -92,7 +108,7 @@ const BotonesControl = ({
           <>
             <Button
               type="submit"
-              onClick={onCalcular}
+              onClick={handleSubmit}
               disabled={disabled}
               variant="default"
               className="flex-1"
@@ -101,7 +117,10 @@ const BotonesControl = ({
             </Button>
             <Button
               type="button"
-              onClick={onLimpiar}
+              onClick={() => {
+                trackCalculator('button_clear_click', { tipo });
+                onLimpiar?.();
+              }}
               variant="secondary"
               className="flex-1"
             >

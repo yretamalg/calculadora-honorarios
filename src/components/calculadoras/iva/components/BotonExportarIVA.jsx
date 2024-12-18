@@ -1,15 +1,38 @@
 import React, { useState } from 'react';
+import { useAnalytics } from '@/hooks/useAnalytics';
 import generarPDFIva from '@/core/pdf/generators/ivaPDF';
 
-const BotonExportarIVA = ({ items, resultados }) => {
+const BotonExportarIVA = ({ items, resultados, onExport }) => {
   const [exportando, setExportando] = useState(false);
+  const { trackCalculator, trackError } = useAnalytics();
 
   const handleExport = async () => {
     try {
       setExportando(true);
+
+      trackCalculator('iva_pdf_start', {
+        num_items: items.length,
+        subtotal: resultados.subtotal,
+        total: resultados.total
+      });
+
       await generarPDFIva(items, resultados);
+      onExport?.();
+
+      trackCalculator('iva_pdf_success', {
+        num_items: items.length,
+        timestamp: new Date().toISOString()
+      });
+
     } catch (error) {
       console.error('Error al generar PDF de IVA:', error);
+      
+      trackError(error, {
+        component: 'BotonExportarIVA',
+        action: 'generar_pdf',
+        num_items: items.length
+      });
+
     } finally {
       setExportando(false);
     }
@@ -19,9 +42,10 @@ const BotonExportarIVA = ({ items, resultados }) => {
     <button
       onClick={handleExport}
       disabled={exportando}
-      className="px-4 py-2 text-sm bg-slate-800 text-slate-300 hover:text-white hover:bg-slate-700 
-                 transition-colors rounded-md border border-slate-600 flex items-center gap-2
-                 disabled:opacity-50 disabled:cursor-not-allowed"
+      className="px-4 py-2 text-sm bg-slate-800 text-slate-300 hover:text-white 
+               hover:bg-slate-700 transition-colors rounded-md border border-slate-600 
+               flex items-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
+      aria-label={exportando ? 'Exportando PDF...' : 'Exportar a PDF'}
     >
       <svg 
         className="w-4 h-4" 

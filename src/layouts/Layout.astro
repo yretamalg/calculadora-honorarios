@@ -1,5 +1,6 @@
 ---
 import MainHead from './MainHead.astro';
+import Analytics from '../components/shared/Analytics';
 import { SEO_CONFIG, STRUCTURED_DATA } from '../config/seo';
 
 interface Props {
@@ -16,7 +17,6 @@ const {
     noindex = false,
 } = Astro.props;
 
-// Enrich structured data with current page info
 const pageStructuredData = {
     ...STRUCTURED_DATA.webApplication,
     name: title,
@@ -33,12 +33,9 @@ const pageStructuredData = {
             image={image}
             noindex={noindex}
         />
-        
-        <!-- Structured Data -->
         <script type="application/ld+json" set:html={JSON.stringify(pageStructuredData)} />
         <script type="application/ld+json" set:html={JSON.stringify(STRUCTURED_DATA.organization)} />
         
-        <!-- Critical CSS -->
         <style is:global>
             :root {
                 color-scheme: dark;
@@ -49,20 +46,12 @@ const pageStructuredData = {
                 -webkit-font-smoothing: antialiased;
                 text-rendering: optimizeLegibility;
             }
-            
-            ::selection {
-                background-color: #ff5722;
-                color: white;
-            }
-            
-            .scroll-smooth {
-                scroll-behavior: smooth;
-            }
         </style>
     </head>
     <body class="bg-slate-950 min-h-screen text-white antialiased">
         <main>
             <slot />
         </main>
+        <Analytics client:load />
     </body>
 </html>

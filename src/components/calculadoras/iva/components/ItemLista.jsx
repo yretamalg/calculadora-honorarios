@@ -1,12 +1,20 @@
 import React from 'react';
-import { formatearMonto, parsearMonto } from '../../../../core/formatters/formatters';
+import { useAnalytics } from '@/hooks/useAnalytics';
+import { formatearMonto, parsearMonto } from '@/core/formatters/formatters';
 
 const ItemLista = ({ item, onUpdate, onDelete, isLastItem }) => {
+  const { trackCalculator } = useAnalytics();
+
   const handleMontoChange = (e) => {
     let valor = e.target.value;
     
     // Si está vacío, resetear el valor
     if (valor === '') {
+      trackCalculator('iva_item_clear', {
+        item_id: item.id,
+        campo: 'valorUnitario'
+      });
+      
       onUpdate(item.id, 'valorUnitario', '');
       return;
     }
@@ -20,7 +28,38 @@ const ItemLista = ({ item, onUpdate, onDelete, isLastItem }) => {
 
     // Convertir a número y formatear
     const numero = parseInt(numeroLimpio);
-    onUpdate(item.id, 'valorUnitario', formatearMonto(numero));
+    const valorFormateado = formatearMonto(numero);
+    onUpdate(item.id, 'valorUnitario', valorFormateado);
+
+    trackCalculator('iva_item_value_change', {
+      item_id: item.id,
+      valor: numero,
+      tiene_descripcion: Boolean(item.descripcion)
+    });
+  };
+
+  const handleCantidadChange = (e) => {
+    const cantidad = parseInt(e.target.value) || 1;
+    onUpdate(item.id, 'cantidad', cantidad);
+
+    trackCalculator('iva_item_quantity_change', {
+      item_id: item.id,
+      cantidad,
+      tiene_valor: Boolean(item.valorUnitario)
+    });
+  };
+
+  const handleDescripcionChange = (e) => {
+    const descripcion = e.target.value;
+    onUpdate(item.id, 'descripcion', descripcion);
+
+    if (descripcion) {
+      trackCalculator('iva_item_description_update', {
+        item_id: item.id,
+        longitud_descripcion: descripcion.length,
+        tiene_valor: Boolean(item.valorUnitario)
+      });
+    }
   };
 
   const handleKeyPress = (e) => {
@@ -41,38 +80,31 @@ const ItemLista = ({ item, onUpdate, onDelete, isLastItem }) => {
         <input
           type="text"
           value={item.descripcion}
-          onChange={(e) => onUpdate(item.id, 'descripcion', e.target.value)}
+          onChange={handleDescripcionChange}
           placeholder="Descripción"
-          className="w-full bg-slate-700 text-white border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-orange-500 focus:border-orange-500 text-sm"
+          className="w-full bg-slate-700 text-white border border-gray-300 rounded-md 
+                   shadow-sm py-2 px-3 focus:outline-none focus:ring-orange-500 
+                   focus:border-orange-500 text-sm"
         />
         <div className="flex gap-2">
           <input
             type="number"
             value={item.cantidad}
-            onChange={(e) => onUpdate(item.id, 'cantidad', parseInt(e.target.value) || 1)}
+            onChange={handleCantidadChange}
             min="1"
-            className="w-1/2 bg-slate-700 text-white border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-orange-500 focus:border-orange-500 text-sm text-center"
+            className="w-1/2 bg-slate-700 text-white border border-gray-300 rounded-md 
+                     shadow-sm py-2 px-3 focus:outline-none focus:ring-orange-500 
+                     focus:border-orange-500 text-sm text-center"
           />
           <input
             type="text"
             value={item.valorUnitario}
             onChange={handleMontoChange}
             onKeyDown={handleKeyPress}
-            onFocus={(e) => {
-              if (!e.target.value) {
-                onUpdate(item.id, 'valorUnitario', formatearMonto(0));
-              }
-              const temp = e.target.value;
-              e.target.value = '';
-              e.target.value = temp;
-            }}
-            onBlur={(e) => {
-              if (e.target.value === formatearMonto(0)) {
-                onUpdate(item.id, 'valorUnitario', '');
-              }
-            }}
             placeholder={formatearMonto(0)}
-            className="w-1/2 bg-slate-700 text-white border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-orange-500 focus:border-orange-500 text-sm"
+            className="w-1/2 bg-slate-700 text-white border border-gray-300 rounded-md 
+                     shadow-sm py-2 px-3 focus:outline-none focus:ring-orange-500 
+                     focus:border-orange-500 text-sm"
           />
         </div>
       </div>
@@ -82,41 +114,41 @@ const ItemLista = ({ item, onUpdate, onDelete, isLastItem }) => {
         <input
           type="text"
           value={item.descripcion}
-          onChange={(e) => onUpdate(item.id, 'descripcion', e.target.value)}
+          onChange={handleDescripcionChange}
           placeholder="Descripción"
-          className="w-full bg-slate-700 text-white border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-orange-500 focus:border-orange-500 text-sm"
+          className="w-full bg-slate-700 text-white border border-gray-300 rounded-md 
+                   shadow-sm py-2 px-3 focus:outline-none focus:ring-orange-500 
+                   focus:border-orange-500 text-sm"
         />
         <input
           type="number"
           value={item.cantidad}
-          onChange={(e) => onUpdate(item.id, 'cantidad', parseInt(e.target.value) || 1)}
+          onChange={handleCantidadChange}
           min="1"
-          className="w-full bg-slate-700 text-white border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-orange-500 focus:border-orange-500 text-sm text-center"
+          className="w-full bg-slate-700 text-white border border-gray-300 rounded-md 
+                   shadow-sm py-2 px-3 focus:outline-none focus:ring-orange-500 
+                   focus:border-orange-500 text-sm text-center"
         />
         <input
           type="text"
           value={item.valorUnitario}
           onChange={handleMontoChange}
           onKeyDown={handleKeyPress}
-          onFocus={(e) => {
-            if (!e.target.value) {
-              onUpdate(item.id, 'valorUnitario', formatearMonto(0));
-            }
-            const temp = e.target.value;
-            e.target.value = '';
-            e.target.value = temp;
-          }}
-          onBlur={(e) => {
-            if (e.target.value === formatearMonto(0)) {
-              onUpdate(item.id, 'valorUnitario', '');
-            }
-          }}
           placeholder={formatearMonto(0)}
-          className="w-full bg-slate-700 text-white border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-orange-500 focus:border-orange-500 text-sm"
+          className="w-full bg-slate-700 text-white border border-gray-300 rounded-md 
+                   shadow-sm py-2 px-3 focus:outline-none focus:ring-orange-500 
+                   focus:border-orange-500 text-sm"
         />
         {!isLastItem && (
           <button
-            onClick={() => onDelete(item.id)}
+            onClick={() => {
+              trackCalculator('iva_item_delete_click', {
+                item_id: item.id,
+                tiene_valor: Boolean(item.valorUnitario),
+                tiene_descripcion: Boolean(item.descripcion)
+              });
+              onDelete(item.id);
+            }}
             className="p-2 text-slate-400 hover:text-slate-300 focus:outline-none"
             title="Eliminar ítem"
           >

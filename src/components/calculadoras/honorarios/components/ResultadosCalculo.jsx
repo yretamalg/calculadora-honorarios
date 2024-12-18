@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { Check, Copy } from 'lucide-react';
+import { useAnalytics } from '@/hooks/useAnalytics';
 import honorariosFormat from '../utils/honorariosFormat';
 import { TASAS_RETENCION } from '@/config/config';
 import BotonExportarHonorarios from './BotonExportarHonorarios';
@@ -20,6 +21,7 @@ const CopyButton = ({ valor, tipo, copiadoActual, onCopy }) => (
 
 const ResultadosCalculo = ({ resultados, tasaRetencion }) => {
   const [copiado, setCopiado] = useState('');
+  const { trackCalculator, trackError } = useAnalytics();
   const tasaActual = TASAS_RETENCION.find(t => t.valor.toString() === tasaRetencion);
   const añoRetencion = tasaActual?.año || '2024';
 
@@ -29,8 +31,20 @@ const ResultadosCalculo = ({ resultados, tasaRetencion }) => {
       await navigator.clipboard.writeText(valorFormateado);
       setCopiado(tipo);
       setTimeout(() => setCopiado(''), 2000);
+
+      trackCalculator('honorarios_copy_value', {
+        tipo_valor: tipo,
+        año_retencion: añoRetencion,
+        valor_copiado: valorFormateado
+      });
+
     } catch (error) {
       console.error('Error al copiar:', error);
+      trackError(error, {
+        component: 'ResultadosCalculo',
+        action: 'copiar_valor',
+        tipo_valor: tipo
+      });
     }
   };
 
@@ -55,13 +69,14 @@ const ResultadosCalculo = ({ resultados, tasaRetencion }) => {
               {honorariosFormat.formatearMonto(resultados.desdeValoresLiquidos.bruto)}
             </p>
             <CopyButton 
-              valor={resultados.desdeValoresLiquidos.bruto} 
+              valor={resultados.desdeValoresLiquidos.bruto}
               tipo="brutoLiquido"
               copiadoActual={copiado}
               onCopy={copiarAlPortapapeles}
             />
           </div>
         </div>
+
         <div className="flex justify-between items-center border-t border-slate-700 pt-4 mt-4">
           <p className="text-slate-300 text-sm leading-none">
             La retención del {tasaRetencion}% corresponde al año {añoRetencion} es de:
@@ -78,8 +93,11 @@ const ResultadosCalculo = ({ resultados, tasaRetencion }) => {
             />
           </div>
         </div>
+
         <div className="flex justify-between items-center border-t border-slate-700 pt-4 mt-4">
-          <p className="text-slate-300 text-sm leading-none">Recibirás un monto líquido a tu cuenta:</p>
+          <p className="text-slate-300 text-sm leading-none">
+            Recibirás un monto líquido a tu cuenta:
+          </p>
           <div className="flex items-center gap-2">
             <p className="text-green-400 text-4xl font-bold leading-none">
               {honorariosFormat.formatearMonto(resultados.desdeValoresLiquidos.liquido)}
@@ -104,6 +122,7 @@ const ResultadosCalculo = ({ resultados, tasaRetencion }) => {
             <div className="text-green-400 text-sm">¡Monto copiado al portapapeles!</div>
           )}
         </div>
+
         <div className="flex justify-between items-center">
           <p className="text-slate-300 text-sm leading-none">
             Este es el monto por el cual debes hacer tu boleta:
@@ -120,6 +139,7 @@ const ResultadosCalculo = ({ resultados, tasaRetencion }) => {
             />
           </div>
         </div>
+
         <div className="flex justify-between items-center border-t border-slate-700 pt-4 mt-4">
           <p className="text-slate-300 text-sm leading-none">
             La retención del {tasaRetencion}% corresponde al año {añoRetencion} es de:
@@ -136,8 +156,11 @@ const ResultadosCalculo = ({ resultados, tasaRetencion }) => {
             />
           </div>
         </div>
+
         <div className="flex justify-between items-center border-t border-slate-700 pt-4 mt-4">
-          <p className="text-slate-300 text-sm leading-none">Recibirás un monto líquido a tu cuenta:</p>
+          <p className="text-slate-300 text-sm leading-none">
+            Recibirás un monto líquido a tu cuenta:
+          </p>
           <div className="flex items-center gap-2">
             <p className="text-green-400 text-4xl font-bold leading-none">
               {honorariosFormat.formatearMonto(resultados.desdeValoresBrutos.liquido)}

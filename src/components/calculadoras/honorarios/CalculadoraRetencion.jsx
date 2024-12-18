@@ -1,10 +1,12 @@
-import { useState } from 'react';
+import React, { useState } from 'react';
 import FormularioIngreso from './components/FormularioIngreso';
-import BotonesControl from '../../../shared/ui/BotonesControl';
+import BotonesControl from '@/shared/ui/BotonesControl';
 import ResultadosCalculo from './components/ResultadosCalculo';
-import NavigationMenu from '../../../layouts/components/NavigationMenu';
-import ShareButtons from '../../../layouts/components/ShareButtons';
-import { TASAS_RETENCION, calcularMontos } from '../../../config/config';
+import NavigationMenu from '@/layouts/components/NavigationMenu';
+import ShareButtons from '@/layouts/components/ShareButtons';
+import { TASAS_RETENCION, calcularMontos } from '@/config/config';
+import { useAnalytics } from '../../../hooks/useAnalytics';
+import { ANALYTICS_CONFIG } from '@/core/analytics/analytics';
 
 const CalculadoraRetencion = () => {
   const [monto, setMonto] = useState('');
@@ -22,6 +24,8 @@ const CalculadoraRetencion = () => {
     }
   });
 
+  const { trackCalculator, trackError } = useAnalytics();
+
   const parsearMonto = (texto) => {
     if (!texto) return 0;
     // Remover el signo peso, los puntos y los espacios
@@ -30,11 +34,27 @@ const CalculadoraRetencion = () => {
   };
 
   const calcular = () => {
-    const montoNumerico = parsearMonto(monto);
-    if (!montoNumerico) return;
+    try {
+      const montoNumerico = parsearMonto(monto);
+      if (!montoNumerico) return;
 
-    const resultadosCalculados = calcularMontos(montoNumerico, tasaRetencion);
-    setResultados(resultadosCalculados);
+      const resultadosCalculados = calcularMontos(montoNumerico, tasaRetencion);
+      setResultados(resultadosCalculados);
+
+      // Track del cálculo exitoso
+      trackCalculator(ANALYTICS_CONFIG.CUSTOM_EVENTS.HONORARIOS_CALCULATE, {
+        monto: montoNumerico,
+        tasa: tasaRetencion,
+        tipo_calculo: 'retencion_honorarios'
+      });
+
+    } catch (error) {
+      console.error('Error en el cálculo:', error);
+      trackError(error, {
+        component: 'CalculadoraRetencion',
+        action: 'calcular'
+      });
+    }
   };
 
   const limpiar = () => {
@@ -52,6 +72,11 @@ const CalculadoraRetencion = () => {
         liquido: 0
       }
     });
+
+    // Track de limpieza del formulario
+    trackCalculator('honorarios_reset', {
+      action: 'reset_form'
+    });
   };
 
   return (
@@ -68,21 +93,46 @@ const CalculadoraRetencion = () => {
                 monto={monto}
                 tasaRetencion={tasaRetencion}
                 onMontoChange={setMonto}
-                onTasaChange={setTasaRetencion}
+                onTasaChange={(tasa) => {
+                  setTasaRetencion(tasa);
+                  // Track de cambio de tasa
+                  trackCalculator('honorarios_tasa_change', {
+                    nueva_tasa: tasa,
+                    año: TASAS_RETENCION.find(t => t.valor.toString() === tasa)?.año
+                  });
+                }}
                 tasasRetencion={TASAS_RETENCION}
               />
+
               <BotonesControl
                 onCalcular={calcular}
                 onLimpiar={limpiar}
               />
-              <ResultadosCalculo
-                resultados={resultados}
-                tasaRetencion={tasaRetencion}
-              />
+
+              {resultados.desdeValoresLiquidos.bruto > 0 && (
+                <ResultadosCalculo
+                  resultados={resultados}
+                  tasaRetencion={tasaRetencion}
+                  onExportPdf={() => {
+                    trackCalculator('honorarios_export_pdf', {
+                      monto: parsearMonto(monto),
+                      tasa: tasaRetencion
+                    });
+                  }}
+                />
+              )}
             </div>
           </div>
+
           <div className="mb-6">
-            <ShareButtons />
+            <ShareButtons 
+              onShare={(platform) => {
+                trackCalculator('honorarios_share', {
+                  platform,
+                  has_results: resultados.desdeValoresLiquidos.bruto > 0
+                });
+              }}
+            />
           </div>
         </div>
       </div>

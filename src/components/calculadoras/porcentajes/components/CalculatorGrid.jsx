@@ -1,8 +1,17 @@
 import React from 'react';
+import { useAnalytics } from '@/hooks/useAnalytics';
 import { calculatorDescriptions } from '../config/calculatorConfig';
 
 const CalculatorGrid = ({ activeCalculator, setActiveCalculator }) => {
+  const { trackCalculator } = useAnalytics();
+
   const handleCalculatorClick = (newActiveCalculator) => {
+    trackCalculator('percentage_calculator_select', {
+      calculator_id: newActiveCalculator,
+      calculator_name: calculatorDescriptions[newActiveCalculator]?.title,
+      previous_calculator: activeCalculator
+    });
+    
     setActiveCalculator(newActiveCalculator);
   };
 
@@ -12,13 +21,13 @@ const CalculatorGrid = ({ activeCalculator, setActiveCalculator }) => {
         <button
           key={num}
           onClick={() => handleCalculatorClick(parseInt(num))}
-          className={`flex flex-col h-[140px] p-4 rounded-lg transition-colors relative ${
-            activeCalculator === parseInt(num)
-              ? 'bg-orange-700 text-white'
-              : 'bg-slate-700 text-slate-300 hover:bg-slate-600'
-          }`}
+          className={`flex flex-col h-[140px] p-4 rounded-lg transition-colors relative 
+                    ${activeCalculator === parseInt(num)
+                      ? 'bg-orange-700 text-white'
+                      : 'bg-slate-700 text-slate-300 hover:bg-slate-600'}`}
         >
-          <div className="absolute top-2 right-2 w-6 h-6 rounded-full bg-slate-600 flex items-center justify-center text-xs font-medium">
+          <div className="absolute top-2 right-2 w-6 h-6 rounded-full bg-slate-600 
+                        flex items-center justify-center text-xs font-medium">
             {num}
           </div>
           

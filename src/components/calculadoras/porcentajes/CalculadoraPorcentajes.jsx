@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import NavigationMenu from '@/layouts/components/NavigationMenu';
 import ShareButtons from '@/layouts/components/ShareButtons';
 import CalculatorGrid from './components/CalculatorGrid';
+import { useAnalytics } from '@/hooks/useAnalytics';
 import {
   Calculator1Form,
   Calculator2Form,
@@ -28,12 +29,21 @@ const CalculadoraPorcentajes = () => {
   const [formData, setFormData] = useState(initialFormData);
   const [resultado, setResultado] = useState(null);
 
+  const { trackCalculator } = useAnalytics();
+
   const getCurrentCalculator = () => {
     const props = {
       formData,
       setFormData,
       resultado,
-      setResultado
+      setResultado,
+      onCalculate: (calculatorType, values) => {
+        trackCalculator('percentage_calculate', {
+          calculator_type: calculatorType,
+          has_all_values: Object.values(values).every(v => v !== ''),
+          ...values
+        });
+      }
     };
 
     switch (activeCalculator) {
@@ -48,10 +58,15 @@ const CalculadoraPorcentajes = () => {
     }
   };
 
-  // Verifica si hay datos ingresados en el calculador activo
-  const hayDatosIngresados = () => {
-    const data = formData[`calculator${activeCalculator}`];
-    return Object.values(data).some(value => value !== '');
+  const handleCalculatorChange = (newCalculator) => {
+    trackCalculator('percentage_calculator_change', {
+      previous: activeCalculator,
+      new: newCalculator,
+      had_result: resultado !== null
+    });
+    
+    setActiveCalculator(newCalculator);
+    setResultado(null);
   };
 
   return (
@@ -66,9 +81,10 @@ const CalculadoraPorcentajes = () => {
             <p className="text-slate-300 text-xs font-bold text-center mb-6">
               Selecciona la calculadora, según el problema que desees resolver.
             </p>
+            
             <CalculatorGrid 
               activeCalculator={activeCalculator}
-              setActiveCalculator={setActiveCalculator}
+              setActiveCalculator={handleCalculatorChange}
             />
 
             <div className="bg-slate-700 p-6 rounded-lg">
