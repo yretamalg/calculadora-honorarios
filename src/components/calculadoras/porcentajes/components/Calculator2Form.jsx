@@ -1,13 +1,23 @@
 import React, { useState } from 'react';
 import FormulaDisplay from './FormulaDisplay';
 import BaseCalculatorForm from './BaseCalculatorForm';
+import { useAnalytics } from '@/hooks/useAnalytics';
 import { formatChileanNumber, parseChileanNumber } from '../utils/calculatorUtils';
 import BotonExportarPorcentajes from './BotonExportarPorcentajes';
 
 const Calculator2Form = ({ formData, setFormData }) => {
   const [result, setResult] = useState(null);
+  const { trackCalculator, trackError } = useAnalytics();
 
   const handleInputChange = (field, value) => {
+    trackCalculator('percentage_input_change', {
+      calculator_type: 2,
+      field,
+      value_length: value.length,
+      has_other_value: field === 'percentage' ? Boolean(formData.calculator2.knownAmount) 
+                                            : Boolean(formData.calculator2.percentage)
+    });
+
     setFormData(prev => ({
       ...prev,
       calculator2: {
@@ -19,6 +29,12 @@ const Calculator2Form = ({ formData, setFormData }) => {
   };
 
   const handleClear = () => {
+    trackCalculator('percentage_clear', {
+      calculator_type: 2,
+      had_result: result !== null,
+      had_values: Boolean(formData.calculator2.percentage || formData.calculator2.knownAmount)
+    });
+
     setFormData(prev => ({
       ...prev,
       calculator2: {
@@ -30,24 +46,42 @@ const Calculator2Form = ({ formData, setFormData }) => {
   };
 
   const handleCalculate = () => {
-    const { percentage, knownAmount } = formData.calculator2;
-    const percentageNum = parseChileanNumber(percentage);
-    if (percentageNum === 0) return '0';
-    
-    const calculatedResult = (parseChileanNumber(knownAmount) * 100) / percentageNum;
-    const formattedResult = formatChileanNumber(calculatedResult);
-    setResult(formattedResult);
-    return formattedResult;
+    try {
+      const { percentage, knownAmount } = formData.calculator2;
+      const percentageNum = parseChileanNumber(percentage);
+      if (percentageNum === 0) return '0';
+      
+      const calculatedResult = (parseChileanNumber(knownAmount) * 100) / percentageNum;
+      const formattedResult = formatChileanNumber(calculatedResult);
+      
+      setResult(formattedResult);
+
+      trackCalculator('percentage_calculate_success', {
+        calculator_type: 2,
+        percentage: percentageNum,
+        known_amount: parseChileanNumber(knownAmount),
+        result: calculatedResult
+      });
+
+      return formattedResult;
+    } catch (error) {
+      trackError(error, {
+        component: 'Calculator2Form',
+        action: 'calculate',
+        values: formData.calculator2
+      });
+      console.error('Error en cálculo:', error);
+    }
   };
 
   return (
     <BaseCalculatorForm
-      title="Encontrar el total conociendo un porcentaje"
+      title="Encontrar el total desde un porcentaje conocido"
       onCalculate={handleCalculate}
       onClear={handleClear}
     >
       {(showResults) => (
-        <div>
+        <>
           <div className="flex flex-wrap md:flex-nowrap items-center gap-3 text-slate-300">
             <span>Si el</span>
             <input
@@ -79,31 +113,29 @@ const Calculator2Form = ({ formData, setFormData }) => {
                 activeCalculator={2}
                 data={formData.calculator2}
                 result={result}
-                calculatorType="calculator2"
               />
               <div className="mt-6 flex justify-center">
                 <BotonExportarPorcentajes 
                   datos={{
-                    titulo: "Encontrar el total desde porcentaje conocido",
+                    titulo: "Encontrar Total",
                     porcentaje: parseChileanNumber(formData.calculator2.percentage),
                     valorConocido: parseChileanNumber(formData.calculator2.knownAmount),
                     resultado: parseChileanNumber(result),
-                    tipo: 2,
-                    // Incluir datos adicionales para la fórmula
-                    formula: {
-                      operacion: 'encontrarTotal',
-                      valores: {
-                        porcentaje: formData.calculator2.percentage,
-                        valorConocido: formData.calculator2.knownAmount,
-                        total: result
-                      }
-                    }
+                    tipo: 2
+                  }}
+                  onExport={() => {
+                    trackCalculator('percentage_export_pdf', {
+                      calculator_type: 2,
+                      percentage: formData.calculator2.percentage,
+                      known_amount: formData.calculator2.knownAmount,
+                      result
+                    });
                   }}
                 />
               </div>
             </>
           )}
-        </div>
+        </>
       )}
     </BaseCalculatorForm>
   );

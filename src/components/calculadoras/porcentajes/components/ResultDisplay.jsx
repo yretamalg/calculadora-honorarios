@@ -1,7 +1,20 @@
 import React from 'react';
-import { formatNumber } from '../utils/numberUtils';  // Cambiado el path de importación
+import { useAnalytics } from '@/hooks/useAnalytics';
+import { formatNumber } from '../utils/numberUtils';
 
 const ResultDisplay = ({ result }) => {
+  const { trackCalculator } = useAnalytics();
+
+  React.useEffect(() => {
+    if (result) {
+      trackCalculator('result_display_view', {
+        operation: result.operation,
+        bar_percentage: result.barPercentage,
+        formatted_result: formatNumber(result.barPercentage)
+      });
+    }
+  }, [result]);
+
   return (
     <div className="mt-6 p-6 bg-slate-700 rounded-lg">
       <h3 className="text-lg font-semibold text-slate-300 mb-4">Resultado:</h3>

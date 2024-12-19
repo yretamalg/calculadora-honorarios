@@ -5,10 +5,11 @@ import TipoIndicadorSelector from './components/TipoIndicadorSelector';
 import ConversionForm from './components/ConversionForm';
 import ResultadosConversion from './components/ResultadosConversion';
 import IndicadoresDisplay from './components/IndicadoresDisplay';
+import DataSourceInfo from './DataSourceInfo';
 import { useIndicadores } from './hooks/useIndicadores';
+import { useAnalytics } from '@/hooks/useAnalytics';
 import { parsearMonto } from '@/core/formatters/formatters';
 import { formatDate } from './utils/dateUtils';
-import DataSourceInfo from './DataSourceInfo';
 
 const CalculadoraIndicadores = () => {
   const { data: indicadores, loading, error, lastUpdate } = useIndicadores();
@@ -16,38 +17,72 @@ const CalculadoraIndicadores = () => {
   const [direccion, setDireccion] = useState('to_clp');
   const [monto, setMonto] = useState('');
   const [resultado, setResultado] = useState(null);
+  const { trackCalculator, trackError, trackPage } = useAnalytics();
+
+  React.useEffect(() => {
+    trackPage('/indicadores', 'Conversor de Indicadores Económicos');
+  }, []);
 
   const calcular = () => {
     if (!monto || !indicadores) return;
 
-    const montoNumerico = parsearMonto(monto);
-    const valorIndicador = indicadores[tipoIndicador]?.valor;
+    try {
+      const montoNumerico = parsearMonto(monto);
+      const valorIndicador = indicadores[tipoIndicador]?.valor;
 
-    if (!valorIndicador) return;
+      if (!valorIndicador) return;
 
-    let resultadoCalculo;
-    if (direccion === 'to_clp') {
-      resultadoCalculo = montoNumerico * valorIndicador;
-    } else {
-      resultadoCalculo = montoNumerico / valorIndicador;
+      let resultadoCalculo;
+      if (direccion === 'to_clp') {
+        resultadoCalculo = montoNumerico * valorIndicador;
+      } else {
+        resultadoCalculo = montoNumerico / valorIndicador;
+      }
+
+      setResultado({
+        montoOriginal: montoNumerico,
+        montoConvertido: resultadoCalculo,
+        tipoIndicador,
+        valorIndicador,
+        direccion,
+        fecha: indicadores[tipoIndicador]?.fecha
+      });
+
+      trackCalculator('indicadores_calculate', {
+        tipo_indicador: tipoIndicador,
+        direccion,
+        monto_original: montoNumerico,
+        resultado: resultadoCalculo,
+        valor_indicador: valorIndicador
+      });
+
+    } catch (error) {
+      trackError(error, {
+        component: 'CalculadoraIndicadores',
+        action: 'calcular',
+        tipo_indicador: tipoIndicador,
+        monto
+      });
     }
-
-    setResultado({
-      montoOriginal: montoNumerico,
-      montoConvertido: resultadoCalculo,
-      tipoIndicador,
-      valorIndicador,
-      direccion,
-      fecha: indicadores[tipoIndicador]?.fecha
-    });
   };
 
   const limpiar = () => {
+    trackCalculator('indicadores_clear', {
+      tipo_indicador: tipoIndicador,
+      had_result: Boolean(resultado)
+    });
+    
     setMonto('');
     setResultado(null);
   };
 
   const toggleDireccion = () => {
+    trackCalculator('indicadores_direction_change', {
+      previous_direction: direccion,
+      new_direction: direccion === 'to_clp' ? 'from_clp' : 'to_clp',
+      tipo_indicador: tipoIndicador
+    });
+
     setDireccion(prev => prev === 'to_clp' ? 'from_clp' : 'to_clp');
     setMonto('');
     setResultado(null);

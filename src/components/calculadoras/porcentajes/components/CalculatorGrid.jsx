@@ -5,14 +5,14 @@ import { calculatorDescriptions } from '../config/calculatorConfig';
 const CalculatorGrid = ({ activeCalculator, setActiveCalculator }) => {
   const { trackCalculator } = useAnalytics();
 
-  const handleCalculatorClick = (newActiveCalculator) => {
-    trackCalculator('percentage_calculator_select', {
-      calculator_id: newActiveCalculator,
-      calculator_name: calculatorDescriptions[newActiveCalculator]?.title,
-      previous_calculator: activeCalculator
+  const handleCalculatorClick = (newCalculator) => {
+    trackCalculator('grid_calculator_select', {
+      previous_calculator: activeCalculator,
+      new_calculator: newCalculator,
+      calculator_name: calculatorDescriptions[newCalculator]?.title
     });
     
-    setActiveCalculator(newActiveCalculator);
+    setActiveCalculator(newCalculator);
   };
 
   return (

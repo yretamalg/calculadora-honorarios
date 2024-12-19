@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { Copy, Check, Download } from 'lucide-react';
 import { format } from 'date-fns';
 import { es } from 'date-fns/locale';
-import { formatCurrency } from '@/core/formatters/formatters';
+import { useAnalytics } from '@/hooks/useAnalytics';
 import { formatearMonto, parsearMonto, formatearNumero } from '@/core/formatters/formatters';
 import generarPDFIndicadores from '@/core/pdf/generators/indicadoresPDF';
 
@@ -10,32 +10,43 @@ const ResultadosConversion = ({ resultado }) => {
   const [copiadoOriginal, setCopiadoOriginal] = useState(false);
   const [copiadoConvertido, setCopiadoConvertido] = useState(false);
   const [exportando, setExportando] = useState(false);
+  const { trackCalculator, trackError } = useAnalytics();
 
   const formatearResultado = (valor, tipo, esDestino = false) => {
     if (!resultado) return formatCurrency.CLP(0);
 
-    // Si es conversión a pesos (desde cualquier indicador a CLP)
-    if (esDestino && resultado.direccion === 'to_clp') {
-      return formatCurrency.CLP(valor);
-    }
-
-    // Si es conversión desde pesos (origen en CLP)
-    if (!esDestino && resultado.direccion === 'from_clp') {
-      return formatCurrency.CLP(valor);
-    }
-
-    // Para otros casos según el tipo
-    switch (tipo) {
-      case 'UF':
-        return `UF ${formatearNumero(valor, true)}`; // Con decimales
-      case 'UTM':
-        return `UTM ${formatearNumero(valor, true)}`; // Con decimales
-      case 'DOLAR':
-        return formatCurrency.USD(valor);
-      case 'EURO':
-        return formatCurrency.EUR(valor);
-      default:
+    try {
+      // Si es conversión a pesos (desde cualquier indicador a CLP)
+      if (esDestino && resultado.direccion === 'to_clp') {
         return formatCurrency.CLP(valor);
+      }
+
+      // Si es conversión desde pesos (origen en CLP)
+      if (!esDestino && resultado.direccion === 'from_clp') {
+        return formatCurrency.CLP(valor);
+      }
+
+      // Para otros casos según el tipo
+      switch (tipo) {
+        case 'UF':
+          return `UF ${formatearNumero(valor, true)}`; // Con decimales
+        case 'UTM':
+          return `UTM ${formatearNumero(valor, true)}`; // Con decimales
+        case 'DOLAR':
+          return formatCurrency.USD(valor);
+        case 'EURO':
+          return formatCurrency.EUR(valor);
+        default:
+          return formatCurrency.CLP(valor);
+      }
+    } catch (error) {
+      trackError(error, {
+        component: 'ResultadosConversion',
+        action: 'formatearResultado',
+        tipo,
+        valor
+      });
+      return formatCurrency.CLP(0);
     }
   };
 
@@ -50,7 +61,19 @@ const ResultadosConversion = ({ resultado }) => {
         setCopiadoConvertido(true);
         setTimeout(() => setCopiadoConvertido(false), 2000);
       }
+
+      trackCalculator('conversion_copy', {
+        tipo_valor: tipo,
+        tipo_indicador: resultado.tipoIndicador,
+        direccion: resultado.direccion,
+        valor_copiado: valorFormateado
+      });
     } catch (err) {
+      trackError(err, {
+        component: 'ResultadosConversion',
+        action: 'copiarAlPortapapeles',
+        tipo_valor: tipo
+      });
       console.error('Error al copiar:', err);
     }
   };
@@ -58,8 +81,24 @@ const ResultadosConversion = ({ resultado }) => {
   const exportarPDF = async () => {
     try {
       setExportando(true);
+      trackCalculator('conversion_pdf_start', {
+        tipo_indicador: resultado.tipoIndicador,
+        direccion: resultado.direccion,
+        monto_original: resultado.montoOriginal,
+        monto_convertido: resultado.montoConvertido
+      });
+
       await generarPDFIndicadores(resultado);
+
+      trackCalculator('conversion_pdf_success', {
+        tipo_indicador: resultado.tipoIndicador,
+        timestamp: new Date().toISOString()
+      });
     } catch (error) {
+      trackError(error, {
+        component: 'ResultadosConversion',
+        action: 'exportarPDF'
+      });
       console.error('Error al exportar PDF:', error);
     } finally {
       setExportando(false);
@@ -76,8 +115,8 @@ const ResultadosConversion = ({ resultado }) => {
   const getLabelDestino = () => {
     if (!resultado) return 'Valor Convertido:';
     return resultado.direccion === 'to_clp'
-      ? 'Monto Covertido en Peso:'
-      : `Monto Covertido en ${resultado.tipoIndicador}:`;
+      ? 'Monto Convertido en Peso:'
+      : `Monto Convertido en ${resultado.tipoIndicador}:`;
   };
 
   return (

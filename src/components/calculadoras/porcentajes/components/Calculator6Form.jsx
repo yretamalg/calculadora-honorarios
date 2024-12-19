@@ -1,13 +1,23 @@
 import React, { useState } from 'react';
 import FormulaDisplay from './FormulaDisplay';
 import BaseCalculatorForm from './BaseCalculatorForm';
+import { useAnalytics } from '@/hooks/useAnalytics';
 import { formatChileanNumber, parseChileanNumber } from '../utils/calculatorUtils';
 import BotonExportarPorcentajes from './BotonExportarPorcentajes';
 
 const Calculator6Form = ({ formData, setFormData }) => {
   const [result, setResult] = useState(null);
+  const { trackCalculator, trackError } = useAnalytics();
 
   const handleInputChange = (field, value) => {
+    trackCalculator('percentage_input_change', {
+      calculator_type: 6,
+      field,
+      value_length: value.length,
+      has_other_value: field === 'initialPrice' ? Boolean(formData.calculator6.increase) 
+                                               : Boolean(formData.calculator6.initialPrice)
+    });
+
     setFormData(prev => ({
       ...prev,
       calculator6: {
@@ -19,6 +29,12 @@ const Calculator6Form = ({ formData, setFormData }) => {
   };
 
   const handleClear = () => {
+    trackCalculator('percentage_clear', {
+      calculator_type: 6,
+      had_result: result !== null,
+      had_values: Boolean(formData.calculator6.initialPrice || formData.calculator6.increase)
+    });
+
     setFormData(prev => ({
       ...prev,
       calculator6: {
@@ -30,15 +46,34 @@ const Calculator6Form = ({ formData, setFormData }) => {
   };
 
   const handleCalculate = () => {
-    const { initialPrice, increase } = formData.calculator6;
-    const priceValue = parseChileanNumber(initialPrice);
-    const increaseValue = parseChileanNumber(increase);
+    try {
+      const { initialPrice, increase } = formData.calculator6;
+      const priceValue = parseChileanNumber(initialPrice);
+      const increaseValue = parseChileanNumber(increase);
 
-    const increaseAmount = (priceValue * increaseValue) / 100;
-    const calculatedResult = priceValue + increaseAmount;
-    const formattedResult = formatChileanNumber(calculatedResult);
-    setResult(formattedResult);
-    return formattedResult;
+      const increaseAmount = (priceValue * increaseValue) / 100;
+      const calculatedResult = priceValue + increaseAmount;
+      const formattedResult = formatChileanNumber(calculatedResult);
+      
+      setResult(formattedResult);
+
+      trackCalculator('percentage_calculate_success', {
+        calculator_type: 6,
+        initial_price: priceValue,
+        increase: increaseValue,
+        result: calculatedResult,
+        increase_amount: increaseAmount
+      });
+
+      return formattedResult;
+    } catch (error) {
+      trackError(error, {
+        component: 'Calculator6Form',
+        action: 'calculate',
+        values: formData.calculator6
+      });
+      console.error('Error en cálculo:', error);
+    }
   };
 
   return (
@@ -91,6 +126,14 @@ const Calculator6Form = ({ formData, setFormData }) => {
                                  parseChileanNumber(formData.calculator6.increase)) / 100,
                     resultado: parseChileanNumber(result),
                     tipo: 6
+                  }}
+                  onExport={() => {
+                    trackCalculator('percentage_export_pdf', {
+                      calculator_type: 6,
+                      initial_price: formData.calculator6.initialPrice,
+                      increase: formData.calculator6.increase,
+                      result: result
+                    });
                   }}
                 />
               </div>

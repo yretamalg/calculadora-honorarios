@@ -29,7 +29,11 @@ const CalculadoraPorcentajes = () => {
   const [formData, setFormData] = useState(initialFormData);
   const [resultado, setResultado] = useState(null);
 
-  const { trackCalculator } = useAnalytics();
+  const { trackCalculator, trackPage } = useAnalytics();
+
+  React.useEffect(() => {
+    trackPage('/porcentajes', 'Calculadora de Porcentajes');
+  }, []);
 
   const getCurrentCalculator = () => {
     const props = {
@@ -60,8 +64,8 @@ const CalculadoraPorcentajes = () => {
 
   const handleCalculatorChange = (newCalculator) => {
     trackCalculator('percentage_calculator_change', {
-      previous: activeCalculator,
-      new: newCalculator,
+      previous_calculator: activeCalculator,
+      new_calculator: newCalculator,
       had_result: resultado !== null
     });
     

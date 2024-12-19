@@ -1,13 +1,23 @@
 import React, { useState } from 'react';
 import FormulaDisplay from './FormulaDisplay';
 import BaseCalculatorForm from './BaseCalculatorForm';
+import { useAnalytics } from '@/hooks/useAnalytics';
 import { formatChileanNumber, parseChileanNumber } from '../utils/calculatorUtils';
 import BotonExportarPorcentajes from './BotonExportarPorcentajes';
 
 const Calculator5Form = ({ formData, setFormData }) => {
   const [result, setResult] = useState(null);
+  const { trackCalculator, trackError } = useAnalytics();
 
   const handleInputChange = (field, value) => {
+    trackCalculator('percentage_input_change', {
+      calculator_type: 5,
+      field,
+      value_length: value.length,
+      has_other_value: field === 'initialPrice' ? Boolean(formData.calculator5.discount) 
+                                               : Boolean(formData.calculator5.initialPrice)
+    });
+
     setFormData(prev => ({
       ...prev,
       calculator5: {
@@ -19,6 +29,12 @@ const Calculator5Form = ({ formData, setFormData }) => {
   };
 
   const handleClear = () => {
+    trackCalculator('percentage_clear', {
+      calculator_type: 5,
+      had_result: result !== null,
+      had_values: Boolean(formData.calculator5.initialPrice || formData.calculator5.discount)
+    });
+
     setFormData(prev => ({
       ...prev,
       calculator5: {
@@ -30,15 +46,34 @@ const Calculator5Form = ({ formData, setFormData }) => {
   };
 
   const handleCalculate = () => {
-    const { initialPrice, discount } = formData.calculator5;
-    const priceValue = parseChileanNumber(initialPrice);
-    const discountValue = parseChileanNumber(discount);
+    try {
+      const { initialPrice, discount } = formData.calculator5;
+      const priceValue = parseChileanNumber(initialPrice);
+      const discountValue = parseChileanNumber(discount);
 
-    const discountAmount = (priceValue * discountValue) / 100;
-    const calculatedResult = priceValue - discountAmount;
-    const formattedResult = formatChileanNumber(calculatedResult);
-    setResult(formattedResult);
-    return formattedResult;
+      const discountAmount = (priceValue * discountValue) / 100;
+      const calculatedResult = priceValue - discountAmount;
+      const formattedResult = formatChileanNumber(calculatedResult);
+      
+      setResult(formattedResult);
+
+      trackCalculator('percentage_calculate_success', {
+        calculator_type: 5,
+        initial_price: priceValue,
+        discount: discountValue,
+        result: calculatedResult,
+        discount_amount: discountAmount
+      });
+
+      return formattedResult;
+    } catch (error) {
+      trackError(error, {
+        component: 'Calculator5Form',
+        action: 'calculate',
+        values: formData.calculator5
+      });
+      console.error('Error en cálculo:', error);
+    }
   };
 
   return (
@@ -84,13 +119,21 @@ const Calculator5Form = ({ formData, setFormData }) => {
               <div className="mt-6 flex justify-center">
                 <BotonExportarPorcentajes 
                   datos={{
-                    titulo: "Calcular el precio con descuento",
+                    titulo: "Calcular precio con descuento",
                     precioInicial: parseChileanNumber(formData.calculator5.initialPrice),
                     descuento: parseChileanNumber(formData.calculator5.discount),
-                    resultado: parseChileanNumber(result),
                     montoDescuento: (parseChileanNumber(formData.calculator5.initialPrice) * 
-                                    parseChileanNumber(formData.calculator5.discount)) / 100,
+                                   parseChileanNumber(formData.calculator5.discount)) / 100,
+                    resultado: parseChileanNumber(result),
                     tipo: 5
+                  }}
+                  onExport={() => {
+                    trackCalculator('percentage_export_pdf', {
+                      calculator_type: 5,
+                      initial_price: formData.calculator5.initialPrice,
+                      discount: formData.calculator5.discount,
+                      result: result
+                    });
                   }}
                 />
               </div>

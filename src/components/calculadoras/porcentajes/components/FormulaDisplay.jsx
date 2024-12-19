@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Check, Copy } from 'lucide-react';
-import { formatChileanNumber } from '../utils/calculatorUtils';
+import { useAnalytics } from '@/hooks/useAnalytics';
 
 const CopyButton = ({ valor, tipo, copiado, onCopy }) => (
   <button
@@ -18,12 +18,12 @@ const CopyButton = ({ valor, tipo, copiado, onCopy }) => (
 
 const FormulaDisplay = ({ activeCalculator, data = {}, result }) => {
   const [copiado, setCopiado] = useState('');
+  const { trackCalculator, trackError } = useAnalytics();
 
   // Función auxiliar para parsear números con manejo de errores
   const parseNumber = (value, defaultValue = 0) => {
     if (!value) return defaultValue;
     try {
-      // Limpia el string de cualquier formato y convierte comas en puntos
       const cleaned = value.toString()
         .replace(/[^0-9,.-]/g, '')
         .replace(/\./g, '')
@@ -33,29 +33,48 @@ const FormulaDisplay = ({ activeCalculator, data = {}, result }) => {
       return isNaN(number) ? defaultValue : number;
     } catch (error) {
       console.error('Error parsing number:', error);
+      trackError(error, {
+        component: 'FormulaDisplay',
+        action: 'parseNumber',
+        value
+      });
       return defaultValue;
     }
   };
 
-  // Función para formatear números con separadores de miles
   const formatLocaleNumber = (number) => {
     try {
       return number.toLocaleString('es-CL');
-    } catch {
+    } catch (error) {
+      trackError(error, {
+        component: 'FormulaDisplay',
+        action: 'formatLocaleNumber',
+        number
+      });
       return '0';
     }
   };
 
   const copiarAlPortapapeles = async (valor, tipo) => {
     try {
-      // Asegura que el valor sea numérico antes de formatear
       const numeroParseado = parseNumber(valor);
       const valorFormateado = formatLocaleNumber(numeroParseado);
       await navigator.clipboard.writeText(valorFormateado);
       setCopiado(tipo);
       setTimeout(() => setCopiado(''), 2000);
+
+      trackCalculator('formula_copy_value', {
+        calculator_type: activeCalculator,
+        value_type: tipo,
+        value: numeroParseado
+      });
     } catch (error) {
       console.error('Error al copiar:', error);
+      trackError(error, {
+        component: 'FormulaDisplay',
+        action: 'copiarAlPortapapeles',
+        value_type: tipo
+      });
     }
   };
 
@@ -75,7 +94,6 @@ const FormulaDisplay = ({ activeCalculator, data = {}, result }) => {
           return Math.min(Math.max(targetPerc, 0), 100);
         }
         case 4: {
-          // Remueve el símbolo % si existe antes de parsear
           const percentage = parseNumber(result?.toString().replace('%', ''));
           return Math.min(Math.max(percentage, 0), 100);
         }
@@ -91,7 +109,11 @@ const FormulaDisplay = ({ activeCalculator, data = {}, result }) => {
           return 0;
       }
     } catch (error) {
-      console.error('Error calculando porcentaje:', error);
+      trackError(error, {
+        component: 'FormulaDisplay',
+        action: 'calculateBarPercentage',
+        calculator_type: activeCalculator
+      });
       return 0;
     }
   };
@@ -215,7 +237,6 @@ const FormulaDisplay = ({ activeCalculator, data = {}, result }) => {
               Descuento: ${formatLocaleNumber(discountAmount)}
             </div>
       
-            {/* Nueva sección de barra de progreso */}
             <div className="bg-slate-800 rounded-lg p-4 mt-4 w-full">
               <div className="text-center text-slate-300 mb-2">Representación del precio final</div>
               <div className="relative pt-6 pb-2">
@@ -407,6 +428,16 @@ const FormulaDisplay = ({ activeCalculator, data = {}, result }) => {
   
     return null;
   };
+
+  React.useEffect(() => {
+    if (result) {
+      trackCalculator('formula_display_view', {
+        calculator_type: activeCalculator,
+        has_result: true,
+        has_progress_bar: [1, 2, 3, 4].includes(activeCalculator)
+      });
+    }
+  }, [result, activeCalculator]);
 
   return (
     <div className="bg-slate-700 rounded-lg p-4 mt-4 text-slate-300">

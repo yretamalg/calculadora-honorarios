@@ -1,19 +1,40 @@
-// src/components/calculadoras/porcentajes/components/BotonExportarPorcentajes.jsx
 import React, { useState } from 'react';
+import { useAnalytics } from '@/hooks/useAnalytics';
 import { generarPDFPorcentaje } from '@/core/pdf';
 
-const BotonExportarPorcentajes = ({ datos }) => {
+const BotonExportarPorcentajes = ({ datos, onExport }) => {
   const [exportando, setExportando] = useState(false);
+  const { trackCalculator, trackError } = useAnalytics();
 
   const handleExport = async () => {
     try {
       setExportando(true);
+
+      trackCalculator('percentage_pdf_start', {
+        calculator_type: datos.tipo,
+        has_complete_data: Boolean(datos.resultado),
+        timestamp: new Date().toISOString()
+      });
+
       const resultado = await generarPDFPorcentaje(datos);
-      if (!resultado) {
-        console.error('Error al generar el PDF');
+      
+      if (resultado) {
+        trackCalculator('percentage_pdf_success', {
+          calculator_type: datos.tipo,
+          timestamp: new Date().toISOString()
+        });
+
+        if (onExport) onExport();
       }
     } catch (error) {
       console.error('Error al exportar:', error);
+      
+      trackError(error, {
+        component: 'BotonExportarPorcentajes',
+        action: 'exportar_pdf',
+        calculator_type: datos.tipo,
+        error_message: error.message
+      });
     } finally {
       setExportando(false);
     }
@@ -24,8 +45,8 @@ const BotonExportarPorcentajes = ({ datos }) => {
       onClick={handleExport}
       disabled={exportando}
       className="px-4 py-2 text-sm bg-slate-800 text-slate-300 hover:text-white hover:bg-slate-700 
-                 transition-colors rounded-md border border-slate-600 flex items-center gap-2
-                 disabled:opacity-50 disabled:cursor-not-allowed"
+                transition-colors rounded-md border border-slate-600 flex items-center gap-2
+                disabled:opacity-50 disabled:cursor-not-allowed"
     >
       <svg 
         className="w-4 h-4" 

@@ -1,15 +1,28 @@
 import React, { useState } from 'react';
+import { useAnalytics } from '@/hooks/useAnalytics';
 
 const BaseCalculatorForm = ({ title, children, onCalculate, onClear }) => {
   const [showResults, setShowResults] = useState(false);
+  const { trackCalculator } = useAnalytics();
 
   const handleSubmit = (e) => {
     e.preventDefault();
     setShowResults(true);
+    
+    trackCalculator('form_submit', {
+      form_title: title,
+      had_previous_results: showResults
+    });
+
     if (onCalculate) onCalculate();
   };
 
   const handleClear = () => {
+    trackCalculator('form_clear', {
+      form_title: title,
+      had_results: showResults
+    });
+
     setShowResults(false);
     if (onClear) onClear();
   };
